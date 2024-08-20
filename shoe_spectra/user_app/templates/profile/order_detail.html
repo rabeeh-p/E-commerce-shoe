@@ -1,0 +1,204 @@
+{% extends 'userBase.html' %}
+{% load static %}
+
+{% block links %}
+
+
+<link rel="canonical" href="https://themeselection.com/item/materio-bootstrap-html-admin-template/">
+
+
+<!-- ? PROD Only: Google Tag Manager (Default ThemeSelection: GTM-5DDHKGP, PixInvent: GTM-5J3LMKC) -->
+<script>(function (w, d, s, l, i) {
+    w[l] = w[l] || []; w[l].push({
+      'gtm.start':
+        new Date().getTime(), event: 'gtm.js'
+    }); var f = d.getElementsByTagName(s)[0],
+      j = d.createElement(s), dl = l != 'dataLayer' ? '&l=' + l : ''; j.async = true; j.src =
+        '../../../../www.googletagmanager.com/gtm5445.html?id=' + i + dl; f.parentNode.insertBefore(j, f);
+  })(window, document, 'script', 'dataLayer', 'GTM-5DDHKGP');</script>
+<!-- End Google Tag Manager -->
+
+<!-- Favicon -->
+<!-- <link rel="icon" type="image/x-icon" href="https://demos.themeselection.com/materio-bootstrap-html-admin-template/assets/img/favicon/favicon.ico" /> -->
+
+<!-- Fonts -->
+<link rel="preconnect" href="https://fonts.googleapis.com/">
+<link rel="preconnect" href="https://fonts.gstatic.com/" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&amp;ampdisplay=swap"
+  rel="stylesheet">
+
+<!-- Icons -->
+<link rel="stylesheet" href="{% static 'Met_style/assets/vendor/fonts/remixicon/remixicon.css' %}" />
+<link rel="stylesheet" href="{% static 'Met_style/assets/vendor/fonts/flag-icons.css' %}" />
+
+<!-- Menu waves for no-customizer fix -->
+<link rel="stylesheet" href="{% static 'Met_style/assets/vendor/libs/node-waves/node-waves.css' %}" />
+
+<!-- Core CSS -->
+<!-- <link rel="stylesheet" href="{% static 'assets/vendor/css/rtl/core.css' %}" class="template-customizer-core-css" />
+<link rel="stylesheet" href="{% static 'assets/vendor/css/rtl/theme-default.css' %}" class="template-customizer-theme-css" /> -->
+<link rel="stylesheet" href="{% static 'Met_style/assets/css/demo.css' %}" />
+
+<!-- Vendors CSS -->
+<link rel="stylesheet" href="{% static 'Met_style/assets/vendor/libs/perfect-scrollbar/perfect-scrollbar.css' %}" />
+<link rel="stylesheet" href="{% static 'Met_style/assets/vendor/libs/typeahead-js/typeahead.css' %}" />
+<link rel="stylesheet" href="{% static 'Met_style/assets/vendor/libs/datatables-bs5/datatables.bootstrap5.css' %}">
+<link rel="stylesheet"
+  href="{% static 'Met_style/assets/vendor/libs/datatables-responsive-bs5/responsive.bootstrap5.css' %}">
+<link rel="stylesheet"
+  href="{% static 'Met_style/assets/vendor/libs/datatables-checkboxes-jquery/datatables.checkboxes.css' %}">
+
+<!-- Page CSS -->
+<link rel="stylesheet" href="{% static 'Met_style/assets/vendor/css/pages/page-profile.css' %}" />
+
+<!-- Helpers -->
+<script src="{% static 'Met_style/assets/vendor/js/helpers.js' %}"></script>
+<!--! Template customizer & Theme config files MUST be included after core stylesheets and helpers.js in the <head> section -->
+<!--? Template customizer: To hide customizer set displayCustomizer value false in config.js.  -->
+<script src="{% static 'Met_style/assets/vendor/js/template-customizer.js' %}"></script>
+<!--? Config:  Mandatory theme config file contain global vars & default theme options, Set your preferred theme option in this file.  -->
+<script src="{% static 'Met_style/assets/js/config.js' %}"></script>
+
+{% endblock %}
+
+
+
+
+
+
+
+
+
+
+
+{% block content %}
+
+
+
+<div class="container mt-4 mb-4">
+  <h2>Order Details</h2>
+
+  <!-- Order Summary Card -->
+  <div class="card mb-4">
+    <div class="card-body">
+      <h5 class="card-title">Order Information</h5>
+      <p><strong>Order ID:</strong> {{ order.id }}</p>
+      <p><strong>Date:</strong> {{ order.order_date }}</p>
+      <p><strong>Status:</strong> {{ order.status }}</p>
+      <p><strong>Total Price:</strong> ${{ order.total_amount }}</p>
+
+
+      {% if order.status == 'Pending' %}
+      <form action="{% url 'cancel-order' order.id %}" method="post">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-danger">Cancel Order</button>
+      </form>
+      {% elif order.status == 'CANCELED' %}
+      <div class="alert alert-warning mt-3">This order has been canceled .</div>
+      {% endif %}
+
+    </div>
+  </div>
+
+
+
+
+
+  <!-- Order Items Table -->
+  <div class="card">
+    <div class="card-body">
+      <h5 class="card-title">Order Items</h5>
+      <div class="table-responsive">
+        <table class="table table-striped table-bordered">
+          <thead>
+            <tr>
+              <th>Product Image</th>
+              <th>Product</th>
+              <th>Size</th>
+              <th>Quantity</th>
+              <th>Price</th>
+              <th>Cancel</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for item in order_items %}
+            <tr>
+              <td>
+                <img src="{{ item.product_size.variant.product.image.url }}" alt="{{ item.product_size.variant.product.name }}" style="width: 50px; height: 50px; object-fit: cover;">
+            </td>
+              <td>{{ item.product_size.variant.product }}</td>
+              <td>{{ item.product_size.size }}</td>
+              <td>{{ item.quantity }}</td>
+              <td>{{ item.product_size.variant.product.price }}</td>
+              <td>
+                {% if order.status == 'Pending' %}
+                <form action="{% url 'cancel-product' order.id item.id %}" method="post" onsubmit="return confirm('Are you sure you want to cancel this product?');">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-danger btn-sm">Cancel</button>
+                </form>
+                {% endif %}
+            </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+
+{% endblock %}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+{% block js %}
+
+<!-- Core JS -->
+<!-- build:js assets/vendor/js/core.js -->
+<script src="{% static 'Met_style/assets/vendor/libs/jquery/jquery.js' %}"></script>
+<script src="{% static 'Met_style/assets/vendor/libs/popper/popper.js' %}"></script>
+<script src="{% static 'Met_style/assets/vendor/js/bootstrap.js' %}"></script>
+<script src="{% static 'Met_style/assets/vendor/libs/node-waves/node-waves.js' %}"></script>
+<script src="{% static 'Met_style/assets/vendor/libs/perfect-scrollbar/perfect-scrollbar.js' %}"></script>
+<script src="{% static 'Met_style/assets/vendor/libs/hammer/hammer.js' %}"></script>
+<script src="{% static 'Met_style/assets/vendor/libs/i18n/i18n.js' %}"></script>
+<script src="{% static 'Met_style/assets/vendor/libs/typeahead-js/typeahead.js' %}"></script>
+<script src="{% static 'Met_style/assets/vendor/js/menu.js' %}"></script>
+
+<!-- endbuild -->
+
+<!-- Vendors JS -->
+<script src="{% static 'Met_style/assets/vendor/libs/apex-charts/apexcharts.js' %}"></script>
+<script src="{% static 'Met_style/assets/vendor/libs/cleavejs/cleave.js' %}"></script>
+<script src="{% static 'Met_style/assets/vendor/libs/cleavejs/cleave-phone.js' %}"></script>
+
+<!-- Main JS -->
+<script src="{% static 'Met_style/assets/js/main.js' %}"></script>
+
+
+<!-- Page JS -->
+<script src="{% static 'Met_style/assets/js/dashboards-crm.js' %}"></script>
+
+{% endblock %}

@@ -1,0 +1,107 @@
+{% extends 'userbase.html' %}
+
+
+
+
+{% block content %}
+
+
+
+<div class="container mt-5">
+    <div class="col-md-8 offset-md-2">
+        <div class="card">
+            <h5 class="card-header">User Details</h5>
+            <div class="card-body">
+                <form class="needs-validation" method="post" novalidate>
+                    {% csrf_token %}
+                    {% if errors %}
+                    <ul style="color: red;">
+                        {% for error in errors %}
+                        <li>{{ error }}</li>
+                        {% endfor %}
+                    </ul>
+                    {% endif %}
+                    <div class="mb-3">
+                        <label for="fullname" class="form-label">Fullname</label>
+                        <input type="text" name="fullname" class="form-control" id="fullname"
+                            placeholder="Enter your fullname" required>
+                        <div class="invalid-feedback">
+                            Please enter your fullname.
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="address" class="form-label">Address</label>
+                        <textarea class="form-control" id="address" name="address" placeholder="Enter your address"
+                            rows="3" required></textarea>
+                        <div class="invalid-feedback">
+                            Please enter your address.
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="phone-number" class="form-label">Phone Number</label>
+                        <input type="tel" name="number" id="phone-number" class="form-control"
+                            placeholder="Enter your phone number" required>
+                        <div class="invalid-feedback">
+                            Please enter your phone number.
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="city" class="form-label">City</label>
+                            <input type="text" name="city" class="form-control" id="city" placeholder="Enter your city"
+                                required>
+                            <div class="invalid-feedback">
+                                Please enter your city.
+                            </div>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="state" class="form-label">State</label>
+                            <input type="text" name="state" class="form-control" id="state"
+                                placeholder="Enter your state" required>
+                            <div class="invalid-feedback">
+                                Please enter your state.
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="country" class="form-label">Country</label>
+                            <input type="text" name="country" class="form-control" id="country"
+                                placeholder="Enter your country" required>
+                            <div class="invalid-feedback">
+                                Please enter your country.
+                            </div>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="pin" class="form-label">Postal Code</label>
+                            <input type="text" name="pin" class="form-control" id="pin"
+                                placeholder="Enter your postal code" required>
+                            <div class="invalid-feedback">
+                                Please enter your postal code.
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="gender" class="form-label">Gender</label>
+                        <input type="text" name="gender" class="form-control" id="gender"
+                            placeholder="Enter your gender" required>
+                        <div class="invalid-feedback">
+                            Please enter your gender.
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary">Submit</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+{% endblock %}

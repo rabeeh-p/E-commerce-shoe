@@ -7,7 +7,7 @@
 	<!-- Mobile Specific Meta -->
 	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 	<!-- Favicon-->
-	<link rel="shortcut icon" href="{% static 'img/fav.png' %}">
+	<link rel="shortcut icon" href="{% static 'img/avatar/spectra 3.png' %}">
 	<!-- Author Meta -->
 	<meta name="author" content="CodePixar">
 	<!-- Meta Description -->
@@ -17,10 +17,13 @@
 	<!-- meta character set -->
 	<meta charset="UTF-8">
 	<!-- Site Title -->
-	<title>Karma Shop</title>
+	<title>ShoeSpectra</title>
 	<!--
 		CSS
 		============================================= -->
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+
+
 	<link rel="stylesheet" href="{% static 'css/linearicons.css' %}">
 	<link rel="stylesheet" href="{% static 'css/font-awesome.min.css' %}">
 	<link rel="stylesheet" href="{% static 'css/themify-icons.css' %}">
@@ -32,6 +35,37 @@
 	<link rel="stylesheet" href="{% static 'css/ion.rangeSlider.skinFlat.css' %}" />
 	<link rel="stylesheet" href="{% static 'css/magnific-popup.css' %}">
 	<link rel="stylesheet" href="{% static 'css/main.css' %}">
+
+	<style>
+		.avatar-icon {
+			width: 20px;
+			/* Set the desired width for the profile icon */
+			height: 20px;
+			/* Set the desired height for the profile icon */
+			border-radius: 50%;
+			/* Make it circular */
+			object-fit: cover;
+			/* Ensures the image covers the entire area without stretching */
+			margin-right: 8px;
+			/* Space between avatar and text */
+			vertical-align: middle;
+			/* Center the avatar vertically with text */
+		}
+
+		.navbar-logo {
+			height: 90px;
+			/* Set the height of the logo */
+			width: auto;
+			/* Maintain aspect ratio */
+
+		}
+
+		.img-fluid-1 {
+			max-width: 100%;
+			height: auto;
+			max-height: 800px;
+		}
+	</style>
 </head>
 
 <body>
@@ -42,9 +76,11 @@
 			<nav class="navbar navbar-expand-lg navbar-light main_box">
 				<div class="container">
 					<!-- Brand and toggle get grouped for better mobile display -->
-					<a class="navbar-brand logo_h" href="index.html"><img src="{% static 'img/logo.png' %}" alt=""></a>
-					<button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent"
-					 aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+					<a class="navbar-brand logo_h" href="{% url 'index-page' %}"><img
+							src="{% static 'img/avatar/spectra 3.png' %}" alt="" class="navbar-logo"></a>
+					<button class="navbar-toggler" type="button" data-toggle="collapse"
+						data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent"
+						aria-expanded="false" aria-label="Toggle navigation">
 						<span class="icon-bar"></span>
 						<span class="icon-bar"></span>
 						<span class="icon-bar"></span>
@@ -52,27 +88,37 @@
 					<!-- Collect the nav links, forms, and other content for toggling -->
 					<div class="collapse navbar-collapse offset" id="navbarSupportedContent">
 						<ul class="nav navbar-nav menu_nav ml-auto">
-							<li class="nav-item active"><a class="nav-link" href="index.html">Home</a></li>
+							<li class="nav-item active"><a class="nav-link" href="{% url 'index-page' %}">Home</a></li>
+							{% if cart_item_count > 0 %}
+							<li class="nav-item"><a class="nav-link" href="{% url 'cart-page' %}">Cart</a></li>
+							{% endif %}
 							<li class="nav-item submenu dropdown">
-								<a href="#" class="nav-link dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true"
-								 aria-expanded="false">Shop</a>
+								<a href="#" class="nav-link dropdown-toggle" data-toggle="dropdown" role="button"
+									aria-haspopup="true" aria-expanded="false">Shop</a>
 								<ul class="dropdown-menu">
-									<li class="nav-item"><a class="nav-link" href="category.html">Shop Category</a></li>
-									<li class="nav-item"><a class="nav-link" href="single-product.html">Product Details</a></li>
+									<li class="nav-item"><a class="nav-link" href="{% url 'shopping-page' %}">Shop
+											Category</a></li>
+									<!-- <li class="nav-item"><a class="nav-link" href="single-product.html">Product Details</a></li>
 									<li class="nav-item"><a class="nav-link" href="checkout.html">Product Checkout</a></li>
 									<li class="nav-item"><a class="nav-link" href="cart.html">Shopping Cart</a></li>
-									<li class="nav-item"><a class="nav-link" href="confirmation.html">Confirmation</a></li>
+									<li class="nav-item"><a class="nav-link" href="confirmation.html">Confirmation</a></li> -->
 								</ul>
 							</li>
-							<li class="nav-item submenu dropdown">
+							{% if request.user.is_authenticated %}
+							<li class="nav-item ">
+								<a class="nav-link  " href="{% url 'wishList-page' %}">Wishlist</a>
+							</li>
+							{% endif %}
+
+							<!-- <li class="nav-item submenu dropdown">
 								<a href="#" class="nav-link dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true"
 								 aria-expanded="false">Blog</a>
 								<ul class="dropdown-menu">
 									<li class="nav-item"><a class="nav-link" href="blog.html">Blog</a></li>
 									<li class="nav-item"><a class="nav-link" href="single-blog.html">Blog Details</a></li>
 								</ul>
-							</li>
-							<li class="nav-item submenu dropdown">
+							</li> -->
+							<!-- <li class="nav-item submenu dropdown">
 								<a href="#" class="nav-link dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true"
 								 aria-expanded="false">Pages</a>
 								<ul class="dropdown-menu">
@@ -80,8 +126,25 @@
 									<li class="nav-item"><a class="nav-link" href="tracking.html">Tracking</a></li>
 									<li class="nav-item"><a class="nav-link" href="elements.html">Elements</a></li>
 								</ul>
+							</li> -->
+							{% if request.user.is_authenticated %}
+							<li class="nav-item submenu dropdown">
+								<a href="#" class="nav-link dropdown-toggle" data-toggle="dropdown" role="button"
+									aria-haspopup="true" aria-expanded="false">
+									<img src="{% static 'img/avatar/1.png' %}" alt="User Avatar" class="avatar-icon">
+									{{ request.user.username }}
+								</a>
+								<ul class="dropdown-menu">
+									<li class="nav-item"><a class="nav-link" href="{% url 'profile' %}">Profile</a></li>
+									<li class="nav-item"><a class="nav-link"
+											href="{% url 'logoutUser-page' %}">Logout</a></li>
+
+								</ul>
 							</li>
-							<li class="nav-item"><a class="nav-link" href="contact.html">Contact</a></li>
+							{% else %}
+							<li class="nav-item"><a class="nav-link" href="{% url 'login-page' %}">Login</a></li>
+							{% endif %}
+
 						</ul>
 						<ul class="nav navbar-nav navbar-right">
 							<li class="nav-item"><a href="#" class="cart"><span class="ti-bag"></span></a></li>
@@ -110,13 +173,14 @@
 		<div class="container">
 			<div class="row fullscreen align-items-center justify-content-start">
 				<div class="col-lg-12">
-					<div class="active-banner-slider owl-carousel">
+					<div class=" owl-carousel">
 						<!-- single-slide -->
 						<div class="row single-slide align-items-center d-flex">
 							<div class="col-lg-5 col-md-6">
 								<div class="banner-content">
 									<h1>Nike New <br>Collection!</h1>
-									<p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et
+									<p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor
+										incididunt ut labore et
 										dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation.</p>
 									<div class="add-bag d-flex align-items-center">
 										<a class="add-btn" href=""><span class="lnr lnr-cross"></span></a>
@@ -131,7 +195,7 @@
 							</div>
 						</div>
 						<!-- single-slide -->
-						<div class="row single-slide">
+						<!-- <div class="row single-slide">
 							<div class="col-lg-5">
 								<div class="banner-content">
 									<h1>Nike New <br>Collection!</h1>
@@ -148,7 +212,8 @@
 									<img class="img-fluid" src="{% static 'img/banner/banner-img.png' %}" alt="">
 								</div>
 							</div>
-						</div>
+							
+						</div> -->
 					</div>
 				</div>
 			</div>
@@ -214,8 +279,8 @@
 						<div class="col-lg-8 col-md-8">
 							<div class="single-deal">
 								<div class="overlay"></div>
-								<img class="img-fluid w-100" src="img/category/c1.jpg" alt="">
-								<a href="img/category/c1.jpg" class="img-pop-up" target="_blank">
+								<img class="img-fluid w-100" src="{% static 'img/category/c1.jpg' %}" alt="">
+								<a href="{% url 'shopping-page' %}" class="img-pop-up" target="_blank">
 									<div class="deal-details">
 										<h6 class="deal-title">Sneaker for Sports</h6>
 									</div>
@@ -225,7 +290,7 @@
 						<div class="col-lg-4 col-md-4">
 							<div class="single-deal">
 								<div class="overlay"></div>
-								<img class="img-fluid w-100" src="img/category/c2.jpg" alt="">
+								<img class="img-fluid w-100" src="{% static 'img/category/c2.jpg' %}" alt="">
 								<a href="img/category/c2.jpg" class="img-pop-up" target="_blank">
 									<div class="deal-details">
 										<h6 class="deal-title">Sneaker for Sports</h6>
@@ -236,7 +301,7 @@
 						<div class="col-lg-4 col-md-4">
 							<div class="single-deal">
 								<div class="overlay"></div>
-								<img class="img-fluid w-100" src="img/category/c3.jpg" alt="">
+								<img class="img-fluid w-100" src="{% static 'img/category/c3.jpg' %}" alt="">
 								<a href="img/category/c3.jpg" class="img-pop-up" target="_blank">
 									<div class="deal-details">
 										<h6 class="deal-title">Product for Couple</h6>
@@ -247,7 +312,7 @@
 						<div class="col-lg-8 col-md-8">
 							<div class="single-deal">
 								<div class="overlay"></div>
-								<img class="img-fluid w-100" src="img/category/c4.jpg" alt="">
+								<img class="img-fluid w-100" src="{% static 'img/category/c4.jpg' %}" alt="">
 								<a href="img/category/c4.jpg" class="img-pop-up" target="_blank">
 									<div class="deal-details">
 										<h6 class="deal-title">Sneaker for Sports</h6>
@@ -260,7 +325,7 @@
 				<div class="col-lg-4 col-md-6">
 					<div class="single-deal">
 						<div class="overlay"></div>
-						<img class="img-fluid w-100" src="img/category/c5.jpg" alt="">
+						<img class="img-fluid w-100" src="{% static 'img/category/c5.jpg' %}" alt="">
 						<a href="img/category/c5.jpg" class="img-pop-up" target="_blank">
 							<div class="deal-details">
 								<h6 class="deal-title">Sneaker for Sports</h6>
@@ -274,7 +339,7 @@
 	<!-- End category Area -->
 
 	<!-- start product Area -->
-	<section class="owl-carousel active-product-area section_gap">
+	<section class="owl-carousel  section_gap">
 		<!-- single product slide -->
 		<div class="single-product-slider">
 			<div class="container">
@@ -282,269 +347,67 @@
 					<div class="col-lg-6 text-center">
 						<div class="section-title">
 							<h1>Latest Products</h1>
-							<p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et
+							<!-- <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et
 								dolore
-								magna aliqua.</p>
+								magna aliqua.</p> -->
 						</div>
 					</div>
 				</div>
 				<div class="row">
 					<!-- single product -->
+					{% for i in product %}
+					{% if i.status and i.category.status %}
 					<div class="col-lg-3 col-md-6">
 						<div class="single-product">
-							<img class="img-fluid" src="{% static 'img/product/p1.jpg ' %}" alt="">
+							<img class="img-fluid-1" src="{{i.image.url}}" alt="">
 							<div class="product-details">
-								<h6>addidas New Hammer sole
-									for Sports person</h6>
+								<h6>{{i.name}}</h6>
 								<div class="price">
-									<h6>$150.00</h6>
+									<h6>{{i.price}}</h6>
 									<h6 class="l-through">$210.00</h6>
 								</div>
 								<div class="prd-bottom">
+									<a href="" class="social-info">
+										<span class="ti-bag"></span>
+										<p class="hover-text">add to bag</p>
+									</a>
 
-									<a href="" class="social-info">
-										<span class="ti-bag"></span>
-										<p class="hover-text">add to bag</p>
-									</a>
-									<a href="" class="social-info">
-										<span class="lnr lnr-heart"></span>
-										<p class="hover-text">Wishlist</p>
-									</a>
-									<a href="" class="social-info">
-										<span class="lnr lnr-sync"></span>
-										<p class="hover-text">compare</p>
-									</a>
-									<a href="" class="social-info">
-										<span class="lnr lnr-move"></span>
-										<p class="hover-text">view more</p>
-									</a>
-								</div>
-							</div>
-						</div>
-					</div>
-					<!-- single product -->
-					<div class="col-lg-3 col-md-6">
-						<div class="single-product">
-							<img class="img-fluid" src="{% static 'img/product/p2.jpg ' %}" alt="">
-							<div class="product-details">
-								<h6>addidas New Hammer sole
-									for Sports person</h6>
-								<div class="price">
-									<h6>$150.00</h6>
-									<h6 class="l-through">$210.00</h6>
-								</div>
-								<div class="prd-bottom">
 
-									<a href="" class="social-info">
-										<span class="ti-bag"></span>
-										<p class="hover-text">add to bag</p>
+									<!-- {% if i.id in user_wishlist %}
+									<a href="{% url 'add-wishList' i.id %}" class="social-info">
+										<span class="fas fa-heart" style="color: rgb(245, 222, 11);"></span>
+										<p class="hover-text">In Wishlist</p>
 									</a>
-									<a href="" class="social-info">
-										<span class="lnr lnr-heart"></span>
+									{% else %}
+									<a href="{% url 'add-wishList' i.id %}" class="social-info">
+										<span class="lnr lnr-heart" style="color: rgb(240, 240, 240);"></span>
 										<p class="hover-text">Wishlist</p>
 									</a>
-									<a href="" class="social-info">
-										<span class="lnr lnr-sync"></span>
-										<p class="hover-text">compare</p>
-									</a>
-									<a href="" class="social-info">
-										<span class="lnr lnr-move"></span>
-										<p class="hover-text">view more</p>
-									</a>
-								</div>
-							</div>
-						</div>
-					</div>
-					<!-- single product -->
-					<div class="col-lg-3 col-md-6">
-						<div class="single-product">
-							<img class="img-fluid" src="{% static 'img/product/p3.jpg ' %}" alt="">
-							<div class="product-details">
-								<h6>addidas New Hammer sole
-									for Sports person</h6>
-								<div class="price">
-									<h6>$150.00</h6>
-									<h6 class="l-through">$210.00</h6>
-								</div>
-								<div class="prd-bottom">
-									<a href="" class="social-info">
-										<span class="ti-bag"></span>
-										<p class="hover-text">add to bag</p>
-									</a>
-									<a href="" class="social-info">
-										<span class="lnr lnr-heart"></span>
-										<p class="hover-text">Wishlist</p>
-									</a>
-									<a href="" class="social-info">
-										<span class="lnr lnr-sync"></span>
-										<p class="hover-text">compare</p>
-									</a>
-									<a href="" class="social-info">
-										<span class="lnr lnr-move"></span>
-										<p class="hover-text">view more</p>
-									</a>
-								</div>
-							</div>
-						</div>
-					</div>
-					<!-- single product -->
-					<div class="col-lg-3 col-md-6">
-						<div class="single-product">
-							<img class="img-fluid" src="{% static 'img/product/p4.jpg ' %}" alt="">
-							<div class="product-details">
-								<h6>addidas New Hammer sole
-									for Sports person</h6>
-								<div class="price">
-									<h6>$150.00</h6>
-									<h6 class="l-through">$210.00</h6>
-								</div>
-								<div class="prd-bottom">
+									{% endif %} -->
 
-									<a href="" class="social-info">
-										<span class="ti-bag"></span>
-										<p class="hover-text">add to bag</p>
+									{% if user.is_authenticated %}
+									{% if i.id in user_wishlist %}
+									<a href="{% url 'add-wishList' i.id %}" class="social-info">
+										<span class="fas fa-heart" style="color: rgb(245, 222, 11);"></span>
+										<p class="hover-text">In Wishlist</p>
 									</a>
-									<a href="" class="social-info">
-										<span class="lnr lnr-heart"></span>
+									{% else %}
+									<a href="{% url 'add-wishList' i.id %}" class="social-info">
+										<span class="lnr lnr-heart" style="color: rgb(240, 240, 240);"></span>
 										<p class="hover-text">Wishlist</p>
 									</a>
-									<a href="" class="social-info">
-										<span class="lnr lnr-sync"></span>
-										<p class="hover-text">compare</p>
+									{% endif %}
+									{% else %}
+									<a href="{% url 'login-page' %}" class="social-info">
+										<span class="lnr lnr-heart" style="color: rgb(240, 240, 240);"></span>
+										<p class="hover-text">Login to Wishlist</p>
 									</a>
-									<a href="" class="social-info">
-										<span class="lnr lnr-move"></span>
-										<p class="hover-text">view more</p>
-									</a>
-								</div>
-							</div>
-						</div>
-					</div>
-					<!-- single product -->
-					<div class="col-lg-3 col-md-6">
-						<div class="single-product">
-							<img class="img-fluid" src="img/product/p5.jpg" alt="">
-							<div class="product-details">
-								<h6>addidas New Hammer sole
-									for Sports person</h6>
-								<div class="price">
-									<h6>$150.00</h6>
-									<h6 class="l-through">$210.00</h6>
-								</div>
-								<div class="prd-bottom">
+									{% endif %}
 
-									<a href="" class="social-info">
-										<span class="ti-bag"></span>
-										<p class="hover-text">add to bag</p>
-									</a>
-									<a href="" class="social-info">
-										<span class="lnr lnr-heart"></span>
-										<p class="hover-text">Wishlist</p>
-									</a>
-									<a href="" class="social-info">
-										<span class="lnr lnr-sync"></span>
-										<p class="hover-text">compare</p>
-									</a>
-									<a href="" class="social-info">
-										<span class="lnr lnr-move"></span>
-										<p class="hover-text">view more</p>
-									</a>
-								</div>
-							</div>
-						</div>
-					</div>
-					<!-- single product -->
-					<div class="col-lg-3 col-md-6">
-						<div class="single-product">
-							<img class="img-fluid" src="img/product/p6.jpg" alt="">
-							<div class="product-details">
-								<h6>addidas New Hammer sole
-									for Sports person</h6>
-								<div class="price">
-									<h6>$150.00</h6>
-									<h6 class="l-through">$210.00</h6>
-								</div>
-								<div class="prd-bottom">
 
-									<a href="" class="social-info">
-										<span class="ti-bag"></span>
-										<p class="hover-text">add to bag</p>
-									</a>
-									<a href="" class="social-info">
-										<span class="lnr lnr-heart"></span>
-										<p class="hover-text">Wishlist</p>
-									</a>
-									<a href="" class="social-info">
-										<span class="lnr lnr-sync"></span>
-										<p class="hover-text">compare</p>
-									</a>
-									<a href="" class="social-info">
-										<span class="lnr lnr-move"></span>
-										<p class="hover-text">view more</p>
-									</a>
-								</div>
-							</div>
-						</div>
-					</div>
-					<!-- single product -->
-					<div class="col-lg-3 col-md-6">
-						<div class="single-product">
-							<img class="img-fluid" src="img/product/p7.jpg" alt="">
-							<div class="product-details">
-								<h6>addidas New Hammer sole
-									for Sports person</h6>
-								<div class="price">
-									<h6>$150.00</h6>
-									<h6 class="l-through">$210.00</h6>
-								</div>
-								<div class="prd-bottom">
 
-									<a href="" class="social-info">
-										<span class="ti-bag"></span>
-										<p class="hover-text">add to bag</p>
-									</a>
-									<a href="" class="social-info">
-										<span class="lnr lnr-heart"></span>
-										<p class="hover-text">Wishlist</p>
-									</a>
-									<a href="" class="social-info">
-										<span class="lnr lnr-sync"></span>
-										<p class="hover-text">compare</p>
-									</a>
-									<a href="" class="social-info">
-										<span class="lnr lnr-move"></span>
-										<p class="hover-text">view more</p>
-									</a>
-								</div>
-							</div>
-						</div>
-					</div>
-					<!-- single product -->
-					<div class="col-lg-3 col-md-6">
-						<div class="single-product">
-							<img class="img-fluid" src="img/product/p8.jpg" alt="">
-							<div class="product-details">
-								<h6>addidas New Hammer sole
-									for Sports person</h6>
-								<div class="price">
-									<h6>$150.00</h6>
-									<h6 class="l-through">$210.00</h6>
-								</div>
-								<div class="prd-bottom">
 
-									<a href="" class="social-info">
-										<span class="ti-bag"></span>
-										<p class="hover-text">add to bag</p>
-									</a>
-									<a href="" class="social-info">
-										<span class="lnr lnr-heart"></span>
-										<p class="hover-text">Wishlist</p>
-									</a>
-									<a href="" class="social-info">
-										<span class="lnr lnr-sync"></span>
-										<p class="hover-text">compare</p>
-									</a>
-									<a href="" class="social-info">
+									<a href="{% url 'single-page' i.id %}" class="social-info">
 										<span class="lnr lnr-move"></span>
 										<p class="hover-text">view more</p>
 									</a>
@@ -552,289 +415,23 @@
 							</div>
 						</div>
 					</div>
+					{% endif %}
+					<!-- single product -->
+					{% endfor %}
+
+
+					<!-- single product -->
+
+
+
+
+
 				</div>
 			</div>
 		</div>
 		<!-- single product slide -->
 		<div class="single-product-slider">
-			<div class="container">
-				<div class="row justify-content-center">
-					<div class="col-lg-6 text-center">
-						<div class="section-title">
-							<h1>Coming Products</h1>
-							<p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et
-								dolore
-								magna aliqua.</p>
-						</div>
-					</div>
-				</div>
-				<div class="row">
-					<!-- single product -->
-					<div class="col-lg-3 col-md-6">
-						<div class="single-product">
-							<img class="img-fluid" src="img/product/p6.jpg" alt="">
-							<div class="product-details">
-								<h6>addidas New Hammer sole
-									for Sports person</h6>
-								<div class="price">
-									<h6>$150.00</h6>
-									<h6 class="l-through">$210.00</h6>
-								</div>
-								<div class="prd-bottom">
 
-									<a href="" class="social-info">
-										<span class="ti-bag"></span>
-										<p class="hover-text">add to bag</p>
-									</a>
-									<a href="" class="social-info">
-										<span class="lnr lnr-heart"></span>
-										<p class="hover-text">Wishlist</p>
-									</a>
-									<a href="" class="social-info">
-										<span class="lnr lnr-sync"></span>
-										<p class="hover-text">compare</p>
-									</a>
-									<a href="" class="social-info">
-										<span class="lnr lnr-move"></span>
-										<p class="hover-text">view more</p>
-									</a>
-								</div>
-							</div>
-						</div>
-					</div>
-					<!-- single product -->
-					<div class="col-lg-3 col-md-6">
-						<div class="single-product">
-							<img class="img-fluid" src="img/product/p8.jpg" alt="">
-							<div class="product-details">
-								<h6>addidas New Hammer sole
-									for Sports person</h6>
-								<div class="price">
-									<h6>$150.00</h6>
-									<h6 class="l-through">$210.00</h6>
-								</div>
-								<div class="prd-bottom">
-
-									<a href="" class="social-info">
-										<span class="ti-bag"></span>
-										<p class="hover-text">add to bag</p>
-									</a>
-									<a href="" class="social-info">
-										<span class="lnr lnr-heart"></span>
-										<p class="hover-text">Wishlist</p>
-									</a>
-									<a href="" class="social-info">
-										<span class="lnr lnr-sync"></span>
-										<p class="hover-text">compare</p>
-									</a>
-									<a href="" class="social-info">
-										<span class="lnr lnr-move"></span>
-										<p class="hover-text">view more</p>
-									</a>
-								</div>
-							</div>
-						</div>
-					</div>
-					<!-- single product -->
-					<div class="col-lg-3 col-md-6">
-						<div class="single-product">
-							<img class="img-fluid" src="img/product/p3.jpg" alt="">
-							<div class="product-details">
-								<h6>addidas New Hammer sole
-									for Sports person</h6>
-								<div class="price">
-									<h6>$150.00</h6>
-									<h6 class="l-through">$210.00</h6>
-								</div>
-								<div class="prd-bottom">
-
-									<a href="" class="social-info">
-										<span class="ti-bag"></span>
-										<p class="hover-text">add to bag</p>
-									</a>
-									<a href="" class="social-info">
-										<span class="lnr lnr-heart"></span>
-										<p class="hover-text">Wishlist</p>
-									</a>
-									<a href="" class="social-info">
-										<span class="lnr lnr-sync"></span>
-										<p class="hover-text">compare</p>
-									</a>
-									<a href="" class="social-info">
-										<span class="lnr lnr-move"></span>
-										<p class="hover-text">view more</p>
-									</a>
-								</div>
-							</div>
-						</div>
-					</div>
-					<!-- single product -->
-					<div class="col-lg-3 col-md-6">
-						<div class="single-product">
-							<img class="img-fluid" src="img/product/p5.jpg" alt="">
-							<div class="product-details">
-								<h6>addidas New Hammer sole
-									for Sports person</h6>
-								<div class="price">
-									<h6>$150.00</h6>
-									<h6 class="l-through">$210.00</h6>
-								</div>
-								<div class="prd-bottom">
-
-									<a href="" class="social-info">
-										<span class="ti-bag"></span>
-										<p class="hover-text">add to bag</p>
-									</a>
-									<a href="" class="social-info">
-										<span class="lnr lnr-heart"></span>
-										<p class="hover-text">Wishlist</p>
-									</a>
-									<a href="" class="social-info">
-										<span class="lnr lnr-sync"></span>
-										<p class="hover-text">compare</p>
-									</a>
-									<a href="" class="social-info">
-										<span class="lnr lnr-move"></span>
-										<p class="hover-text">view more</p>
-									</a>
-								</div>
-							</div>
-						</div>
-					</div>
-					<!-- single product -->
-					<div class="col-lg-3 col-md-6">
-						<div class="single-product">
-							<img class="img-fluid" src="img/product/p1.jpg" alt="">
-							<div class="product-details">
-								<h6>addidas New Hammer sole
-									for Sports person</h6>
-								<div class="price">
-									<h6>$150.00</h6>
-									<h6 class="l-through">$210.00</h6>
-								</div>
-								<div class="prd-bottom">
-
-									<a href="" class="social-info">
-										<span class="ti-bag"></span>
-										<p class="hover-text">add to bag</p>
-									</a>
-									<a href="" class="social-info">
-										<span class="lnr lnr-heart"></span>
-										<p class="hover-text">Wishlist</p>
-									</a>
-									<a href="" class="social-info">
-										<span class="lnr lnr-sync"></span>
-										<p class="hover-text">compare</p>
-									</a>
-									<a href="" class="social-info">
-										<span class="lnr lnr-move"></span>
-										<p class="hover-text">view more</p>
-									</a>
-								</div>
-							</div>
-						</div>
-					</div>
-					<!-- single product -->
-					<div class="col-lg-3 col-md-6">
-						<div class="single-product">
-							<img class="img-fluid" src="img/product/p4.jpg" alt="">
-							<div class="product-details">
-								<h6>addidas New Hammer sole
-									for Sports person</h6>
-								<div class="price">
-									<h6>$150.00</h6>
-									<h6 class="l-through">$210.00</h6>
-								</div>
-								<div class="prd-bottom">
-
-									<a href="" class="social-info">
-										<span class="ti-bag"></span>
-										<p class="hover-text">add to bag</p>
-									</a>
-									<a href="" class="social-info">
-										<span class="lnr lnr-heart"></span>
-										<p class="hover-text">Wishlist</p>
-									</a>
-									<a href="" class="social-info">
-										<span class="lnr lnr-sync"></span>
-										<p class="hover-text">compare</p>
-									</a>
-									<a href="" class="social-info">
-										<span class="lnr lnr-move"></span>
-										<p class="hover-text">view more</p>
-									</a>
-								</div>
-							</div>
-						</div>
-					</div>
-					<!-- single product -->
-					<div class="col-lg-3 col-md-6">
-						<div class="single-product">
-							<img class="img-fluid" src="img/product/p1.jpg" alt="">
-							<div class="product-details">
-								<h6>addidas New Hammer sole
-									for Sports person</h6>
-								<div class="price">
-									<h6>$150.00</h6>
-									<h6 class="l-through">$210.00</h6>
-								</div>
-								<div class="prd-bottom">
-
-									<a href="" class="social-info">
-										<span class="ti-bag"></span>
-										<p class="hover-text">add to bag</p>
-									</a>
-									<a href="" class="social-info">
-										<span class="lnr lnr-heart"></span>
-										<p class="hover-text">Wishlist</p>
-									</a>
-									<a href="" class="social-info">
-										<span class="lnr lnr-sync"></span>
-										<p class="hover-text">compare</p>
-									</a>
-									<a href="" class="social-info">
-										<span class="lnr lnr-move"></span>
-										<p class="hover-text">view more</p>
-									</a>
-								</div>
-							</div>
-						</div>
-					</div>
-					<!-- single product -->
-					<div class="col-lg-3 col-md-6">
-						<div class="single-product">
-							<img class="img-fluid" src="img/product/p8.jpg" alt="">
-							<div class="product-details">
-								<h6>addidas New Hammer sole
-									for Sports person</h6>
-								<div class="price">
-									<h6>$150.00</h6>
-									<h6 class="l-through">$210.00</h6>
-								</div>
-								<div class="prd-bottom">
-
-									<a href="" class="social-info">
-										<span class="ti-bag"></span>
-										<p class="hover-text">add to bag</p>
-									</a>
-									<a href="" class="social-info">
-										<span class="lnr lnr-heart"></span>
-										<p class="hover-text">Wishlist</p>
-									</a>
-									<a href="" class="social-info">
-										<span class="lnr lnr-sync"></span>
-										<p class="hover-text">compare</p>
-									</a>
-									<a href="" class="social-info">
-										<span class="lnr lnr-move"></span>
-										<p class="hover-text">view more</p>
-									</a>
-								</div>
-							</div>
-						</div>
-					</div>
-				</div>
-			</div>
 		</div>
 	</section>
 	<!-- end product Area -->
@@ -876,7 +473,7 @@
 					<div class="active-exclusive-product-slider">
 						<!-- single exclusive carousel -->
 						<div class="single-exclusive-slider">
-							<img class="img-fluid" src="img/product/e-p1.png" alt="">
+							<img class="img-fluid" src="{% static 'img/product/e-p1.png' %}" alt="">
 							<div class="product-details">
 								<div class="price">
 									<h6>$150.00</h6>
@@ -892,7 +489,7 @@
 						</div>
 						<!-- single exclusive carousel -->
 						<div class="single-exclusive-slider">
-							<img class="img-fluid" src="img/product/e-p1.png" alt="">
+							<img class="img-fluid" src="{% static 'img/product/e-p1.png' %}" alt="">
 							<div class="product-details">
 								<div class="price">
 									<h6>$150.00</h6>
@@ -918,19 +515,19 @@
 		<div class="container">
 			<div class="row">
 				<a class="col single-img" href="#">
-					<img class="img-fluid d-block mx-auto" src="img/brand/1.png" alt="">
+					<img class="img-fluid d-block mx-auto" src="{% static 'img/brand/1.png' %}" alt="">
 				</a>
 				<a class="col single-img" href="#">
-					<img class="img-fluid d-block mx-auto" src="img/brand/2.png" alt="">
+					<img class="img-fluid d-block mx-auto" src="{% static 'img/brand/2.png' %}" alt="">
 				</a>
 				<a class="col single-img" href="#">
-					<img class="img-fluid d-block mx-auto" src="img/brand/3.png" alt="">
+					<img class="img-fluid d-block mx-auto" src="{% static 'img/brand/3.png' %}" alt="">
 				</a>
 				<a class="col single-img" href="#">
-					<img class="img-fluid d-block mx-auto" src="img/brand/4.png" alt="">
+					<img class="img-fluid d-block mx-auto" src="{% static 'img/brand/4.png' %}" alt="">
 				</a>
 				<a class="col single-img" href="#">
-					<img class="img-fluid d-block mx-auto" src="img/brand/5.png" alt="">
+					<img class="img-fluid d-block mx-auto" src="{% static 'img/brand/5.png' %}" alt="">
 				</a>
 			</div>
 		</div>
@@ -944,7 +541,8 @@
 				<div class="col-lg-6 text-center">
 					<div class="section-title">
 						<h1>Deals of the Week</h1>
-						<p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore
+						<p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut
+							labore et dolore
 							magna aliqua.</p>
 					</div>
 				</div>
@@ -954,7 +552,7 @@
 					<div class="row">
 						<div class="col-lg-4 col-md-4 col-sm-6 mb-20">
 							<div class="single-related-product d-flex">
-								<a href="#"><img src="img/r1.jpg" alt=""></a>
+								<a href="#"><img src="{% static 'img/r1.jpg' %}" alt=""></a>
 								<div class="desc">
 									<a href="#" class="title">Black lace Heels</a>
 									<div class="price">
@@ -966,7 +564,7 @@
 						</div>
 						<div class="col-lg-4 col-md-4 col-sm-6 mb-20">
 							<div class="single-related-product d-flex">
-								<a href="#"><img src="img/r2.jpg" alt=""></a>
+								<a href="#"><img src="{% static 'img/r2.jpg' %}" alt=""></a>
 								<div class="desc">
 									<a href="#" class="title">Black lace Heels</a>
 									<div class="price">
@@ -978,7 +576,7 @@
 						</div>
 						<div class="col-lg-4 col-md-4 col-sm-6 mb-20">
 							<div class="single-related-product d-flex">
-								<a href="#"><img src="img/r3.jpg" alt=""></a>
+								<a href="#"><img src="{% static 'img/r3.jpg' %}" alt=""></a>
 								<div class="desc">
 									<a href="#" class="title">Black lace Heels</a>
 									<div class="price">
@@ -990,7 +588,7 @@
 						</div>
 						<div class="col-lg-4 col-md-4 col-sm-6 mb-20">
 							<div class="single-related-product d-flex">
-								<a href="#"><img src="img/r5.jpg" alt=""></a>
+								<a href="#"><img src="{% static 'img/r5.jpg' %}" alt=""></a>
 								<div class="desc">
 									<a href="#" class="title">Black lace Heels</a>
 									<div class="price">
@@ -1002,7 +600,7 @@
 						</div>
 						<div class="col-lg-4 col-md-4 col-sm-6 mb-20">
 							<div class="single-related-product d-flex">
-								<a href="#"><img src="img/r6.jpg" alt=""></a>
+								<a href="#"><img src="{% static 'img/r6.jpg' %}" alt=""></a>
 								<div class="desc">
 									<a href="#" class="title">Black lace Heels</a>
 									<div class="price">
@@ -1014,7 +612,7 @@
 						</div>
 						<div class="col-lg-4 col-md-4 col-sm-6 mb-20">
 							<div class="single-related-product d-flex">
-								<a href="#"><img src="img/r7.jpg" alt=""></a>
+								<a href="#"><img src="{% static 'img/r7.jpg' %}" alt=""></a>
 								<div class="desc">
 									<a href="#" class="title">Black lace Heels</a>
 									<div class="price">
@@ -1026,7 +624,7 @@
 						</div>
 						<div class="col-lg-4 col-md-4 col-sm-6">
 							<div class="single-related-product d-flex">
-								<a href="#"><img src="img/r9.jpg" alt=""></a>
+								<a href="#"><img src="{% static 'img/r9.jpg' %}" alt=""></a>
 								<div class="desc">
 									<a href="#" class="title">Black lace Heels</a>
 									<div class="price">
@@ -1038,7 +636,7 @@
 						</div>
 						<div class="col-lg-4 col-md-4 col-sm-6">
 							<div class="single-related-product d-flex">
-								<a href="#"><img src="img/r10.jpg" alt=""></a>
+								<a href="#"><img src="{% static 'img/r10.jpg' %}" alt=""></a>
 								<div class="desc">
 									<a href="#" class="title">Black lace Heels</a>
 									<div class="price">
@@ -1050,7 +648,7 @@
 						</div>
 						<div class="col-lg-4 col-md-4 col-sm-6">
 							<div class="single-related-product d-flex">
-								<a href="#"><img src="img/r11.jpg" alt=""></a>
+								<a href="#"><img src="{% static 'img/r11.jpg' %}" alt=""></a>
 								<div class="desc">
 									<a href="#" class="title">Black lace Heels</a>
 									<div class="price">
@@ -1065,7 +663,7 @@
 				<div class="col-lg-3">
 					<div class="ctg-right">
 						<a href="#" target="_blank">
-							<img class="img-fluid d-block mx-auto" src="img/category/c5.jpg" alt="">
+							<img class="img-fluid d-block mx-auto" src="{% static 'img/category/c5.jpg' %}" alt="">
 						</a>
 					</div>
 				</div>
@@ -1082,7 +680,8 @@
 					<div class="single-footer-widget">
 						<h6>About Us</h6>
 						<p>
-							Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore dolore
+							Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt
+							ut labore dolore
 							magna aliqua.
 						</p>
 					</div>
@@ -1093,18 +692,22 @@
 						<p>Stay update with our latest</p>
 						<div class="" id="mc_embed_signup">
 
-							<form target="_blank" novalidate="true" action="https://spondonit.us12.list-manage.com/subscribe/post?u=1462626880ade1ac87bd9c93a&amp;id=92a4423d01"
-							 method="get" class="form-inline">
+							<form target="_blank" novalidate="true"
+								action="https://spondonit.us12.list-manage.com/subscribe/post?u=1462626880ade1ac87bd9c93a&amp;id=92a4423d01"
+								method="get" class="form-inline">
 
 								<div class="d-flex flex-row">
 
-									<input class="form-control" name="EMAIL" placeholder="Enter Email" onfocus="this.placeholder = ''" onblur="this.placeholder = 'Enter Email '"
-									 required="" type="email">
+									<input class="form-control" name="EMAIL" placeholder="Enter Email"
+										onfocus="this.placeholder = ''" onblur="this.placeholder = 'Enter Email '"
+										required="" type="email">
 
 
-									<button class="click-btn btn btn-default"><i class="fa fa-long-arrow-right" aria-hidden="true"></i></button>
+									<button class="click-btn btn btn-default"><i class="fa fa-long-arrow-right"
+											aria-hidden="true"></i></button>
 									<div style="position: absolute; left: -5000px;">
-										<input name="b_36c4fd991d266f23781ded980_aefe40901a" tabindex="-1" value="" type="text">
+										<input name="b_36c4fd991d266f23781ded980_aefe40901a" tabindex="-1" value=""
+											type="text">
 									</div>
 
 									<!-- <div class="col-lg-4 col-md-4">
@@ -1120,14 +723,14 @@
 					<div class="single-footer-widget mail-chimp">
 						<h6 class="mb-20">Instragram Feed</h6>
 						<ul class="instafeed d-flex flex-wrap">
-							<li><img src="img/i1.jpg" alt=""></li>
-							<li><img src="img/i2.jpg" alt=""></li>
-							<li><img src="img/i3.jpg" alt=""></li>
-							<li><img src="img/i4.jpg" alt=""></li>
-							<li><img src="img/i5.jpg" alt=""></li>
-							<li><img src="img/i6.jpg" alt=""></li>
-							<li><img src="img/i7.jpg" alt=""></li>
-							<li><img src="img/i8.jpg" alt=""></li>
+							<li><img src="{% static 'img/i1.jpg' %}" alt=""></li>
+							<li><img src="{% static 'img/i2.jpg' %}" alt=""></li>
+							<li><img src="{% static 'img/i3.jpg' %}" alt=""></li>
+							<li><img src="{% static 'img/i4.jpg' %}" alt=""></li>
+							<li><img src="{% static 'img/i5.jpg' %}" alt=""></li>
+							<li><img src="{% static 'img/i6.jpg' %}" alt=""></li>
+							<li><img src="{% static 'img/i7.jpg' %}" alt=""></li>
+							<li><img src="{% static 'img/i8.jpg' %}" alt=""></li>
 						</ul>
 					</div>
 				</div>
@@ -1145,18 +748,23 @@
 				</div>
 			</div>
 			<div class="footer-bottom d-flex justify-content-center align-items-center flex-wrap">
-				<p class="footer-text m-0"><!-- Link back to Colorlib can't be removed. Template is licensed under CC BY 3.0. -->
-Copyright &copy;<script>document.write(new Date().getFullYear());</script> All rights reserved | This template is made with <i class="fa fa-heart-o" aria-hidden="true"></i> by <a href="https://colorlib.com" target="_blank">Colorlib</a>
-<!-- Link back to Colorlib can't be removed. Template is licensed under CC BY 3.0. -->
-</p>
+				<p class="footer-text m-0">
+					<!-- Link back to Colorlib can't be removed. Template is licensed under CC BY 3.0. -->
+					Copyright &copy;
+					<script>document.write(new Date().getFullYear());</script> All rights reserved | This template is
+					made with <i class="fa fa-heart-o" aria-hidden="true"></i> by <a href="https://colorlib.com"
+						target="_blank">Colorlib</a>
+					<!-- Link back to Colorlib can't be removed. Template is licensed under CC BY 3.0. -->
+				</p>
 			</div>
 		</div>
 	</footer>
 	<!-- End footer Area -->
 
 	<script src="{% static 'js/vendor/jquery-2.2.4.min.js' %}"></script>
-	<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.11.0/umd/popper.min.js" integrity="sha384-b/U6ypiBEHpOf/4+1nzFpr53nxSS+GLCkfwBdFNTxtclqqenISfwAzpKaMNFNmj4"
-	 crossorigin="anonymous"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.11.0/umd/popper.min.js"
+		integrity="sha384-b/U6ypiBEHpOf/4+1nzFpr53nxSS+GLCkfwBdFNTxtclqqenISfwAzpKaMNFNmj4"
+		crossorigin="anonymous"></script>
 	<script src="{% static 'js/vendor/bootstrap.min.js' %}"></script>
 	<script src="{% static 'js/jquery.ajaxchimp.min.js' %}"></script>
 	<script src="{% static 'js/jquery.nice-select.min.js' %}"></script>
@@ -1169,6 +777,9 @@ Copyright &copy;<script>document.write(new Date().getFullYear());</script> All r
 	<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCjCGmQ0Uq4exrzdcL6rvxywDDOvfAu6eE"></script>
 	<script src="{% static 'js/gmaps.min.js' %}"></script>
 	<script src="{% static 'js/main.js' %}"></script>
+
+
+
 </body>
 
 </html>

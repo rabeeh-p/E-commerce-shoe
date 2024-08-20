@@ -1,0 +1,91 @@
+{% extends 'profile/detailsProfile.html' %}
+
+
+
+
+{% block profile %}
+
+<div class="col-lg-8">
+  <div class="card mb-4">
+    <div class="card-body">
+      <div class="row">
+        <div class="col-sm-3">
+          <p class="mb-0">Full Name</p>
+        </div>
+        <div class="col-sm-9">
+          <p class="text-muted mb-0">{{obj.full_name}}</p>
+        </div>
+      </div>
+      <hr>
+      
+      <div class="row">
+        <div class="col-sm-3">
+          <p class="mb-0">Phone</p>
+        </div>
+        <div class="col-sm-9">
+          <p class="text-muted mb-0">{{obj.phone_number}}</p>
+        </div>
+      </div>
+      <hr>
+      <div class="row">
+        <div class="col-sm-3">
+          <p class="mb-0">city</p>
+        </div>
+        <div class="col-sm-9">
+          <p class="text-muted mb-0">{{obj.city}}</p>
+        </div>
+      </div>
+      <hr>
+      <div class="row">
+        <div class="col-sm-3">
+          <p class="mb-0">Address</p>
+        </div>
+        <div class="col-sm-9">
+          <p class="text-muted mb-0">{{obj.address_line1}}</p>
+        </div>
+      </div>
+      <hr>
+      <div class="row">
+        <div class="col-sm-3">
+          <p class="mb-0">state</p>
+        </div>
+        <div class="col-sm-9">
+          <p class="text-muted mb-0">{{obj.state}}</p>
+        </div>
+      </div>
+      <hr>
+      <div class="row">
+        <div class="col-sm-3">
+          <p class="mb-0">Country</p>
+        </div>
+        <div class="col-sm-9">
+          <p class="text-muted mb-0">{{obj.country}}</p>
+        </div>
+      </div>
+      <hr>
+      <div class="row">
+        <div class="col-sm-3">
+          <p class="mb-0">Gender</p>
+        </div>
+        <div class="col-sm-9">
+          <p class="text-muted mb-0">{{obj.gender}}</p>
+        </div>
+      </div>
+      <hr>
+      <div class="text-center mt-4">
+        <div class="btn-group">
+            <a href="{% url 'profile-update' %}" class="btn btn-light">Edit Profile</a>
+            <a href="{% url 'change-password' %}" class="btn btn-light mx-3">Change Password</a>
+        </div>
+    </div>
+    
+    </div>
+  </div>
+  
+</div>
+
+
+
+
+
+{% endblock %}

@@ -1,0 +1,157 @@
+{% extends 'userBase.html' %}\
+
+{% block css %}
+<style>
+    
+body {
+    background-color: #f8f9fa; /* Light background for contrast */
+    font-family: 'Arial', sans-serif;
+}
+
+.otp-container {
+    background-color: #ffffff; /* White background for the container */
+    padding: 30px;
+    border-radius: 12px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1); /* More pronounced shadow for depth */
+    text-align: center;
+    width: 400px; /* Increased width for better layout */
+    margin: 50px auto; /* Top and bottom margin of 50px, centering horizontally */
+}
+
+
+h2 {
+    color: #4a4a4a; /* Darker text for the title */
+    font-size: 24px; /* Slightly larger font for the title */
+    margin-bottom: 15px;
+}
+
+p {
+    color: #6c757d; /* Gray text for description */
+    font-size: 16px; /* Consistent font size */
+}
+
+.alert-messages {
+    margin-bottom: 20px;
+}
+
+.alert {
+    padding: 10px;
+    border-radius: 5px;
+    margin-bottom: 10px;
+}
+
+.otp-input {
+    font-size: 18px;
+    padding: 12px; /* Slightly increased padding */
+    margin: 0 5px; /* Adjusted margin for better spacing */
+    width: 40px;
+    text-align: center;
+    border: 2px solid #ffc107; /* Yellow border for the brand */
+    border-radius: 4px;
+    transition: border-color 0.3s; /* Smooth transition for focus */
+}
+
+.otp-input:focus {
+    border-color: #e0a800; /* Darker yellow on focus */
+    outline: none; /* Remove default outline */
+}
+
+.submit-btn-1 {
+    margin-top: 20px;
+    background-color: #ffc107; /* Brand color (yellow) */
+    color: #ffffff;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 16px;
+    transition: background-color 0.3s; /* Smooth transition */
+}
+
+.submit-btn:hover {
+    background-color: #e0a800; /* Darker yellow on hover */
+}
+
+.resend-otp-link {
+    display: block;
+    margin-top: 20px;
+    color: #ffc107; /* Brand color */
+    text-decoration: none;
+}
+
+.resend-otp-link:hover {
+    text-decoration: underline; /* Underline on hover */
+}
+
+</style>
+
+{% endblock %}
+
+{% block content %}
+
+    <div class="otp-container">
+    <h2>OTP Verification</h2>
+    <p>Please enter the OTP sent to your email</p>
+    
+    <!-- Message Box -->
+    {% if messages %}
+        <div class="alert-messages">
+            {% for message in messages %}
+                <div class="alert alert-{{ message.tags }}">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        </div>
+    {% endif %}
+    
+    <form action="" method="post">
+        {% csrf_token %}
+        <div id="otp-inputs">
+            <input type="text" maxlength="1" class="otp-input" id="otp1" name="otp1" onkeyup="moveToNext(this, 'otp2')">
+            <input type="text" maxlength="1" class="otp-input" id="otp2" name="otp2" onkeyup="moveToNext(this, 'otp3')">
+            <input type="text" maxlength="1" class="otp-input" id="otp3" name="otp3" onkeyup="moveToNext(this, 'otp4')">
+            <input type="text" maxlength="1" class="otp-input" id="otp4" name="otp4" onkeyup="moveToNext(this, 'otp5')">
+            <input type="text" maxlength="1" class="otp-input" id="otp5" name="otp5" onkeyup="moveToNext(this, 'otp6')">
+            <input type="text" maxlength="1" class="otp-input" id="otp6" name="otp6">
+        </div>
+        <button type="submit" class="submit-btn-1">Submit</button>
+    </form>
+    <a href="{% url 'otp-resend' %}" class="resend-otp-link">Resend OTP</a>
+    <div id="timer" class="timer"></div>
+</div>
+
+
+{% endblock %}
+
+
+
+{% block js  %}
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        const otpExpirationTime = new Date("{{ otp_expiration_time|date:'c' }}").getTime();
+        const timerElement = document.getElementById('timer');
+
+        function updateTimer() {
+            const now = new Date().getTime();
+            const distance = otpExpirationTime - now;
+
+            if (distance < 0) {
+                timerElement.innerHTML = "OTP has expired";
+                document.querySelector('form').style.display = 'none';  // Hide the form if OTP expired
+                return;
+            }
+
+            const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+            const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+            timerElement.innerHTML = `${minutes}m ${seconds}s`;
+
+            setTimeout(updateTimer, 1000);
+        }
+
+        updateTimer();
+    });
+</script>
+
+
+
+{% endblock %}

@@ -1,0 +1,162 @@
+{% extends 'base.html' %}
+{% load static %}
+
+
+{% block css %}
+
+<style>
+  .status-badge:hover {
+    cursor: pointer; /* Changes the cursor to pointer on hover */
+}
+</style>
+
+
+
+{% endblock %}
+
+{% block content %}
+
+
+<div class="container-xxl flex-grow-1 container-p-y">
+
+
+
+  <div class="row g-6 mb-6">
+    <div class="col-sm-6 col-xl-3">
+      <div class="card">
+        <div class="card-body">
+          <div class="d-flex justify-content-between">
+            <div class="me-1">
+              <p class="text-heading mb-1">Tottel Users</p>
+              <div class="d-flex align-items-center">
+                <h4 class="mb-1 me-2">{{count.total_users}}</h4>
+              </div>
+            </div>
+            <div class="avatar">
+              <div class="avatar-initial bg-label-primary rounded">
+                <div class="ri-group-line ri-26px"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+  <!-- Users List Table -->
+  <div class="card">
+    <div class="card-header">
+      <h5 class="mb-0">Users</h5>
+      <div class="d-flex justify-content-between align-items-center row pt-4 gap-4 gap-md-0">
+        <div class="col-md-4 product_status"></div>
+        <div class="col-md-4 product_category"></div>
+        <div class="col-md-4 product_stock"></div>
+      </div>
+    </div>
+    <div class="card-datatable table-responsive">
+      <div id="DataTables_Table_0_wrapper" class="dataTables_wrapper dt-bootstrap5 no-footer">
+        <div class="card-header d-flex border-top rounded-0 flex-wrap py-3 pb-5 pb-md-4">
+          <div class="me-5 ms-n2">
+            <div id="DataTables_Table_0_filter" class="dataTables_filter"><label><input type="search"
+                  class="form-control form-control-sm" placeholder="Search" aria-controls="DataTables_Table_0"></label>
+            </div>
+          </div>
+          <div class="d-flex justify-content-start justify-content-md-end align-items-baseline">
+            <div
+              class="dt-action-buttons d-flex align-items-start align-items-md-center justify-content-sm-center gap-4 pt-0">
+
+
+            </div>
+          </div>
+        </div>
+        <table class="datatables-products table dataTable no-footer dtr-column" id="DataTables_Table_0" aria-describedby="DataTables_Table_0_info">
+          <thead>
+              <tr>
+                  <th class="control sorting_disabled dtr-hidden" rowspan="1" colspan="1" style="width: 17.625px; display: none;" aria-label=""></th>
+                  <th class="sorting_disabled dt-checkboxes-cell dt-checkboxes-select-all" rowspan="1" colspan="1" style="width: 17.625px;" data-col="1" aria-label="">No</th>
+                  <th class="sorting sorting_asc" tabindex="0" aria-controls="DataTables_Table_0" rowspan="1" colspan="1" style="width: 114.025px;" aria-label="product: activate to sort column descending" aria-sort="ascending">Full Name</th>
+                  <th class="sorting" tabindex="0" aria-controls="DataTables_Table_0" rowspan="1" colspan="1" style="width: 124.062px;" aria-label="category: activate to sort column ascending">Address</th>
+                  <th class="sorting" tabindex="0" aria-controls="DataTables_Table_0" rowspan="1" colspan="1" style="width: 59.975px;" aria-label="qty: activate to sort column ascending">Status</th>
+                  <th class="sorting" tabindex="0" aria-controls="DataTables_Table_0" rowspan="1" colspan="1" style="width: 94.175px;" aria-label="status: activate to sort column ascending">Details</th>
+              </tr>
+          </thead>
+          <tbody>
+              {% for u in users %}
+              <tr class="odd">
+                  <td valign="top" class="dtr-control sorting_1" style="display: none;"></td>
+                  <td valign="top" class="dt-checkboxes-cell">{{ forloop.counter }}</td>
+                  <td valign="top">{{ u.full_name }}</td> <!-- Full Name -->
+                  <td valign="top">{{ u.address_line1 }}</td> <!-- Address -->
+                  <td valign="top" id="status-{{ u.id }}">                
+                      {% if u.is_active %}
+                          <span class="badge bg-success status-badge" data-status="active">Active</span>
+                      {% else %}
+                          <span class="badge bg-danger status-badge" data-status="blocked">Blocked</span>
+                      {% endif %}
+                  </td>
+                  <td valign="top">
+                    <a href="{% url 'user-details' u.id %}" class="view-button-link">
+                        <button class="view-button">View</button>
+                    </a>
+                </td>
+                
+              </tr>
+              {% endfor %}
+          </tbody>
+      </table>
+     
+      </div>
+    </div>
+  </div>
+
+
+
+
+
+
+  {% endblock %}
+
+
+
+  {% block js %}
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+ 
+  <script>
+     $(document).ready(function() {
+        // Event delegation for toggling user status
+        $('#DataTables_Table_0 tbody').on('click', 'td[id^="status-"]', function() {
+            const userId = this.id.split('-')[1]; // Get user ID from the cell ID
+            const currentStatus = $(this).find('span').data('status'); // Get current status
+
+            // Call userStatus function with the user ID and current status
+            userStatus(userId, currentStatus);
+        });
+    });
+
+    function userStatus(userId, currentStatus) {
+        // Toggle the status for the AJAX request
+        const newStatus = currentStatus === 'active' ? 'blocked' : 'active';
+        
+        $.ajax({
+            url: '{% url "users-status" %}',  // Ensure this URL is correct
+            type: 'POST',
+            data: {
+                'user_id': userId,
+                'new_status': newStatus,  // Send the new status
+                'csrfmiddlewaretoken': '{{ csrf_token }}'
+            },
+            success: function(response) {
+                console.log('Status updated successfully:', response);
+                // Refresh the page after successful update
+                location.reload();
+            },
+            error: function(xhr, status, error) {
+                console.error('Error in userStatus AJAX request:', error);
+            }
+        });
+    }
+</script>
+
+
+
+  {% endblock %}

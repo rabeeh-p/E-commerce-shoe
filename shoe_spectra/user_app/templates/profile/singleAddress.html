@@ -1,0 +1,54 @@
+{% extends 'profile/detailsProfile.html' %}
+
+
+
+
+{% block profile %}
+
+
+<!-- <h1>order</h1> -->
+
+<div class="col-lg-8">
+
+    <div class="container mt-4">
+        <h1 class="mb-4">Address Details</h1>
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">Address Details</h5>
+                <p class="card-text">
+                    <strong>full name  1:</strong> {{ address.fullname }} <br>
+                    <strong>Address  1:</strong> {{ address.address_line1 }} <br>
+                    <strong>Address  2:</strong> {{ address.address_line2 }} <br>
+                    <strong>Phone number:</strong> {{ address.phone_number }} <br>
+                    <strong>City:</strong> {{ address.city }} <br>
+                    <strong>State:</strong> {{ address.state }} <br>
+                    <strong>ZIP Code:</strong> {{ address.postal_code }} <br>
+                </p>
+                <div class="d-flex">
+                    <a href="{% url 'edit_address' address.id %}" class="btn btn-primary me-2">Edit</a>
+                    <form method="post" action="{% url 'delete_address' address.id %}">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-danger mx-3">Delete</button>
+                    </form>
+                </div>
+                <a href="{% url 'address-list' %}" class="btn btn-secondary mt-3">Back to List</a>
+            </div>
+        </div>
+    </div>
+   
+
+
+</div>
+
+
+
+
+{% endblock %}
+
+
+{% block js %}
+
+    
+
+
+{% endblock %}

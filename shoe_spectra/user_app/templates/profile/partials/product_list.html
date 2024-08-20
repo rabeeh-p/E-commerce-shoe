@@ -1,0 +1,12 @@
+{% for product in product %}
+    <div class="product-item">
+        <h3>{{ product.name }}</h3>
+        <p>Price: {{ product.price }}</p>
+        <p>Category: {{ product.category.name }}</p>
+        <p>Brand: {{ product.brand.name }}</p>
+        <p>Color: {{ product.color.name }}</p>
+        <!-- Add more product details as needed -->
+    </div>
+{% empty %}
+    <p>No products found.</p>
+{% endfor %}

@@ -1,0 +1,23 @@
+{% extends 'userBase.html' %}
+
+
+
+
+{% block content %}
+
+
+<div class="container mt-5">
+    <div class="alert alert-success" role="alert">
+        <h4 class="alert-heading">Order Successful!</h4>
+        <p>Your order with ID <strong>{{ order_id }}</strong> has been placed successfully. Thank you for shopping with us.</p>
+        <hr>
+        <p class="mb-0">You will receive an email confirmation soon.</p>
+        <a href="{% url 'profile-order' %}" class="btn btn-primary mt-3">View Your Orders</a>
+    </div>
+</div>
+
+
+
+{% endblock %}
+
+

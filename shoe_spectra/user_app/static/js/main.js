@@ -54,7 +54,10 @@ $(document).ready(function(){
         autoplayTimeout: 5000,
         loop:true,
         nav:true,
-        navText:["<img src='img/banner/prev.png'>","<img src='img/banner/next.png'>"],
+        navText: [
+        "<img src=\"{% static 'img/banner/prev.png' %}\" alt='Previous'>",
+        "<img src=\"{% static 'img/banner/next.png' %}\" alt='Next'>"
+    ],
         dots:false
     });
 
@@ -67,8 +70,11 @@ $(document).ready(function(){
         autoplayTimeout: 5000,
         loop:true,
         nav:true,
-        navText:["<img src='img/product/prev.png'>","<img src='img/product/next.png'>"],
-        dots:false
+        navText: [
+          "<img src=\"{% static 'img/product/prev.png' %}\" alt='Previous'>",
+          "<img src=\"{% static 'img/product/next.png' %}\" alt='Next'>"
+      ],
+              dots:false
     });
 
     /*=================================

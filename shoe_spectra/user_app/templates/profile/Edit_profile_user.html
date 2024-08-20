@@ -1,0 +1,73 @@
+{% extends 'profile/detailsProfile.html' %}
+
+
+
+
+{% block profile %}
+
+<div class="col-lg-8">
+    <form action="" method="post">
+        {% csrf_token %}
+
+        <div class="form-group">
+            <label for="full_name">Full Name</label>
+            <input type="text" class="form-control" id="full_name" name="full_name" value="{{ user_profile.full_name }}"
+                required>
+        </div>
+
+        <div class="form-group">
+            <label for="phone_number">Phone Number</label>
+            <input type="text" class="form-control" id="phone_number" name="phone_number"
+                value="{{ user_profile.phone_number }}" required>
+        </div>
+
+        <div class="form-group">
+            <label for="address_line1">Address Line 1</label>
+            <input type="text" class="form-control" id="address_line1" name="address_line1"
+                value="{{ user_profile.address_line1 }}" required>
+        </div>
+
+        <div class="form-group">
+            <label for="city">City</label>
+            <input type="text" class="form-control" id="city" name="city" value="{{ user_profile.city }}" required>
+        </div>
+
+        <div class="form-group">
+            <label for="state">State</label>
+            <input type="text" class="form-control" id="state" name="state" value="{{ user_profile.state }}" required>
+        </div>
+
+        <div class="form-group">
+            <label for="country">Country</label>
+            <input type="text" class="form-control" id="country" name="country" value="{{ user_profile.country }}"
+                required>
+        </div>
+
+        <div class="form-group">
+            <label for="postal_code">Postal Code</label>
+            <input type="text" class="form-control" id="postal_code" name="postal_code"
+                value="{{ user_profile.postal_code }}" required>
+        </div>
+        <div class="form-group">
+            <label for="gender">Gender</label>
+            <select id="gender" name="gender" class="form-control" required>
+                <option value="" disabled>Select Gender</option>
+                <option value="Male" {% if user_profile.gender == 'Male' %}selected{% endif %}>Male</option>
+                <option value="Female" {% if user_profile.gender == 'Female' %}selected{% endif %}>Female</option>
+                <option value="Other" {% if user_profile.gender == 'Other' %}selected{% endif %}>Other</option>
+            </select>
+        </div>
+        
+
+        <button type="submit" class="btn btn-warning mt-3">Save Changes</button>
+
+        {% if error %}
+        <div class="alert alert-danger mt-3">{{ error }}</div>
+        {% endif %}
+    </form>
+
+</div>
+
+
+
+{% endblock %}

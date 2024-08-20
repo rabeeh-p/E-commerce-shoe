@@ -1,0 +1,370 @@
+{% extends 'base.html' %}
+
+{% load static %}
+
+
+
+
+{% block css %}
+<style>
+    .status-button {
+        display: inline-block;
+        padding: 5px 10px;
+        background-color: green; /* Green background */
+        color: white; /* White text */
+        border-radius: 5px; /* Rounded corners */
+        text-align: center;
+    }
+    .view-button {
+        background-color: #c9b129; /* Yellow background */
+        color: black; /* Black text for contrast */
+        border: none; /* No border */
+        padding: 10px 20px; /* Padding */
+        text-align: center; /* Center text */
+        text-decoration: none; /* No underline */
+        display: inline-block; /* Inline block */
+        font-size: 16px; /* Font size */
+        border-radius: 5px; /* Rounded corners */
+        cursor: pointer; /* Pointer cursor on hover */
+        transition: background-color 0.3s, transform 0.2s; /* Transition effect */
+    }
+
+    .view-button:hover {
+        background-color: #FFC107; /* Darker yellow on hover */
+        transform: scale(1.05); /* Slightly increase size on hover */
+    }
+    .pagination-1 {
+        display: flex;
+        justify-content: center; /* Center pagination */
+        padding: 10px; /* Padding around pagination */
+        list-style-type: none; /* Remove default list style */
+    }
+
+    .pagination-1 .page-item {
+        margin: 0 5px; /* Margin between items */
+    }
+
+    .pagination-1 .page-link {
+        display: inline-block; /* Inline block for links */
+        padding: 10px 15px; /* Padding for links */
+        background-color: #FFD700; /* Yellow background */
+        color: black; /* Black text */
+        border-radius: 5px; /* Rounded corners */
+        text-decoration: none; /* Remove underline */
+        transition: background-color 0.3s, color 0.3s; /* Transition effect */
+    }
+
+    .pagination-1 .page-link:hover {
+        background-color: #FFC107; /* Darker yellow on hover */
+        color: white; /* Change text to white on hover */
+    }
+
+    .pagination-1 .page-item.active .page-link {
+        background-color: #FFC107; /* Highlight active page */
+        color: white; /* White text for active page */
+    }
+
+    .pagination-1 .page-item.previous.disabled,
+    .pagination-1 .page-item.next.disabled {
+        color: gray; /* Gray color for disabled buttons */
+        pointer-events: none; /* Disable pointer events for disabled buttons */
+    }
+    
+</style>
+
+{% endblock %}
+
+{% block content %}
+
+<div class="container-xxl flex-grow-1 container-p-y">
+
+
+    <!-- Product List Widget -->
+    <div class="card mb-6">
+        <div class="card-widget-separator-wrapper">
+            <div class="card-body card-widget-separator">
+                <div class="row gy-4 gy-sm-1">
+                    <div class="col-sm-6 col-lg-3">
+                        <div
+                            class="d-flex justify-content-between align-items-start card-widget-1 border-end pb-4 pb-sm-0">
+                            <div>
+                                <p class="mb-1">PRODUCTS</p>
+                                <h4 class="mb-1">{{p_count}}</h4>
+                                <p class="mb-0"><span class="me-2">{{p_count}} product</span><span
+                                        class="badge rounded-pill bg-label-success">AVAILABE</span></p>
+                            </div>
+                            <div class="avatar me-sm-6">
+                                <span class="avatar-initial rounded bg-label-secondary text-heading">
+                                    <i class="ri-home-6-line ri-24px"></i>
+                                </span>
+                            </div>
+                        </div>
+                        <hr class="d-none d-sm-block d-lg-none me-6">
+                    </div>
+                    <div class="col-sm-6 col-lg-3">
+                        <div
+                            class="d-flex justify-content-between align-items-start card-widget-2 border-end pb-4 pb-sm-0">
+                            <div>
+                                <p class="mb-1">BRANDS</p>
+                                <h4 class="mb-1">{{b_count}}</h4>
+                                <p class="mb-0"><span class="me-2">{{b_count}} brands</span><span
+                                        class="badge rounded-pill bg-label-success">HERE</span></p>
+                            </div>
+                            <div class="avatar me-lg-6">
+                                <span class="avatar-initial rounded bg-label-secondary text-heading">
+                                    <i class="ri-computer-line ri-24px"></i>
+                                </span>
+                            </div>
+                        </div>
+                        <hr class="d-none d-sm-block d-lg-none">
+                    </div>
+                    <div class="col-sm-6 col-lg-3">
+                        <div
+                            class="d-flex justify-content-between align-items-start border-end pb-4 pb-sm-0 card-widget-3">
+                            <div>
+                                <p class="mb-1">CATEGORIES</p>
+                                <h4 class="mb-1">{{c_count}}</h4>
+                                <p class="mb-0">{{co_count}} available <span
+                                    class="badge rounded-pill bg-label-secondary">NOW</span></p>
+                            </div>
+                            <div class="avatar me-sm-6">
+                                <span class="avatar-initial rounded bg-label-secondary text-heading">
+                                    <i class="ri-gift-line ri-24px"></i>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-6 col-lg-3">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div>
+                                <p class="mb-1">COLORS</p>
+                                <h4 class="mb-1">{{color_count}}</h4>
+                                <p class="mb-0"><span class="me-2">{{color_count}} colors </span><span
+                                        class="badge rounded-pill bg-label-secondary">totel</span></p>
+                            </div>
+                            <div class="avatar">
+                                <span class="avatar-initial rounded bg-label-secondary text-heading">
+                                    <i class="ri-money-dollar-circle-line ri-24px"></i>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Product List Table -->
+    <div class="card">
+        <div class="card-header">
+            <h5 class="mb-0">Filter</h5>
+            <div class="d-flex justify-content-between align-items-center row pt-4 gap-4 gap-md-0">
+                <div class="col-md-4 product_status"></div>
+                <div class="col-md-4 product_category"></div>
+                <div class="col-md-4 product_stock"></div>
+            </div>
+        </div>
+        <div class="card-datatable table-responsive">
+            <div id="DataTables_Table_0_wrapper" class="dataTables_wrapper dt-bootstrap5 no-footer">
+                <div class="card-header d-flex border-top rounded-0 flex-wrap py-3 pb-5 pb-md-4">
+                    <div class="me-5 ms-n2">
+                        <div id="DataTables_Table_0_filter" class="dataTables_filter"><label><input type="search"
+                                    class="form-control form-control-sm" placeholder="Search"
+                                    aria-controls="DataTables_Table_0"></label></div>
+                    </div>
+                    <div class="d-flex justify-content-start justify-content-md-end align-items-baseline">
+                        <div
+                            class="dt-action-buttons d-flex align-items-start align-items-md-center justify-content-sm-center gap-4 pt-0">
+                            <div class="dataTables_length my-0" id="DataTables_Table_0_length"><label><select
+                                        name="DataTables_Table_0_length" aria-controls="DataTables_Table_0"
+                                        class="form-select form-select-sm">
+                                        <option value="7">7</option>
+                                        <option value="10">10</option>
+                                        <option value="20">20</option>
+                                        <option value="50">50</option>
+                                        <option value="70">70</option>
+                                        <option value="100">100</option>
+                                    </select></label></div>
+                            <div class="dt-buttons btn-group flex-wrap d-flex">
+                                <!-- <div class="btn-group"><button
+                                        class="btn btn-secondary buttons-collection dropdown-toggle btn-outline-secondary me-4 waves-effect waves-light"
+                                        tabindex="0" aria-controls="DataTables_Table_0" type="button"
+                                        aria-haspopup="dialog" aria-expanded="false"><span><i
+                                                class="ri-download-line ri-16px me-2"></i><span
+                                                class="d-none d-sm-inline-block">Export </span></span></button></div> -->
+                                <button class="btn btn-secondary add-new btn-warning waves-effect waves-light"
+                                    tabindex="0" aria-controls="DataTables_Table_0" type=""><a href="{% url 'add2-page' %}" style="text-decoration: none; color: inherit;"><span><i
+                                            class="ri-add-line ri-16px me-0 me-sm-1_5"></i><span
+                                            class="d-none d-sm-inline-block">Add Product</span></span></a></button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <table class="datatables-products table dataTable no-footer dtr-column" id="DataTables_Table_0"
+                    aria-describedby="DataTables_Table_0_info">
+                    <thead>
+                        <tr>
+                            <th class="control sorting_disabled dtr-hidden" rowspan="1" colspan="1"
+                                style="width: 17.625px; display: none;" aria-label=""></th>
+                            <th class="sorting_disabled dt-checkboxes-cell dt-checkboxes-select-all" rowspan="1"
+                                colspan="1" style="width: 17.625px;" data-col="1" aria-label=""> NO</th>
+                            <th class="sorting sorting_asc" tabindex="0" aria-controls="DataTables_Table_0" rowspan="1"
+                                colspan="1" style="width: 114.025px;"
+                                aria-label="product: activate to sort column descending" aria-sort="ascending">product
+                            </th>
+                            <th class="sorting" tabindex="0" aria-controls="DataTables_Table_0" rowspan="1" colspan="1"
+                                style="width: 124.062px;" aria-label="category: activate to sort column ascending">
+                                category</th>
+                            <th class="sorting_disabled" rowspan="1" colspan="1" style="width: 83.3375px;"
+                                aria-label="stock">Brand</th>
+                           
+                            <th class="sorting" tabindex="0" aria-controls="DataTables_Table_0" rowspan="1" colspan="1"
+                                style="width: 94.175px;" aria-label="status: activate to sort column ascending">status
+                            </th>
+                            <th class="sorting_disabled" rowspan="1" colspan="1" style="width: 101.85px;"
+                                aria-label="Actions">View</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for p in page_obj%}
+                        <tr class="odd">
+                            <td valign="top" class="dtr-control sorting_1" style="display: none;"></td>
+                            <td valign="top" class="dt-checkboxes-cell">
+                                {{forloop.counter}}
+                            </td>
+                            <td valign="top">{{p.name}}</td>  <!-- product -->
+                            <td valign="top">{{p.category.name}}</td>   <!-- category -->
+                            <td valign="top">{{p.brand.name}}</td>              <!-- brand -->
+                            <!-- <td valign="top">{{p.stock}}</td>                qty -->
+                            <!-- <td valign="top">
+                                {% if p.status == True %}
+                                <span class="badge bg-success">Available</span>
+                                {% else %} 
+                                <span class="badge bg-warning">Unavailable</span>
+                                {% endif  %}
+                            
+                            </td>  -->
+                            <td valign="top">
+                                <a href="{% url 'mainStatus' p.id %}" class="status-link">
+                                    {% if p.status == True %}
+                                        <span class="badge bg-success">Available</span>
+                                    {% else %}
+                                        <span class="badge bg-warning">Unavailable</span>
+                                    {% endif %}
+                                </a>
+                            </td>
+                            
+                                         <!-- status -->
+                            <td valign="top">
+                                <button class="view-button"><a href="{% url 'product-edit' p.id %}">View</a></button>  <!-- Actions -->
+                            </td>
+                        </tr>
+
+                        {% endfor %}
+                        
+                    </tbody>
+                </table>
+                <div class="row mx-1">
+                    <div class="col-sm-12 col-md-6">
+                        <div class="dataTables_info" role="status" aria-live="polite">
+                            Showing {{ start_index }} to {{ end_index }} of {{ total_items }} entries
+                        </div>
+                    </div>
+                    <div class="col-sm-12 col-md-6">
+                        <div class="dataTables_paginate paging_simple_numbers" >
+                            <ul class="pagination-1">
+                                {% if page_obj.has_previous %}
+                                    <li class="paginate_button page-item previous" >
+                                        <a href="?page={{ page_obj.previous_page_number }}" aria-controls="DataTables_Table_0" role="link"  tabindex="0" class="page-link">Previous</a>
+                                    </li>
+                                {% else %}
+                                    <li class="paginate_button page-item previous disabled" >
+                                        <a aria-controls="DataTables_Table_0" role="link"  tabindex="0" class="page-link">Previous</a>
+                                    </li>
+                                {% endif %}
+                
+                                {% for page_num in page_obj.paginator.page_range %}
+                                    {% if page_num == page_obj.number %}
+                                        <li class="paginate_button page-item active">
+                                            <a aria-controls="DataTables_Table_0" role="link" tabindex="0" class="page-link">{{ page_num }}</a>
+                                        </li>
+                                    {% else %}
+                                        <li class="paginate_button page-item">
+                                            <a href="?page={{ page_num }}" aria-controls="DataTables_Table_0" role="link" tabindex="0" class="page-link">{{ page_num }}</a>
+                                        </li>
+                                    {% endif %}
+                                {% endfor %}
+
+                
+                                {% if page_obj.has_next %}
+                                    <li class="paginate_button page-item next" >
+                                        <a href="?page={{ page_obj.next_page_number }}" aria-controls="DataTables_Table_0" role="link"  tabindex="0" class="page-link">Next </a>
+                                    </li>
+                                {% else %}
+                                    <li class="paginate_button page-item next disabled" >
+                                        <a aria-controls="DataTables_Table_0" role="link"  tabindex="0" class="page-link">Next</a>
+                                    </li>
+                                {% endif %}
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+</div>
+
+
+{% endblock %}
+
+
+
+
+{% block js %}
+<script>
+
+
+let currentPage = 1;
+const totalEntries = 50; // Total number of entries
+const entriesPerPage = 10; // Number of entries per page
+
+function updatePagination() {
+    const totalPages = Math.ceil(totalEntries / entriesPerPage);
+
+    // Show current range of entries
+    const startEntry = (currentPage - 1) * entriesPerPage + 1;
+    const endEntry = Math.min(startEntry + entriesPerPage - 1, totalEntries);
+    $('#DataTables_Table_0_info').text(`Showing ${startEntry} to ${endEntry} of ${totalEntries} entries`);
+
+    // Enable/disable Previous button
+    $('#DataTables_Table_0_previous').toggleClass('disabled', currentPage === 1);
+    
+    // Enable/disable Next button
+    $('#DataTables_Table_0_next').toggleClass('disabled', currentPage === totalPages);
+
+    // Show current page number and others
+    $('.pagination').find('.page-item').not('.previous, .next').remove();
+    for (let i = 1; i <= totalPages; i++) {
+        const pageItem = $('<li class="paginate_button page-item"></li>').append(
+            $('<a role="link" class="page-link"></a>').text(i).on('click', function() {
+                currentPage = i;
+                updatePagination();
+            })
+        );
+        if (i === currentPage) pageItem.addClass('active');
+        $('.pagination').find('.next').before(pageItem);
+    }
+}
+
+// Initial call
+updatePagination();
+
+</script>
+
+
+
+
+
+{% endblock %}

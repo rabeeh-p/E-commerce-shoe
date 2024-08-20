@@ -1,0 +1,178 @@
+{% extends 'userBase.html' %}
+
+
+
+
+{% block content %}
+
+
+
+
+
+
+
+
+<section class="checkout_area section_gap">
+    <div class="container">
+
+        <!-- <div class="cupon_area">
+            <div class="check_title">
+                <h2>Have a coupon? <a href="#">Click here to enter your code</a></h2>
+            </div>
+            <input type="text" placeholder="Enter coupon code">
+            <a class="tp_btn" href="#">Apply Coupon</a>
+        </div> -->
+        <div class="billing_details">
+            <div class="row">
+                {% if errors %}
+                <div class="alert alert-danger" role="alert">
+                    <ul class="mb-0">
+                        {% for error in errors %}
+                        <li>{{ error }}</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+                {% endif %}
+                <form class="row contact_form" method="post" novalidate="novalidate">
+                    {% csrf_token %}
+                    <div class="col-lg-8">
+                        <h3>Billing Details</h3>
+
+                        <div class="form-group">
+                            <label>Existing Addresses:</label>
+                            <div class="row">
+                                {% for address in addresses %}
+                                <div class="col-md-6">
+                                    <div class="card mb-3">
+                                        <div class="card-body">
+                                            <h5 class="card-title">Address {{ forloop.counter }}</h5>
+                                            <p><strong>Address Line 1:</strong> {{ address.address_line1 }}</p>
+                                            <p><strong>Address Line 2:</strong> {{ address.address_line2 }}</p>
+                                            <p><strong>City:</strong> {{ address.city }}</p>
+                                            <!-- <p><strong>State:</strong> {{ address.state }}</p> -->
+                                            <!-- <p><strong>Country:</strong> {{ address.country }}</p> -->
+                                            <p><strong>Postal Code:</strong> {{ address.postal_code }}</p>
+                                            <!-- <p><strong>Full Name:</strong> {{ address.fullname }}</p> -->
+                                            <!-- <p><strong>Phone Number:</strong> {{ address.phone_number }}</p> -->
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="radio" name="address_id"
+                                                    id="address_{{ address.id }}" value="{{ address.id }}">
+                                                <label class="form-check-label" for="address_{{ address.id }}">Select
+                                                    this address</label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                {% empty %}
+                                <p>No existing addresses available.</p>
+                                {% endfor %}
+                            </div>
+                        </div>
+
+                        <div class="col-md-6 form-group p_star">
+                            <input type="text" class="form-control" id="first" name="name" placeholder="full name">
+                            <!-- <span   data-placeholder=""></span> -->
+                        </div>
+
+                        <div class="col-md-6 form-group p_star">
+                            <input type="number" class="form-control" id="number" name="number"
+                                placeholder="phone number">
+                            <span data-placeholder="Phone number"></span>
+                        </div>
+
+
+                        <div class="col-md-12 form-group p_star">
+                            <input type="text" class="form-control" id="add1" name="add1" placeholder="address line 1">
+                            <!-- <span class="placeholder" ></span> -->
+                        </div>
+                        <div class="col-md-12 form-group p_star">
+                            <input type="text" class="form-control" id="add2" name="add2" placeholder="address line 2">
+                            <!-- <span class="placeholder" ></span> -->
+                        </div>
+                        <div class="col-md-12 form-group p_star">
+                            <input type="text" class="form-control" id="city" name="city" placeholder="city">
+                            <!-- <span class="placeholder" data-placeholder="Town/City"></span> -->
+                        </div>
+                        <div class="col-md-12 form-group p_star">
+                            <input type="text" class="form-control" id="city" name="state" placeholder="state">
+                            <!-- <span class="placeholder" data-placeholder="District"></span> -->
+                        </div>
+                        <div class="col-md-12 form-group p_star">
+                            <input type="text" class="form-control" id="city" name="country" placeholder="Country">
+                            <!-- <span class="placeholder" data-placeholder="Country"></span> -->
+                        </div>
+
+                        <div class="col-md-12 form-group">
+                            <input type="number" class="form-control" id="zip" name="zip" placeholder="Postcode/ZIP">
+                        </div>
+
+
+                    </div>
+                    <div class="col-lg-4">
+                        <div class="order_box">
+                            <h2>Your Order</h2>
+                            <ul class="list">
+                                <li><a href="#">Product <span>Total</span></a></li>
+                                {% for item in cart_items %}
+                                <li>
+                                    <a href="#">{{ item.variant.product.name }}
+                                        <span class="middle">x {{ item.quantity }}</span>
+                                        <span class="last">${{ item.get_total_price }}</span>
+                                    </a>
+                                </li>
+                                {% endfor %}
+                            </ul>
+                            <ul class="list list_2">
+                                <li><a href="#">Subtotal <span>Rs{{ subtotal }}</span></a></li>
+                                <!-- <li><a href="#">Shipping <span>Flat rate: ${{ shipping_cost }}</span></a></li> -->
+                                <li><a href="#">Total <span>Rs{{ total_price }}</span></a></li>
+                            </ul>
+                            <div class="payment_item">
+                                <div class="radion_btn">
+                                    <input type="radio" id="f-option5" name="selector" value="Cash on delivery">
+                                    <label for="f-option5">Cash on delivery</label>
+                                    <div class="check"></div>
+                                </div>
+
+                            </div>
+                            <!-- <div class="payment_item active">
+                                <div class="radion_btn">
+                                    <input type="radio" id="f-option6" name="selector">
+                                    <label for="f-option6">Razopay </label>
+                                    <img src="img/product/card.jpg" alt="">
+                                    <div class="check"></div>
+                                </div>
+
+                            </div> -->
+
+                            <button class="primary-btn" href="#">Proceed to Paypal</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</section>
+
+{% endblock %}
+
+
+
+{% block js %}
+
+<script>
+    document.querySelector('form').addEventListener('submit', function (event) {
+        if (!document.querySelector('input[name="selector"]:checked')) {
+            alert('Please select a payment method.');
+            event.preventDefault(); // Prevent form submission
+        }
+    });
+</script>
+
+
+
+
+
+
+
+{% endblock %}

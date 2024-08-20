@@ -39,7 +39,33 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'user_app',
     'admin_app',
+    'cart_app',
+
+    'django.contrib.sites',
+    'allauth',
+    'allauth.account',
+    'allauth.socialaccount',
+    'allauth.socialaccount.providers.google',
 ]
+
+SITE_ID = 1
+
+AUTHENTICATION_BACKENDS = (
+    'django.contrib.auth.backends.ModelBackend',
+    'allauth.account.auth_backends.AuthenticationBackend',
+)
+# LOGIN_REDIRECT_URL = 'index-page'
+LOGIN_REDIRECT_URL = 'profile-form'
+
+SOCIALACCOUNT_PROVIDERS = {
+    'google': {
+        'APP': {
+            'client_id': '1026950511350-h4a1dik27uugqja7oe1qhstml3kc0hjh.apps.googleusercontent.com',
+            'secret': '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',
+            'key': ''
+        }
+    }
+}
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -49,6 +75,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'allauth.account.middleware.AccountMiddleware',
 ]
 
 ROOT_URLCONF = 'shoe_spectra.urls'
@@ -64,6 +91,7 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'user_app.context_processors.profile_context',
             ],
         },
     },
@@ -78,7 +106,7 @@ WSGI_APPLICATION = 'shoe_spectra.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'shoe_spectra',
+        'NAME': 'shoe_spectra_pjt',
         'USER': 'postgres',
         'PASSWORD': 'admin123',
         'HOST': 'localhost',  # or the IP address of your database server
@@ -127,3 +155,36 @@ STATIC_URL = 'static/'
 # https://docs.djangoproject.com/en/5.0/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'  
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = 'rabeehpuzhakkalakath8547@gmail.com'
+EMAIL_HOST_PASSWORD = 'uzvs fzaj uotu kdvi'
+
+
+
+
+
+
+import os
+
+# MEDIA_URL = '/media/'
+# MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+
+MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+
+
+
+from django.contrib.messages import constants as messages
+
+
+MESSAGE_TAGS = {
+  
+    messages.ERROR: 'alert alert-danger',     # Error messages
+}

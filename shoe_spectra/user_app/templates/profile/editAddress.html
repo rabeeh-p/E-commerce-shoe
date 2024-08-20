@@ -1,0 +1,96 @@
+{% extends 'profile/detailsProfile.html' %}
+
+
+
+
+{% block profile %}
+
+
+
+
+<div class="col-lg-8">
+
+   
+    <div class="container mt-4">
+        <h1 class="mb-4">Edit Address</h1>
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">Edit Address Details</h5>
+                <form method="post">
+                    {% csrf_token %}
+                    
+                    <div class="mb-3">
+                        <label for="fullname" class="form-label">Full Name</label>
+                        <input type="text" class="form-control {% if errors.fullname %}is-invalid{% endif %}" id="fullname" name="fullname" value="{{ address.fullname }}" required>
+                        {% if errors.fullname %}
+                        <div class="invalid-feedback">{{ errors.fullname }}</div>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="address_line1" class="form-label">Address Line 1</label>
+                        <input type="text" class="form-control {% if errors.address_line1 %}is-invalid{% endif %}" id="address_line1" name="address_line1" value="{{ address.address_line1 }}" required>
+                        {% if errors.address_line1 %}
+                        <div class="invalid-feedback">{{ errors.address_line1 }}</div>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="address_line2" class="form-label">Address Line 2</label>
+                        <input type="text" class="form-control" id="address_line2" name="address_line2" value="{{ address.address_line2 }}">
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="phone_number" class="form-label">Phone Number</label>
+                        <input type="text" class="form-control {% if errors.phone_number %}is-invalid{% endif %}" id="phone_number" name="phone_number" value="{{ address.phone_number }}" required>
+                        {% if errors.phone_number %}
+                        <div class="invalid-feedback">{{ errors.phone_number }}</div>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="city" class="form-label">City</label>
+                        <input type="text" class="form-control {% if errors.city %}is-invalid{% endif %}" id="city" name="city" value="{{ address.city }}" required>
+                        {% if errors.city %}
+                        <div class="invalid-feedback">{{ errors.city }}</div>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="state" class="form-label">State</label>
+                        <input type="text" class="form-control {% if errors.state %}is-invalid{% endif %}" id="state" name="state" value="{{ address.state }}" required>
+                        {% if errors.state %}
+                        <div class="invalid-feedback">{{ errors.state }}</div>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="postal_code" class="form-label">ZIP Code</label>
+                        <input type="text" class="form-control {% if errors.postal_code %}is-invalid{% endif %}" id="postal_code" name="postal_code" value="{{ address.postal_code }}" required>
+                        {% if errors.postal_code %}
+                        <div class="invalid-feedback">{{ errors.postal_code }}</div>
+                        {% endif %}
+                    </div>
+                    
+                    <button type="submit" class="btn btn-primary">Save Changes</button>
+                    <a href="{% url 'single-address' address.id %}" class="btn btn-secondary ms-2">Cancel</a>
+                </form>
+            </div>
+        </div>
+    </div>
+
+
+</div>
+
+
+
+
+{% endblock %}
+
+
+{% block js %}
+
+    
+
+
+{% endblock %}

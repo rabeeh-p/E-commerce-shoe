@@ -1,0 +1,61 @@
+{% extends 'base.html' %}
+
+{% block links %}
+
+
+<link href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.12/cropper.min.css" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.12/cropper.min.js"></script>
+
+
+
+{% endblock %}
+
+
+{% block content %}
+{% if messages %}
+    <div class="alert alert-dismissible fade show" role="alert">
+        {% for message in messages %}
+            <div class="alert {% if message.tags == 'error' %}alert-danger{% elif message.tags == 'success' %}alert-success{% endif %}">
+                {{ message }}
+            </div>
+        {% endfor %}
+    </div>
+{% endif %}
+
+<div class="col-md-6 mb-6 mb-md-0">  <!-- Adjusted from col-md to col-md-6 -->
+    <div class="card">
+        <h5 class="card-header">Add New Category</h5>
+        <div class="card-body">
+            <form class="browser-default-validation" method="post">
+                {% csrf_token %}
+                <div class="form-floating form-floating-outline mb-6">
+                    <input type="text" name="category" value="{{category.name}}" class="form-control" id="basic-default-name"
+                        placeholder="new category" required="">
+                    <label for="basic-default-name">category</label>
+                </div>
+      
+                <button type="submit" class="btn btn-primary waves-effect waves-light">Submit</button>
+                
+                <a href="{% url 'deleteCategory-page' category.id %}" class="btn btn-danger waves-effect waves-light">Delete Category</a>
+                
+            </form>
+        </div>
+    </div>
+</div>
+
+
+
+{% endblock %}
+
+
+
+
+{% block js %}
+
+
+
+
+
+
+
+{% endblock %}

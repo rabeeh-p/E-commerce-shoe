@@ -1,0 +1,511 @@
+{% extends 'base.html' %}
+
+
+
+{% block css %}
+
+<script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+
+<style>
+    .btn {
+    display: inline-block;      /* Ensure buttons are inline */
+    margin: 0;                 /* Reset margins */
+    padding: 10px 20px;        /* Set consistent padding */
+    font-size: 14px;           /* Adjust font size as needed */
+    text-decoration: none;      /* Remove underline from links */
+    cursor: pointer;            /* Change cursor to pointer */
+    transition: background-color 0.3s; /* Smooth transition */
+}
+
+.btn-success {
+    background-color: #28a745; /* Bootstrap success color */
+    color: white;               /* Text color for success */
+}
+
+.btn-danger {
+    background-color: #dc3545; /* Bootstrap danger color */
+    color: white;               /* Text color for danger */
+}
+
+/* Optional: Add hover effects */
+.btn:hover {
+    opacity: 0.8;               /* Slightly fade on hover */
+}
+</style>
+
+{% endblock %}
+
+{% block content %}
+
+
+<div class="card">
+    <div class="card-header">
+        <h5 class="mb-0">Brand</h5>
+        <div class="d-flex justify-content-between align-items-center row pt-4 gap-4 gap-md-0">
+            <div class="col-md-4 product_status"></div>
+            <div class="col-md-4 product_category"></div>
+            <div class="col-md-4 product_stock"></div>
+        </div>
+    </div>
+    <div class="card-datatable table-responsive">
+        <div id="DataTables_Table_0_wrapper" class="dataTables_wrapper dt-bootstrap5 no-footer">
+            <div class="card-header d-flex border-top rounded-0 flex-wrap py-3 pb-5 pb-md-4">
+                <div class="me-5 ms-n2">
+                    <div id="DataTables_Table_0_filter" class="dataTables_filter"><label><input type="search"
+                                class="form-control form-control-sm" placeholder="Search"
+                                aria-controls="DataTables_Table_0"></label></div>
+                </div>
+                <div class="d-flex justify-content-start justify-content-md-end align-items-baseline">
+                    <div
+                        class="dt-action-buttons d-flex align-items-start align-items-md-center justify-content-sm-center gap-4 pt-0">
+
+                        <div class="dt-buttons btn-group flex-wrap d-flex">
+                            <div class="btn-group"><a href="{% url 'add-brand' %}"
+                                    class="btn btn-secondary buttons-collection dropdown-toggle btn-outline-secondary me-4 waves-effect waves-light"
+                                    tabindex="0" aria-controls="DataTables_Table_0" type="button" aria-haspopup="dialog"
+                                    aria-expanded="false"><span><span class="d-none d-sm-inline-block">Add
+                                        </span></span></a></div>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <table class="datatables-products table dataTable no-footer dtr-column" id="DataTables_Table_0"
+                aria-describedby="DataTables_Table_0_info">
+                <thead>
+                    <tr>
+                        <th class="control sorting_disabled dtr-hidden" rowspan="1" colspan="1"
+                            style="width: 17.625px; display: none;" aria-label=""></th>
+                        <th class="sorting_disabled dt-checkboxes-cell dt-checkboxes-select-all" rowspan="1" colspan="1"
+                            style="width: 17.625px;" data-col="1" aria-label="">No</th>
+                        <th class="sorting sorting_asc" tabindex="0" aria-controls="DataTables_Table_0" rowspan="1"
+                            colspan="1" style="width: 114.025px;"
+                            aria-label="product: activate to sort column descending" aria-sort="ascending">brands
+                        </th>
+                        <th class="sorting" tabindex="0" aria-controls="DataTables_Table_0" rowspan="1" colspan="1"
+                            style="width: 124.062px;" aria-label="category: activate to sort column ascending">
+                            status</th>
+                        <th class="sorting" tabindex="0" aria-controls="DataTables_Table_0" rowspan="1" colspan="1"
+                            style="width: 124.062px;" aria-label="category: activate to sort column ascending">
+                            Edit</th>
+                    </tr>
+                </thead>
+                
+                <tbody>
+                    {% for i in brand %}
+                    <tr>
+                        <th>{{forloop.counter}}</th>
+                        <th class="sorting" tabindex="0" aria-controls="DataTables_Table_0" rowspan="1" colspan="1"
+                            style="width: 124.062px;" aria-label="category: activate to sort column ascending">
+                            {{i.name}}</th>
+                            <th class="sorting" tabindex="0" aria-controls="DataTables_Table_0" rowspan="1" colspan="1" style="width: 124.062px;" aria-label="category: activate to sort column ascending">
+                                <a href="#" class="btn btn-sm {% if i.status %}btn-success{% else %}btn-danger{% endif %}" 
+                                   data-item-id="{{ i.id }}" id="toggle-status-button-{{ i.id }}">
+                                    {% if i.status %}Available{% else %}Not Available{% endif %}
+                                </a>
+                            </th>
+                            
+                        <th class="sorting" tabindex="0" aria-controls="DataTables_Table_0" rowspan="1" colspan="1"
+                            style="width: 124.062px;" aria-label="category: activate to sort column ascending">
+                            <a type="" href="{% url 'edit-brand' i.id %}"
+                                class="btn btn-sm "
+                                 >
+                                edit
+                            </a>
+                        </th>
+                        
+                        
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+
+<!-- CATEGORY -->
+
+
+<div class="card mt-5">
+    <div class="card-header">
+        <h5 class="mb-0">Category</h5>
+        <div class="d-flex justify-content-between align-items-center row pt-4 gap-4 gap-md-0">
+            <div class="col-md-4 product_status"></div>
+            <div class="col-md-4 product_category"></div>
+            <div class="col-md-4 product_stock"></div>
+        </div>
+    </div>
+    <div class="card-datatable table-responsive">
+        <div id="DataTables_Table_0_wrapper" class="dataTables_wrapper dt-bootstrap5 no-footer">
+            <div class="card-header d-flex border-top rounded-0 flex-wrap py-3 pb-5 pb-md-4">
+                <div class="me-5 ms-n2">
+                    <div id="DataTables_Table_0_filter" class="dataTables_filter"><label><input type="search"
+                                class="form-control form-control-sm" placeholder="Search"
+                                aria-controls="DataTables_Table_0"></label></div>
+                </div>
+                <div class="d-flex justify-content-start justify-content-md-end align-items-baseline">
+                    <div
+                        class="dt-action-buttons d-flex align-items-start align-items-md-center justify-content-sm-center gap-4 pt-0">
+
+                        <div class="dt-buttons btn-group flex-wrap d-flex">
+                            <div class="btn-group"><a href="{% url 'add-categories' %}"
+                                    class="btn btn-secondary buttons-collection dropdown-toggle btn-outline-secondary me-4 waves-effect waves-light"
+                                    tabindex="0" aria-controls="DataTables_Table_0" type="button" aria-haspopup="dialog"
+                                    aria-expanded="false"><span><span class="d-none d-sm-inline-block">Add
+                                        </span></span></a></div>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <table class="datatables-products table dataTable no-footer dtr-column" id="DataTables_Table_0"
+                aria-describedby="DataTables_Table_0_info">
+                <thead>
+                    <tr>
+                        <th class="control sorting_disabled dtr-hidden" rowspan="1" colspan="1"
+                            style="width: 17.625px; display: none;" aria-label=""></th>
+                        <th class="sorting_disabled dt-checkboxes-cell dt-checkboxes-select-all" rowspan="1" colspan="1"
+                            style="width: 17.625px;" data-col="1" aria-label="">No</th>
+                        <th class="sorting sorting_asc" tabindex="0" aria-controls="DataTables_Table_0" rowspan="1"
+                            colspan="1" style="width: 114.025px;"
+                            aria-label="product: activate to sort column descending" aria-sort="ascending">Category
+                        </th>
+                        <th class="sorting" tabindex="0" aria-controls="DataTables_Table_0" rowspan="1" colspan="1"
+                            style="width: 124.062px;" aria-label="category: activate to sort column ascending">
+                            Status</th>
+                        <th class="sorting" tabindex="0" aria-controls="DataTables_Table_0" rowspan="1" colspan="1"
+                            style="width: 124.062px;" aria-label="category: activate to sort column ascending">
+                            Edit</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for category in categories %}
+                    <tr>
+                        <th>{{forloop.counter}}</th>
+                        <th class="sorting" tabindex="0" aria-controls="DataTables_Table_0" rowspan="1" colspan="1"
+                            style="width: 124.062px;" aria-label="category: activate to sort column ascending">
+                            {{category.name}}</th>
+                        <th class="sorting" tabindex="0" aria-controls="DataTables_Table_0" rowspan="1" colspan="1"
+                            style="width: 124.062px;" aria-label="category: activate to sort column ascending">
+                            <a type="button" href="#"
+                                class="btn btn-sm {% if category.status %}btn-success{% else %}btn-danger{% endif %}"
+                                data-item-id="{{ category.id }}" id="toggle-status-button1-{{ category.id }}">
+                                {% if category.status %}Available{% else %}Not Available{% endif %}
+                            </a>
+                        </th>
+                        <th class="sorting" tabindex="0" aria-controls="DataTables_Table_0" rowspan="1" colspan="1"
+                            style="width: 124.062px;" aria-label="category: activate to sort column ascending">
+                            <a type="" href="{% url 'editcategory-page' category.id %}"
+                                class="btn btn-sm "
+                                 >
+                                edit
+                            </a>
+                        </th>
+                        
+                        
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+
+<div class="card mt-5">
+    <div class="card-header">
+        <h5 class="mb-0">Colors</h5>
+        <div class="d-flex justify-content-between align-items-center row pt-4 gap-4 gap-md-0">
+            <div class="col-md-4 product_status"></div>
+            <div class="col-md-4 product_category"></div>
+            <div class="col-md-4 product_stock"></div>
+        </div>
+    </div>
+    <div class="card-datatable table-responsive">
+        <div id="DataTables_Table_0_wrapper" class="dataTables_wrapper dt-bootstrap5 no-footer">
+            <div class="card-header d-flex border-top rounded-0 flex-wrap py-3 pb-5 pb-md-4">
+                <div class="me-5 ms-n2">
+                    <div id="DataTables_Table_0_filter" class="dataTables_filter"><label><input type="search"
+                                class="form-control form-control-sm" placeholder="Search"
+                                aria-controls="DataTables_Table_0"></label></div>
+                </div>
+                <div class="d-flex justify-content-start justify-content-md-end align-items-baseline">
+                    <div
+                        class="dt-action-buttons d-flex align-items-start align-items-md-center justify-content-sm-center gap-4 pt-0">
+
+                        <div class="dt-buttons btn-group flex-wrap d-flex">
+                            <div class="btn-group"><a href="{% url 'add-color' %}"
+                                    class="btn btn-secondary buttons-collection dropdown-toggle btn-outline-secondary me-4 waves-effect waves-light"
+                                    tabindex="0" aria-controls="DataTables_Table_0" type="button" aria-haspopup="dialog"
+                                    aria-expanded="false"><span><span class="d-none d-sm-inline-block">Add
+                                        </span></span></a></div>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <table class="datatables-products table dataTable no-footer dtr-column" id="DataTables_Table_0"
+                aria-describedby="DataTables_Table_0_info">
+                <thead>
+                    <tr>
+                        <th class="control sorting_disabled dtr-hidden" rowspan="1" colspan="1"
+                            style="width: 17.625px; display: none;" aria-label=""></th>
+                        <th class="sorting_disabled dt-checkboxes-cell dt-checkboxes-select-all" rowspan="1" colspan="1"
+                            style="width: 17.625px;" data-col="1" aria-label="">No</th>
+                        <th class="sorting sorting_asc" tabindex="0" aria-controls="DataTables_Table_0" rowspan="1"
+                            colspan="1" style="width: 114.025px;"
+                            aria-label="product: activate to sort column descending" aria-sort="ascending">Colors
+                        </th>
+                        <th class="sorting" tabindex="0" aria-controls="DataTables_Table_0" rowspan="1" colspan="1"
+                            style="width: 124.062px;" aria-label="category: activate to sort column ascending">
+                            details</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for c in color %}
+                    <tr>
+                        <th>{{forloop.counter}}</th>
+                        <th class="sorting" tabindex="0" aria-controls="DataTables_Table_0" rowspan="1" colspan="1"
+                            style="width: 124.062px;" aria-label="category: activate to sort column ascending">
+                            {{c.name}}</th>
+                        <th class="sorting" tabindex="0" aria-controls="DataTables_Table_0" rowspan="1" colspan="1"
+                            style="width: 124.062px;" aria-label="category: activate to sort column ascending">
+                            <a type="" href="{% url 'edit-color' c.id %}"
+                                class="btn btn-sm "
+                                data-model-type="category" data-item-id="{{ c.id }}">
+                                edit
+                            </a>
+                        </th>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<div class="card mt-5">
+    <div class="card-header">
+        <h5 class="mb-0">Shoe Size</h5>
+        <div class="d-flex justify-content-between align-items-center row pt-4 gap-4 gap-md-0">
+            <div class="col-md-4 product_status"></div>
+            <div class="col-md-4 product_category"></div>
+            <div class="col-md-4 product_stock"></div>
+        </div>
+    </div>
+    <div class="card-datatable table-responsive">
+        <div id="DataTables_Table_0_wrapper" class="dataTables_wrapper dt-bootstrap5 no-footer">
+            <div class="card-header d-flex border-top rounded-0 flex-wrap py-3 pb-5 pb-md-4">
+                <div class="me-5 ms-n2">
+                    <div id="DataTables_Table_0_filter" class="dataTables_filter"><label><input type="search"
+                                class="form-control form-control-sm" placeholder="Search"
+                                aria-controls="DataTables_Table_0"></label></div>
+                </div>
+                
+            </div>
+            <table class="datatables-products table dataTable no-footer dtr-column" id="DataTables_Table_0"
+                aria-describedby="DataTables_Table_0_info">
+                <thead>
+                    <tr>
+                        <th class="control sorting_disabled dtr-hidden" rowspan="1" colspan="1"
+                            style="width: 17.625px; display: none;" aria-label=""></th>
+                        <th class="sorting_disabled dt-checkboxes-cell dt-checkboxes-select-all" rowspan="1" colspan="1"
+                            style="width: 17.625px;" data-col="1" aria-label="">No</th>
+                        <th class="sorting sorting_asc" tabindex="0" aria-controls="DataTables_Table_0" rowspan="1"
+                            colspan="1" style="width: 114.025px;"
+                            aria-label="product: activate to sort column descending" aria-sort="ascending">size
+                        </th>
+                        
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for s in shoe %}
+                    <tr>
+                        <th>{{forloop.counter}}</th>
+                        <th class="sorting" tabindex="0" aria-controls="DataTables_Table_0" rowspan="1" colspan="1"
+                            style="width: 124.062px;" aria-label="category: activate to sort column ascending">
+                            {{s.size}}</th>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+
+<div class="card mt-5">
+    <div class="card-header">
+        <h5 class="mb-0">Gender</h5>
+        <div class="d-flex justify-content-between align-items-center row pt-4 gap-4 gap-md-0">
+            <div class="col-md-4 product_status"></div>
+            <div class="col-md-4 product_category"></div>
+            <div class="col-md-4 product_stock"></div>
+        </div>
+    </div>
+    <div class="card-datatable table-responsive">
+        <div id="DataTables_Table_0_wrapper" class="dataTables_wrapper dt-bootstrap5 no-footer">
+            <div class="card-header d-flex border-top rounded-0 flex-wrap py-3 pb-5 pb-md-4">
+                <div class="me-5 ms-n2">
+                    <div id="DataTables_Table_0_filter" class="dataTables_filter"><label><input type="search"
+                                class="form-control form-control-sm" placeholder="Search"
+                                aria-controls="DataTables_Table_0"></label></div>
+                </div>
+                <div class="d-flex justify-content-start justify-content-md-end align-items-baseline">
+                    <div
+                        class="dt-action-buttons d-flex align-items-start align-items-md-center justify-content-sm-center gap-4 pt-0">
+
+                        <div class="dt-buttons btn-group flex-wrap d-flex">
+                            <div class="btn-group"><a href="{% url 'add-gender' %}"
+                                    class="btn btn-secondary buttons-collection dropdown-toggle btn-outline-secondary me-4 waves-effect waves-light"
+                                    tabindex="0" aria-controls="DataTables_Table_0" type="button" aria-haspopup="dialog"
+                                    aria-expanded="false"><span><span class="d-none d-sm-inline-block">Add
+                                        </span></span></a></div>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <table class="datatables-products table dataTable no-footer dtr-column" id="DataTables_Table_0"
+                aria-describedby="DataTables_Table_0_info">
+                <thead>
+                    <tr>
+                        <th class="control sorting_disabled dtr-hidden" rowspan="1" colspan="1"
+                            style="width: 17.625px; display: none;" aria-label=""></th>
+                        <th class="sorting_disabled dt-checkboxes-cell dt-checkboxes-select-all" rowspan="1" colspan="1"
+                            style="width: 17.625px;" data-col="1" aria-label="">No</th>
+                        <th class="sorting sorting_asc" tabindex="0" aria-controls="DataTables_Table_0" rowspan="1"
+                            colspan="1" style="width: 114.025px;"
+                            aria-label="product: activate to sort column descending" aria-sort="ascending">Colors
+                        </th>
+                        <th class="sorting" tabindex="0" aria-controls="DataTables_Table_0" rowspan="1" colspan="1"
+                            style="width: 124.062px;" aria-label="category: activate to sort column ascending">
+                            details</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for g in gender %}
+                    <tr>
+                        <th>{{forloop.counter}}</th>
+                        <th class="sorting" tabindex="0" aria-controls="DataTables_Table_0" rowspan="1" colspan="1"
+                            style="width: 124.062px;" aria-label="category: activate to sort column ascending">
+                            {{g.name}}</th>
+                        <th class="sorting" tabindex="0" aria-controls="DataTables_Table_0" rowspan="1" colspan="1"
+                            style="width: 124.062px;" aria-label="category: activate to sort column ascending">
+                            <a type="" href="{% url 'edit-gender' g.id %}"
+                                class="btn btn-sm "
+                                data-model-type="category" >
+                                edit
+                            </a>
+                        </th>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+
+
+{% block js %}
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+
+
+// working
+$(document).ready(function() {
+    $(document).on('click', '[id^=toggle-status-button-]', function(event) {
+        event.preventDefault(); 
+        const itemId = $(this).data('item-id'); 
+        const button = $(this); 
+
+        
+        $.ajax({
+            url: '/admin-page/brand_status/',  
+            type: 'POST',
+            data: {
+                'csrfmiddlewaretoken': '{{ csrf_token }}',  
+                'item_id': itemId  
+            },
+            success: function(response) {
+                if (response.success) {
+                   
+                    location.reload()
+                } else {
+                    location.reload()
+                    
+                }
+            },
+           
+        });
+    });
+});
+
+
+$(document).ready(function() {
+    // Event delegation to handle clicks on dynamically generated buttons
+    $(document).on('click', '[id^=toggle-status-button1-]', function(event) {
+        event.preventDefault(); // Prevent the default anchor behavior
+        const itemId = $(this).data('item-id'); // Get the item ID from the data attribute
+        const button = $(this); // Reference to the clicked button
+
+        // AJAX request to toggle status
+        $.ajax({
+            url: '/admin-page/category_status/',  // Update this URL as needed
+            type: 'POST',
+            data: {
+                'csrfmiddlewaretoken': '{{ csrf_token }}',  // Include the CSRF token
+                'item_id': itemId  // Send the item ID in the request
+            },
+            success: function(response) {
+                if (response.success) {
+                    // Update the button based on the new status
+                    location.reload()
+                } else {
+                    location.reload()
+                    // alert(response.error);
+                }
+            },
+           
+        });
+    });
+});
+
+
+// $(document).ready(function() {
+//     $('a[data-model-type]').on('click', function(event) {
+//         event.preventDefault(); // Prevent the default anchor behavior
+//         const modelType = $(this).data('model-type'); // Get model type from the data attribute
+//         const itemId = $(this).data('item-id'); // Get the item ID from the data attribute
+
+//         // AJAX request to toggle status
+//         $.ajax({
+//             url: `/admin-page/product_status/`,  // Ensure this URL matches your Django URL pattern
+//             type: 'POST',
+//             data: {
+//                 'csrfmiddlewaretoken': '{{ csrf_token }}',  // Include the CSRF token
+//                 'model_type': modelType,  // Send the model type
+//                 'item_id': itemId  // Send the item ID
+//             },
+//             success: function(response) {
+//                 // Refresh the page on success
+//                 location.reload(); // Force page refresh to reflect updated status
+//             },
+//             error: function(xhr, status, error) {
+//                 alert('An error occurred while processing the request.');
+//                 console.error('AJAX Error: ', status, error);
+//             }
+//         });
+//     });
+// });
+
+
+
+</script>
+
+
+{% endblock %}

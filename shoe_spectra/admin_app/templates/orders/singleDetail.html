@@ -1,0 +1,102 @@
+{% extends 'base.html' %}
+
+{% block links %}
+
+{% endblock %}
+
+
+{% block content %}
+
+
+
+
+
+<div class="container mt-5">
+    <h2 class="mb-4">Order Details</h2>
+
+    <!-- Order Information -->
+    <div class="card mb-4">
+        <div class="card-body">
+            <h5 class="card-title">Order Information</h5>
+            <p><strong>Order ID:</strong> {{ order.id }}</p>
+            <p><strong>Payment method:</strong> {{ order.payment_method }}</p>
+            <p><strong>Date:</strong> {{ order.order_date }}</p>
+            <p><strong>Status:</strong> {{ order.status }}</p>
+            <p><strong>Total Price:</strong> ${{ order.total_amount }}</p>
+
+            <!-- Admin controls to update order status -->
+            <form action="" method="post">
+                {% csrf_token %}
+                <div class="form-group">
+                    <label for="status">Update Order Status:</label>
+                    <select name="status" id="status" class="form-control" {% if order.status != 'Pending' %}disabled{% endif %}>
+                        <option value="PENDING" {% if order.status == 'PENDING' %}selected{% endif %}>Pending</option>
+                        <option value="DELIVERED" {% if order.status == 'DELIVERED' %}selected{% endif %}>Delivered</option>
+                        <option value="CANCELED" {% if order.status == 'CANCELED' %}selected{% endif %}>Canceled</option>
+                    </select>
+                </div>
+                <button type="submit" class="btn btn-primary" {% if order.status != 'Pending' %}disabled{% endif %}>Update Status</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Shipping Address -->
+    <div class="card mb-4">
+        <div class="card-body">
+            <h5 class="card-title">Shipping Address</h5>
+            <p><strong>Full Name:</strong> {{ order_address.fullname }}</p>
+            <p><strong>Address Line 1:</strong> {{ order_address.address_line1 }}</p>
+            <p><strong>Address Line 2:</strong> {{ order_address.address_line2 }}</p>
+            <p><strong>City:</strong> {{ order_address.city }}</p>
+            <p><strong>State:</strong> {{ order_address.state }}</p>
+            <p><strong>Country:</strong> {{ order_address.country }}</p>
+            <p><strong>Postal Code:</strong> {{ order_address.postal_code }}</p>
+            <p><strong>Phone Number:</strong> {{ order_address.phone_number }}</p>
+        </div>
+    </div>
+
+    <!-- Order Items Table -->
+    <div class="card">
+        <div class="card-body">
+            <h5 class="card-title">Order Items</h5>
+            <div class="table-responsive">
+                <table class="table table-striped table-bordered">
+                    <thead>
+                        <tr>
+                            <th>Product</th>
+                            <th>Size</th>
+                            <th>Quantity</th>
+                            <th>Price</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for item in order_items %}
+                        <tr>
+                            <td>
+                                <img src="{{ item.product_size.variant.product.image.url }}" alt="{{ item.product_size.variant.product.name }}" style="width: 50px; height: auto; margin-right: 10px;">
+                                {{ item.product_size.variant.product.name }}
+                            </td>
+                            <td>{{ item.product_size.size }}</td>
+                            <td>{{ item.quantity }}</td>
+                            <td>${{ item.product_size.variant.product.price }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+
+
+{% endblock %}
+
+
+
+
+{% block js %}
+
+
+{% endblock %}

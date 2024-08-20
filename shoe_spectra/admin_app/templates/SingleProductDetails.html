@@ -1,0 +1,310 @@
+{% extends 'base.html' %}
+
+{% block links %}
+
+
+<link href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.12/cropper.min.css" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.12/cropper.min.js"></script>
+
+
+
+{% endblock %}
+
+
+{% block content %}
+
+
+<div class="card mb-4">
+  <div class="card-body">
+    <div class="row">
+      <div class="col-sm-3">
+        <p class="mb-0">Product name</p>
+      </div>
+      <div class="col-sm-9">
+        <p class="text-muted mb-0">{{product.name}}</p>
+      </div>
+    </div>
+    <hr>
+    <div class="row">
+      <div class="col-sm-3">
+        <p class="mb-0">Description</p>
+      </div>
+      <div class="col-sm-9">
+        <p class="text-muted mb-0">{{product.description}}</p>
+      </div>
+    </div>
+    <hr>
+    <div class="row">
+      <div class="col-sm-3">
+        <p class="mb-0">Price</p>
+      </div>
+      <div class="col-sm-9">
+        <p class="text-muted mb-0">{{product.price}}</p>
+      </div>
+    </div>
+    <hr>
+    <div class="row">
+      <div class="col-sm-3">
+        <p class="mb-0">category</p>
+      </div>
+      <div class="col-sm-9">
+        <p class="text-muted mb-0">{{product.category}}</p>
+      </div>
+    </div>
+    <hr>
+    <div class="row">
+      <div class="col-sm-3">
+        <p class="mb-0">Gender</p>
+      </div>
+      <div class="col-sm-9">
+        <p class="text-muted mb-0">{{product.gender}}</p>
+      </div>
+    </div>
+    <hr>
+    <div class="row">
+      <div class="col-sm-3">
+        <p class="mb-0">brand</p>
+      </div>
+      <div class="col-sm-9">
+        <p class="text-muted mb-0">{{product.brand}}</p>
+      </div>
+    </div>
+    <hr>
+    <!-- <a href="{% url 'edit_product' product.id %}" class="btn btn-primary">Edit</a> -->
+  </div>
+</div>
+
+
+
+<div class="card">
+  <div class="card-header">
+    <h5 class="mb-0">Variants</h5>
+    <div class="d-flex justify-content-between align-items-center row pt-4 gap-4 gap-md-0">
+      <div class="col-md-4 product_status"></div>
+      <div class="col-md-4 product_category"></div>
+      <div class="col-md-4 product_stock"></div>
+    </div>
+  </div>
+  <div class="card-datatable table-responsive">
+    <div id="DataTables_Table_0_wrapper" class="dataTables_wrapper dt-bootstrap5 no-footer">
+      <div class="card-header d-flex border-top rounded-0 flex-wrap py-3 pb-5 pb-md-4">
+        <div class="me-5 ms-n2">
+          <div id="DataTables_Table_0_filter" class="dataTables_filter"><label><input type="search"
+                class="form-control form-control-sm" placeholder="Search" aria-controls="DataTables_Table_0"></label>
+          </div>
+        </div>
+        <div class="d-flex justify-content-start justify-content-md-end align-items-baseline">
+          <div
+            class="dt-action-buttons d-flex align-items-start align-items-md-center justify-content-sm-center gap-4 pt-0">
+            <button class="btn btn-secondary add-new btn-warning waves-effect waves-light" tabindex="0"
+              aria-controls="DataTables_Table_0" type=""><a href="{% url 'variants-add' product.id %}"
+                style="text-decoration: none; color: inherit;"><span><i
+                    class="ri-add-line ri-16px me-0 me-sm-1_5"></i><span class="d-none d-sm-inline-block">Add
+                    Variant</span></span></a></button>
+
+
+          </div>
+        </div>
+      </div>
+      <table class="datatables-products table dataTable no-footer dtr-column" id="DataTables_Table_0"
+        aria-describedby="DataTables_Table_0_info">
+        <thead>
+          <tr>
+            <th class="control sorting_disabled dtr-hidden" rowspan="1" colspan="1"
+              style="width: 17.625px; display: none;" aria-label=""></th>
+            <th class="sorting_disabled dt-checkboxes-cell dt-checkboxes-select-all" rowspan="1" colspan="1"
+              style="width: 17.625px;" data-col="1" aria-label="">No</th>
+            <th class="sorting sorting_asc" tabindex="0" aria-controls="DataTables_Table_0" rowspan="1" colspan="1"
+              style="width: 114.025px;" aria-label="product: activate to sort column descending" aria-sort="ascending">
+              color</th>
+            <th class="sorting" tabindex="0" aria-controls="DataTables_Table_0" rowspan="1" colspan="1"
+              style="width: 124.062px;" aria-label="category: activate to sort column ascending">quantity</th>
+            <!-- <th class="sorting" tabindex="0" aria-controls="DataTables_Table_0" rowspan="1" colspan="1"
+              style="width: 124.062px;" aria-label="category: activate to sort column ascending">Status</th> -->
+            <th class="sorting" tabindex="0" aria-controls="DataTables_Table_0" rowspan="1" colspan="1"
+              style="width: 124.062px;" aria-label="category: activate to sort column ascending">Edit</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for v in variant %}
+          <tr class="odd">
+            <td valign="top" class="dtr-control sorting_1" style="display: none;"></td>
+            <td valign="top" class="dt-checkboxes-cell">{{forloop.counter}}</td>
+            <td valign="top">{{v.color}}</td>
+            <!-- <td valign="top">{{v.quantity}}</td> -->
+            <td valign="top">
+              <a href="{% url 'single-variant-status' v.id %}" class="status-link">
+                  {% if v.status == True %}
+                      <span class="badge bg-success">Available</span>
+                  {% else %}
+                      <span class="badge bg-warning">Unavailable</span>
+                  {% endif %}
+              </a>
+          </td>
+            <td valign="top">
+              <a href="{% url 'variants-edit' v.id %}">
+                <button class="view-button">View</button>
+              </a>
+            </td>
+          </tr>
+          {% endfor %}
+
+
+
+
+        </tbody>
+      </table>
+
+    </div>
+  </div>
+</div>
+
+<!-- <div class="card mt-5">
+  <div class="card-header">
+    <h5 class="mb-0">Variants</h5>
+    <div class="d-flex justify-content-between align-items-center row pt-4 gap-4 gap-md-0">
+      <div class="col-md-4 product_status"></div>
+      <div class="col-md-4 product_category"></div>
+      <div class="col-md-4 product_stock"></div>
+    </div>
+  </div>
+  <div class="card-datatable table-responsive">
+    <div id="DataTables_Table_0_wrapper" class="dataTables_wrapper dt-bootstrap5 no-footer">
+      <div class="card-header d-flex border-top rounded-0 flex-wrap py-3 pb-5 pb-md-4">
+        <div class="me-5 ms-n2">
+          <div id="DataTables_Table_0_filter" class="dataTables_filter"><label><input type="search"
+                class="form-control form-control-sm" placeholder="Search" aria-controls="DataTables_Table_0"></label>
+          </div>
+        </div>
+        <div class="d-flex justify-content-start justify-content-md-end align-items-baseline">
+          <div
+            class="dt-action-buttons d-flex align-items-start align-items-md-center justify-content-sm-center gap-4 pt-0">
+            <button class="btn btn-secondary add-new btn-warning waves-effect waves-light" tabindex="0"
+              aria-controls="DataTables_Table_0" type=""><a href="{% url 'variants-add' product.id %}"
+                style="text-decoration: none; color: inherit;"><span><i
+                    class="ri-add-line ri-16px me-0 me-sm-1_5"></i><span class="d-none d-sm-inline-block">Add
+                    Variant</span></span></a></button>
+
+
+          </div>
+        </div>
+      </div>
+      <table class="datatables-products table dataTable no-footer dtr-column" id="DataTables_Table_0"
+        aria-describedby="DataTables_Table_0_info">
+        <thead>
+          <tr>
+            <th class="control sorting_disabled dtr-hidden" rowspan="1" colspan="1"
+              style="width: 17.625px; display: none;" aria-label=""></th>
+            <th class="sorting_disabled dt-checkboxes-cell dt-checkboxes-select-all" rowspan="1" colspan="1"
+              style="width: 17.625px;" data-col="1" aria-label="">No</th>
+            <th class="sorting sorting_asc" tabindex="0" aria-controls="DataTables_Table_0" rowspan="1" colspan="1"
+              style="width: 114.025px;" aria-label="product: activate to sort column descending" aria-sort="ascending">
+              color</th>
+            <th class="sorting" tabindex="0" aria-controls="DataTables_Table_0" rowspan="1" colspan="1"
+              style="width: 124.062px;" aria-label="category: activate to sort column ascending">quantity</th>
+            <th class="sorting" tabindex="0" aria-controls="DataTables_Table_0" rowspan="1" colspan="1"
+              style="width: 124.062px;" aria-label="category: activate to sort column ascending">Status</th>
+            <th class="sorting" tabindex="0" aria-controls="DataTables_Table_0" rowspan="1" colspan="1"
+              style="width: 124.062px;" aria-label="category: activate to sort column ascending">Edit</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for v in variant %}
+          <tr class="odd">
+            <td valign="top" class="dtr-control sorting_1" style="display: none;"></td>
+            <td valign="top" class="dt-checkboxes-cell">{{forloop.counter}}</td>
+            <td valign="top">{{v.color}}</td>
+            <td valign="top">{{v.quantity}}</td>
+            <td valign="top">
+              <a href="{% url 'single-variant-status' v.id %}" class="status-link">
+                  {% if v.status == True %}
+                      <span class="badge bg-success">Available</span>
+                  {% else %}
+                      <span class="badge bg-warning">Unavailable</span>
+                  {% endif %}
+              </a>
+          </td>
+            <td valign="top">
+              <a href="{% url 'variants-edit' v.id %}">
+                <button class="view-button">View</button>
+              </a>
+            </td>
+          </tr>
+          {% endfor %}
+
+
+
+
+        </tbody>
+      </table>
+
+    </div>
+  </div>
+</div> -->
+
+
+{% endblock %}
+
+
+
+
+{% block js %}
+
+
+
+
+<script>
+  let cropperInstances = {};
+
+  function previewImage(index) {
+    const fileInput = document.getElementById(`upload-file-${index}`);
+    const imagePreview = document.getElementById(`image-preview-${index}`);
+    const cropButton = document.getElementById(`crop-button-${index}`);
+
+    const file = fileInput.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = function (e) {
+        imagePreview.src = e.target.result;
+        imagePreview.style.display = 'block'; // Show the image preview
+        cropButton.style.display = 'block'; // Show the crop button
+
+        // Destroy any existing cropper instance
+        if (cropperInstances[index]) {
+          cropperInstances[index].destroy();
+        }
+
+        // Create a new Cropper instance
+        cropperInstances[index] = new Cropper(imagePreview, {
+          aspectRatio: 1, // Set the desired aspect ratio
+          viewMode: 1,
+          ready() {
+            console.log(`Cropper ready for image ${index}`);
+          }
+        });
+      };
+      reader.readAsDataURL(file);
+    }
+  }
+
+  function cropImage(index) {
+    console.log(`Crop button clicked for image ${index}`); // Debug log
+    if (cropperInstances[index]) {
+      const canvas = cropperInstances[index].getCroppedCanvas();
+      const croppedImage = canvas.toDataURL('image/png');
+      document.getElementById(`cropped-image-${index}`).value = croppedImage; // Set the base64 string to the hidden input
+
+      // Optionally, you can display the cropped image
+      const croppedImagePreview = document.createElement('img');
+      croppedImagePreview.src = croppedImage;
+      croppedImagePreview.style.maxWidth = '100%';
+      croppedImagePreview.style.display = 'block';
+      document.body.appendChild(croppedImagePreview); // Append to the body or a specific container
+      console.log('Cropped Image:', croppedImage);
+    } else {
+      console.error(`No cropper instance found for image ${index}`);
+    }
+  }
+</script>
+
+{% endblock %}

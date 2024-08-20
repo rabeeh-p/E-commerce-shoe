@@ -1,0 +1,233 @@
+{% extends 'base.html' %}
+
+{% block links %}
+
+
+<link href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.12/cropper.min.css" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.12/cropper.min.js"></script>
+
+
+
+{% endblock %}
+
+
+{% block content %}
+
+<div class="col-md mb-6 mb-md-0">
+    <div class="card">
+        <h5 class="card-header">Product</h5>
+        <div class="card-body">
+            <form class="browser-default-validation" method="post">
+                {% csrf_token %}
+                <div class="form-floating form-floating-outline mb-6">
+                    <input type="text" name="productTitle" class="form-control" id="basic-default-name"
+                        placeholder="John Doe" required="" value="{{product.name}}">
+                    <label for="basic-default-name">Name</label>
+                </div>
+                <!-- <div class="form-floating form-floating-outline mb-6">
+            <input type="text" name="description" class="form-control" id="basic-default-name" placeholder="John Doe" required="">
+            <label for="basic-default-name">Description</label>
+          </div> -->
+                <div class="form-floating form-floating-outline mb-6">
+                    <textarea class="form-control h-px-75" id="basic-default-bio" name="description"
+                        placeholder="My name is john" rows="3" required=""> {{product.description}}</textarea>
+                    <label for="basic-default-bio">Description</label>
+                </div>
+                <div class="form-floating form-floating-outline mb-6">
+                    <input type="text" name="price" id="basic-default-email" class="form-control" placeholder="99.9"
+                        value="{{product.price}}" required="">
+                    <label for="basic-default-email">Price</label>
+                </div>
+
+                <div class="form-floating form-floating-outline mb-6">
+                    <input type="text" name="productStock" class="form-control" id="basic-default-name"
+                        placeholder="John Doe" required="" value="{{product.stock}}">
+                    <label for="basic-default-name">Stock</label>
+                </div>
+
+                <div class="form-floating form-floating-outline mb-6">
+                    <select class="form-select" name="gender" id="" required="">
+                        <option value="">Select Gender</option>
+                        {% for c in gender %}
+                        <option value="{{ c.id }}" {% if product.gender and product.gender.id == c.id %}selected{% endif %}> {{ c.name }}</option>
+                        {% endfor %}
+                    </select>
+                    <label for="basic-default-country">gender</label>
+                </div>
+                
+
+                <div class="form-floating form-floating-outline mb-6">
+                    <select class="form-select" name="category1" id="basic-default-country" required="">
+                        <option value="">Select Category</option>
+                        {% for c in category %}
+                        <option value="{{ c.id }}" {% if product.category and product.category.id == c.id %}selected{% endif %}>{{ c.name }}</option>
+                        {% endfor %}
+
+                    </select>
+                    <label for="basic-default-country">Country</label>
+                </div>
+
+
+                <div class="form-floating form-floating-outline mb-6">
+                    <select class="form-select" name="brand1" id="basic-default-country" required="">
+                        <option value="">Select Brand</option>
+                        <option value="">Select Brand</option>
+                        {% for b in brand %}
+                        <option value="{{ b.id }}"{% if product.brand and product.brand.id == b.id %}selected{% endif %} >{{ b.name }}</option>
+                        {% endfor %}
+
+
+                    </select>
+                    <label for="basic-default-country">Brand</label>
+                </div>
+
+                <div class="form-floating form-floating-outline mb-6">
+                    <select class="form-select" name="color" id="basic-default-country" required="">
+                        <option value="">Select Colors</option>
+                        {% for c in color %}
+                        <option value="{{ c.id }}" {% if product.colors and product.colors.id == c.id %}selected{% endif %}>{{ c.name }}
+                        </option>
+                        {% endfor %}
+
+                    </select>
+                    <label for="basic-default-country">Colors</label>
+                </div>
+
+                <div class="form-floating form-floating-outline mb-6">
+                    <select class="form-select" name="size" id="basic-default-country" required="">
+                        <option value="">Select Size</option>
+                        {% for s in size %}
+                        <option value="{{ s.id }}" {% if product.shoe_size and product.shoe_size.id == s.id %}selected{% endif %}>{{ s.size }}
+                        </option>
+                        {% endfor %}
+
+                    </select>
+                    <label for="basic-default-country">Size</label>
+                </div>
+
+
+
+
+
+                <img id=""
+                    src="{% if product.image %}{{ product.image.url }}{% else %}path/to/default/image.jpg{% endif %}"
+                    style="max-width: 100%; display: block;">
+
+                <div class="product-images">
+                    {% for image in image %}
+                    <img src="{{ image.image.url }}" alt="{{ product.name }} image"
+                        style="max-width: 100%; display: block;">
+                    {% empty %}
+                    <p>No images available for this product.</p>
+                    {% endfor %}
+
+                    <div class="form-floating form-floating-outline mb-6">
+                        <input type="file" class="form-control" id="upload-file-1" accept="image/*" onchange="previewImage(1)" required>
+                        <label for="upload-file-1">Product Main Pic</label>
+                        <img id="image-preview-1" style="display:none; max-width: 100%;">
+                        <button type="button" id="crop-button-1" style="display:none;" onclick="cropImage(1)">Crop</button>
+                        <input type="hidden" id="cropped-image-1" name="cropped_image">
+                    </div>
+                    
+                    <div class="form-floating form-floating-outline mb-6">
+                        <input type="file" class="form-control" id="upload-file-2" accept="image/*" onchange="previewImage(2)" required>
+                        <label for="upload-file-2">Product Additional Pic 1</label>
+                        <img id="image-preview-2" style="display:none; max-width: 100%;">
+                        <button type="button" id="crop-button-2" style="display:none;" onclick="cropImage(2)">Crop</button>
+                        <input type="hidden" id="cropped-image-2" name="additional_cropped_images">
+                    </div>
+                    
+                    <div class="form-floating form-floating-outline mb-6">
+                        <input type="file" class="form-control" id="upload-file-3" accept="image/*" onchange="previewImage(3)" required>
+                        <label for="upload-file-3">Product Additional Pic 2</label>
+                        <img id="image-preview-3" style="display:none; max-width: 100%;">
+                        <button type="button" id="crop-button-3" style="display:none;" onclick="cropImage(3)">Crop</button>
+                        <input type="hidden" id="cropped-image-3" name="additional_cropped_images">
+                    </div>
+                    
+                    <div class="form-floating form-floating-outline mb-6">
+                        <input type="file" class="form-control" id="upload-file-4" accept="image/*" onchange="previewImage(4)" required>
+                        <label for="upload-file-4">Product Additional Pic 3</label>
+                        <img id="image-preview-4" style="display:none; max-width: 100%;">
+                        <button type="button" id="crop-button-4" style="display:none;" onclick="cropImage(4)">Crop</button>
+                        <input type="hidden" id="cropped-image-4" name="additional_cropped_images">
+                    </div>
+                    
+                    <button type="submit" class="btn btn-primary waves-effect waves-light">Submit</button>
+                    
+            </form>
+        </div>
+    </div>
+    
+</div>
+
+
+
+
+
+
+{% endblock %}
+
+
+
+
+{% block js %}
+
+
+
+
+    <script>
+    let cropperInstances = {};
+
+    function previewImage(index) {
+        const fileInput = document.getElementById(`upload-file-${index}`);
+        const imagePreview = document.getElementById(`image-preview-${index}`);
+        const cropButton = document.getElementById(`crop-button-${index}`);
+
+        const file = fileInput.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = function (e) {
+                imagePreview.src = e.target.result;
+                imagePreview.style.display = 'block'; // Show the image preview
+                cropButton.style.display = 'block'; // Show the crop button
+
+                // Destroy any existing cropper instance
+                if (cropperInstances[index]) {
+                    cropperInstances[index].destroy();
+                }
+
+                // Create a new Cropper instance
+                cropperInstances[index] = new Cropper(imagePreview, {
+                    aspectRatio: 1, // Set the desired aspect ratio
+                    viewMode: 1,
+                    ready() {
+                        console.log(`Cropper ready for image ${index}`);
+                    }
+                });
+            };
+            reader.readAsDataURL(file);
+        }
+    }
+
+    function cropImage(index) {
+        console.log(`Crop button clicked for image ${index}`); // Debug log
+        if (cropperInstances[index]) {
+            const canvas = cropperInstances[index].getCroppedCanvas();
+            const croppedImage = canvas.toDataURL('image/png');
+            document.getElementById(`cropped-image-${index}`).value = croppedImage; // Set the base64 string to the hidden input
+
+            // Optionally, you can display the cropped image
+            const croppedImagePreview = document.createElement('img');
+            croppedImagePreview.src = croppedImage;
+            croppedImagePreview.style.maxWidth = '100%';
+            croppedImagePreview.style.display = 'block';
+            document.body.appendChild(croppedImagePreview); // Append to the body or a specific container
+            console.log('Cropped Image:', croppedImage);
+        } else {
+            console.error(`No cropper instance found for image ${index}`);
+        }
+    }
+</script>
+
+{% endblock %}

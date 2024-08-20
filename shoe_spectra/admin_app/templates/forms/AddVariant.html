@@ -1,0 +1,215 @@
+{% extends 'base.html' %}
+
+{% block links %}
+
+
+<link href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.12/cropper.min.css" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.12/cropper.min.js"></script>
+
+
+
+{% endblock %}
+
+
+{% block content %}
+{% if messages %}
+<div class="alert alert-dismissible fade show" role="alert">
+    {% for message in messages %}
+    <div
+        class="alert {% if message.tags == 'error' %}alert-danger{% elif message.tags == 'success' %}alert-success{% endif %}">
+        {{ message }}
+    </div>
+    {% endfor %}
+</div>
+{% endif %}
+
+<div class="col-md-6 mb-6 mb-md-0"> <!-- Adjusted from col-md to col-md-6 -->
+    <div class="card">
+        <h5 class="card-header">Add New Variants1</h5>
+        <div class="card-body">
+            {% if messages %}
+            {% for message in messages %}
+            <div class="alert alert-danger">
+                {{ message }}
+            </div>
+            {% endfor %}
+            {% endif %}
+            <form class="browser-default-validation" method="post">
+                {% csrf_token %}
+
+                <div class="form-floating form-floating-outline mb-6">
+                    <select class="form-select" name="color" id="basic-default-country" required="">
+                        <option value="">Select Color</option>
+                        {% for c in color %}
+                        <option value="{{ c.id }}">{{ c.name }}
+                        </option>
+                        {% endfor %}
+
+                    </select>
+                    <label for="basic-default-country">Color</label>
+                </div>
+
+
+
+                <!-- <div class="form-floating form-floating-outline mb-6">
+                    <select class="form-select" name="size" id="basic-default-country" required="">
+                        <option value="">Select Size</option>
+                        {% for s in size %}
+                        <option value="{{ s.id }}" >{{ s.size }}
+                        </option>
+                        {% endfor %}
+
+                    </select>
+                    <label for="basic-default-country">Size</label>
+                </div> -->
+
+
+                <div class="form-floating form-floating-outline mb-6">
+                    <input type="file" class="form-control" id="upload-file-1" required>
+                    <label for="upload-file-1">Product Main Pic</label>
+                    <img id="image-preview-1" style="display:none; max-width: 100%;">
+                    <button type="button" id="crop-button-1" style="display:none;">Crop</button>
+                    <input type="hidden" id="cropped-image-1" name="cropped_image_1">
+                </div>
+
+                <div class="form-floating form-floating-outline mb-6">
+                    <input type="file" class="form-control" id="upload-file-2" required>
+                    <label for="upload-file-2">Product Additional Pic 1</label>
+                    <img id="image-preview-2" style="display:none; max-width: 100%;">
+                    <button type="button" id="crop-button-2" style="display:none;">Crop</button>
+                    <input type="hidden" id="cropped-image-2" name="cropped_image_2">
+                </div>
+
+                <div class="form-floating form-floating-outline mb-6">
+                    <input type="file" class="form-control" id="upload-file-3" required>
+                    <label for="upload-file-3">Product Additional Pic 2</label>
+                    <img id="image-preview-3" style="display:none; max-width: 100%;">
+                    <button type="button" id="crop-button-3" style="display:none;">Crop</button>
+                    <input type="hidden" id="cropped-image-3" name="cropped_image_3">
+                </div>
+
+                <div class="form-floating form-floating-outline mb-6">
+                    <input type="file" class="form-control" id="upload-file-4" required>
+                    <label for="upload-file-4">Product Additional Pic 3</label>
+                    <img id="image-preview-4" style="display:none; max-width: 100%;">
+                    <button type="button" id="crop-button-4" style="display:none;">Crop</button>
+                    <input type="hidden" id="cropped-image-4" name="cropped_image_4">
+                </div>
+
+
+
+
+
+                <div class="form-floating form-floating-outline mb-6">
+                    <select class="form-select" name="size" id="basic-default-country" required="">
+                        <option value="">Select Size</option>
+                        {% for s in size %}
+                        <option value="{{ s.id }}">{{ s.size }}
+                        </option>
+                        {% endfor %}
+
+                    </select>
+                    <label for="basic-default-country">Size</label>
+                </div>
+                <div class="form-floating form-floating-outline mb-6">
+                    <input type="number" name="quantitiy" class="form-control" id="basic-default-name"
+                        placeholder="new quantity" required="">
+                    <label for="basic-default-name">quantity</label>
+                </div>
+
+
+
+
+
+                <button type="submit" class="btn btn-primary waves-effect waves-light">Submit</button>
+            </form>
+        </div>
+    </div>
+</div>
+
+
+
+{% endblock %}
+
+
+
+
+{% block js %}
+
+
+
+<script>
+    function handleFileSelect(event, imgPreviewId, cropButtonId, croppedImageId) {
+        var files = event.target.files;
+        var done = function (url) {
+            document.getElementById(imgPreviewId).src = url;
+            document.getElementById(imgPreviewId).style.display = 'block';
+            document.getElementById(cropButtonId).style.display = 'block';
+        };
+        var reader;
+        var file;
+        var url;
+
+        if (files && files.length > 0) {
+            file = files[0];
+            if (URL) {
+                done(URL.createObjectURL(file));
+            } else if (FileReader) {
+                reader = new FileReader();
+                reader.onload = function (event) {
+                    done(reader.result);
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+    }
+
+    function initializeCropper(imgPreviewId, cropButtonId, croppedImageId) {
+        var cropper;
+        document.getElementById(imgPreviewId).addEventListener('load', function () {
+            cropper = new Cropper(document.getElementById(imgPreviewId), {
+                aspectRatio: 1,
+                viewMode: 1,
+            });
+        });
+
+        document.getElementById(cropButtonId).addEventListener('click', function () {
+            var canvas;
+            if (cropper) {
+                canvas = cropper.getCroppedCanvas({
+                    width: 256,
+                    height: 256,
+                });
+                document.getElementById(croppedImageId).value = canvas.toDataURL();
+                cropper.destroy();
+                cropper = null;
+            }
+        });
+    }
+
+    document.getElementById('upload-file-1').addEventListener('change', function (event) {
+        handleFileSelect(event, 'image-preview-1', 'crop-button-1', 'cropped-image-1');
+    });
+
+    document.getElementById('upload-file-2').addEventListener('change', function (event) {
+        handleFileSelect(event, 'image-preview-2', 'crop-button-2', 'cropped-image-2');
+    });
+
+    document.getElementById('upload-file-3').addEventListener('change', function (event) {
+        handleFileSelect(event, 'image-preview-3', 'crop-button-3', 'cropped-image-3');
+    });
+
+    document.getElementById('upload-file-4').addEventListener('change', function (event) {
+        handleFileSelect(event, 'image-preview-4', 'crop-button-4', 'cropped-image-4');
+    });
+
+    initializeCropper('image-preview-1', 'crop-button-1', 'cropped-image-1');
+    initializeCropper('image-preview-2', 'crop-button-2', 'cropped-image-2');
+    initializeCropper('image-preview-3', 'crop-button-3', 'cropped-image-3');
+    initializeCropper('image-preview-4', 'crop-button-4', 'cropped-image-4');
+</script>
+
+
+
+
+{% endblock %}

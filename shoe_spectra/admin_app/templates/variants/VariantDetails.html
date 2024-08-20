@@ -1,0 +1,338 @@
+{% extends 'base.html' %}
+
+{% block links %}
+
+
+<link href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.12/cropper.min.css" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.12/cropper.min.js"></script>
+
+
+
+{% endblock %}
+
+
+{% block content %}
+{% if messages %}
+<div class="alert alert-dismissible fade show" role="alert">
+    {% for message in messages %}
+    <div
+        class="alert {% if message.tags == 'error' %}alert-danger{% elif message.tags == 'success' %}alert-success{% endif %}">
+        {{ message }}
+    </div>
+    {% endfor %}
+</div>
+{% endif %}
+
+
+<div class="card mb-4">
+    <div class="card-body">
+        <div class="row">
+            <div class="col-sm-3">
+                <p class="mb-0">Color</p>
+            </div>
+            <div class="col-sm-9">
+                <p class="text-muted mb-0"> {{ product.color }}</p>
+            </div>
+        </div>
+        <hr>
+        <div class="row mb-4">
+            <div class="col-sm-3">
+                <p class="mb-0">Status</p>
+            </div>
+            <div class="col-sm-9">
+                <p class="mb-0 {% if product.status %}text-success{% else %}text-danger{% endif %}">
+                    {% if product.status %}
+                    Active
+                    {% else %}
+                    Not Active
+                    {% endif %}
+                </p>
+            </div>
+        </div>
+        <hr>
+    </div>
+</div>
+
+<!-- <div class="dt-action-buttons d-flex align-items-start align-items-md-center justify-content-sm-center gap-4 pt-0"> -->
+    <button class="btn btn-secondary add-new btn-warning waves-effect waves-light" tabindex="0"
+        aria-controls="DataTables_Table_0" type=""><a href="{% url 'add-size' product.id %}"
+            style="text-decoration: none; color: inherit;"><span><i class="ri-add-line ri-16px me-0 me-sm-1_5"></i><span
+                    class="d-none d-sm-inline-block">Add
+                    Size</span></span></a></button>
+
+
+<!-- </div> -->
+
+<div class="container mt-5">
+    <div class="card mb-4">
+        <div class="card-body">
+            <div class="row">
+                <div class="col-sm-12">
+                    <div class="table-responsive">
+                        <table class="table table-bordered">
+                            <thead>
+                                <tr>
+                                    <th>Size</th>
+                                    <th>Quantity</th>
+                                    <th>Status</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for n in newsize %}
+                                <tr>
+                                    <td>{{ n.size.size }}</td>
+                                    <td>{{ n.quantity }}</td>
+                                    <td>
+                                        {% if n.status %}
+                                        <a  href="{% url 'size-status' n.id %}" type="button" class="btn btn-success btn-sm">Active</a>
+                                        {% else %}
+                                        <a href="{% url 'size-status' n.id %}" type="button" class="btn btn-danger btn-sm">Inactive</a>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <a href="">Edit</a>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div> <!-- End .table-responsive -->
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+<div class="container mt-5">
+    <div class="row">
+        <!-- First Card -->
+        <div class="col-md-4 mb-4">
+            <div class="card h-100">
+                <div class="card-img-container">
+                    <img src="{{ product.image.url }}" class="card-img-top" alt="Description of image">
+                </div>
+                <div class="card-body text-center">
+                    <h5 class="card-title">Variant Image</h5>
+                    <a href="{% url 'variants-image-edit' product.id %}">Edit</a>
+                </div>
+            </div>
+        </div>
+        <!-- Second Card -->
+        <div class="col-md-8 mb-4">
+            <div class="card h-100">
+                <div class="card-body text-center">
+                    <h5 class="card-title">Additional Image</h5>
+                    <div class="d-flex justify-content-center flex-wrap">
+                        {% for i in images %}
+                        <img src="{{ i.image.url }}" class="m-2" alt="Description of image">
+                        {% endfor %}
+                    </div>
+                    <a href="">Edit</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</div>
+</div>
+</div>
+
+
+
+
+<!-- 
+<div class="col-md-6 mb-6 mb-md-0 mt-5">  
+    <div class="card">
+        <h5 class="card-header">Edit variant {{product.product}}</h5>
+        <div class="card-body">
+            <form class="browser-default-validation" method="post">
+                {% csrf_token %}
+
+                
+
+                <div class="form-floating form-floating-outline mb-6">
+                    <select class="form-select" name="color" id="basic-default-country" required="">
+                        <option value="">Select Color</option>
+                        {% for c in colors %}
+                        <option value="{{ c.id }}" >{{ c.name }}
+                        </option>
+                        {% endfor %}
+
+                    </select>
+                    <label for="basic-default-country">Color</label>
+                </div>
+
+                <div class="form-floating form-floating-outline mb-6">
+                    <div class="form-control" id="basic-default-name" style="border: 1px solid #ced4da; padding: 10px; border-radius: 0.25rem;">
+                        {{ product.quantity }}
+                    </div>
+                    <label for="basic-default-name">Quantity</label>
+                </div>
+                <div class="form-floating form-floating-outline mb-6">
+                    <input type="text" name="quantitiy" class="form-control" value="{{product.quantity}}" id="basic-default-name"
+                        placeholder="new quantity" required="">
+                    <label for="basic-default-name">change quantity</label>
+                </div>
+
+
+                <div class="form-floating form-floating-outline mb-6">
+                    <div class="form-control" id="basic-default-name" style="border: 1px solid #ced4da; padding: 10px; border-radius: 0.25rem;">
+                        {{ product.size }}
+                    </div>
+                    <label for="basic-default-name">Size</label>
+                </div>
+
+                <div class="form-floating form-floating-outline mb-6">
+                    <select class="form-select" name="size" id="basic-default-country" required="">
+                        <option value="">Select Size</option>
+                        {% for s in sizes %}
+                        <option value="{{ s.id }}" >{{ s.size }}
+                        </option>
+                        {% endfor %}
+
+                    </select>
+                    <label for="basic-default-country">Select size</label>
+                </div>
+
+
+                <img src="{{product.image.url}}" alt="">
+
+                <h4> images</h4>
+
+                {% for i in images %}
+
+                <img src="{{ i.image.url}}" alt="">
+
+
+                {% endfor %}
+
+
+                <h6>do you want edit please fill this field</h6>
+                <div class="form-floating form-floating-outline mb-6">
+                    <input type="file" class="form-control" id="upload-file-1" required>
+                    <label for="upload-file-1">Product Main Pic</label>
+                    <img id="image-preview-1" style="display:none; max-width: 100%;">
+                    <button type="button" id="crop-button-1" style="display:none;">Crop</button>
+                    <input type="hidden" id="cropped-image-1" name="cropped_image_1">
+                </div>
+            
+                <div class="form-floating form-floating-outline mb-6">
+                    <input type="file" class="form-control" id="upload-file-2" required>
+                    <label for="upload-file-2">Product Additional Pic 1</label>
+                    <img id="image-preview-2" style="display:none; max-width: 100%;">
+                    <button type="button" id="crop-button-2" style="display:none;">Crop</button>
+                    <input type="hidden" id="cropped-image-2" name="cropped_image_2">
+                </div>
+            
+                <div class="form-floating form-floating-outline mb-6">
+                    <input type="file" class="form-control" id="upload-file-3" required>
+                    <label for="upload-file-3">Product Additional Pic 2</label>
+                    <img id="image-preview-3" style="display:none; max-width: 100%;">
+                    <button type="button" id="crop-button-3" style="display:none;">Crop</button>
+                    <input type="hidden" id="cropped-image-3" name="cropped_image_3">
+                </div>
+            
+                <div class="form-floating form-floating-outline mb-6">
+                    <input type="file" class="form-control" id="upload-file-4" required>
+                    <label for="upload-file-4">Product Additional Pic 3</label>
+                    <img id="image-preview-4" style="display:none; max-width: 100%;">
+                    <button type="button" id="crop-button-4" style="display:none;">Crop</button>
+                    <input type="hidden" id="cropped-image-4" name="cropped_image_4">
+                </div>
+
+      
+                <button type="submit" class="btn btn-primary waves-effect waves-light">Submit</button>
+            </form>
+        </div>
+    </div>
+</div> -->
+
+
+
+{% endblock %}
+
+
+
+
+{% block js %}
+
+
+
+<script>
+    function handleFileSelect(event, imgPreviewId, cropButtonId, croppedImageId) {
+        var files = event.target.files;
+        var done = function (url) {
+            document.getElementById(imgPreviewId).src = url;
+            document.getElementById(imgPreviewId).style.display = 'block';
+            document.getElementById(cropButtonId).style.display = 'block';
+        };
+        var reader;
+        var file;
+        var url;
+
+        if (files && files.length > 0) {
+            file = files[0];
+            if (URL) {
+                done(URL.createObjectURL(file));
+            } else if (FileReader) {
+                reader = new FileReader();
+                reader.onload = function (event) {
+                    done(reader.result);
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+    }
+
+    function initializeCropper(imgPreviewId, cropButtonId, croppedImageId) {
+        var cropper;
+        document.getElementById(imgPreviewId).addEventListener('load', function () {
+            cropper = new Cropper(document.getElementById(imgPreviewId), {
+                aspectRatio: 1,
+                viewMode: 1,
+            });
+        });
+
+        document.getElementById(cropButtonId).addEventListener('click', function () {
+            var canvas;
+            if (cropper) {
+                canvas = cropper.getCroppedCanvas({
+                    width: 256,
+                    height: 256,
+                });
+                document.getElementById(croppedImageId).value = canvas.toDataURL();
+                cropper.destroy();
+                cropper = null;
+            }
+        });
+    }
+
+    document.getElementById('upload-file-1').addEventListener('change', function (event) {
+        handleFileSelect(event, 'image-preview-1', 'crop-button-1', 'cropped-image-1');
+    });
+
+    document.getElementById('upload-file-2').addEventListener('change', function (event) {
+        handleFileSelect(event, 'image-preview-2', 'crop-button-2', 'cropped-image-2');
+    });
+
+    document.getElementById('upload-file-3').addEventListener('change', function (event) {
+        handleFileSelect(event, 'image-preview-3', 'crop-button-3', 'cropped-image-3');
+    });
+
+    document.getElementById('upload-file-4').addEventListener('change', function (event) {
+        handleFileSelect(event, 'image-preview-4', 'crop-button-4', 'cropped-image-4');
+    });
+
+    initializeCropper('image-preview-1', 'crop-button-1', 'cropped-image-1');
+    initializeCropper('image-preview-2', 'crop-button-2', 'cropped-image-2');
+    initializeCropper('image-preview-3', 'crop-button-3', 'cropped-image-3');
+    initializeCropper('image-preview-4', 'crop-button-4', 'cropped-image-4');
+</script>
+
+
+
+
+{% endblock %}

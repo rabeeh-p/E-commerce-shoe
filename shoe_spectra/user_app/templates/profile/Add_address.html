@@ -1,0 +1,100 @@
+{% extends 'profile/detailsProfile.html' %}
+
+
+
+
+{% block profile %}
+
+
+<!-- <h1>order</h1> -->
+
+<div class="col-lg-8">
+    <div class="container mt-4">
+        <h1 class="mb-4">Add Address</h1>
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">New Address</h5>
+                {% if messages %}
+                <div class="alert alert-danger">
+                    {% for message in messages %}
+                    {{ message }}
+                    {% endfor %}
+                </div>
+                {% endif %}
+                <form method="post" action="{% url 'add_address' %}">
+                    {% csrf_token %}
+
+                    <!-- Full Name -->
+                    <div class="mb-3">
+                        <label for="fullname" class="form-label">Full Name</label>
+                        <input type="text" class="form-control" id="fullname" name="fullname"
+                            value="{{ form_data.fullname|default:'' }}">
+                    </div>
+
+                    <!-- Address Line 1 -->
+                    <div class="mb-3">
+                        <label for="address_line1" class="form-label">Address Line 1</label>
+                        <input type="text" class="form-control" id="address_line1" name="address_line1"
+                            value="{{ form_data.address_line1|default:'' }}">
+                    </div>
+
+                    <!-- Address Line 2 -->
+                    <div class="mb-3">
+                        <label for="address_line2" class="form-label">Address Line 2</label>
+                        <input type="text" class="form-control" id="address_line2" name="address_line2"
+                            value="{{ form_data.address_line2|default:'' }}">
+                    </div>
+
+                    <!-- Phone Number -->
+                    <div class="mb-3">
+                        <label for="phone_number" class="form-label">Phone Number</label>
+                        <input type="text" class="form-control" id="phone_number" name="phone_number"
+                            value="{{ form_data.phone_number|default:'' }}">
+                    </div>
+
+                    <!-- City -->
+                    <div class="mb-3">
+                        <label for="city" class="form-label">City</label>
+                        <input type="text" class="form-control" id="city" name="city"
+                            value="{{ form_data.city|default:'' }}">
+                    </div>
+
+                    <!-- State -->
+                    <div class="mb-3">
+                        <label for="state" class="form-label">State</label>
+                        <input type="text" class="form-control" id="state" name="state"
+                            value="{{ form_data.state|default:'' }}">
+                    </div>
+
+                    <!-- Postal Code -->
+                    <div class="mb-3">
+                        <label for="postal_code" class="form-label">Postal Code</label>
+                        <input type="text" class="form-control" id="postal_code" name="postal_code"
+                            value="{{ form_data.postal_code|default:'' }}">
+                    </div>
+
+                    <!-- Submit Button -->
+                    <button type="submit" class="btn btn-primary">Save Address</button>
+                    <a href="{% url 'address-list' %}" class="btn btn-secondary ms-2">Cancel</a>
+                </form>
+            </div>
+        </div>
+    </div>
+
+
+
+
+</div>
+
+
+
+
+{% endblock %}
+
+
+{% block js %}
+
+
+
+
+{% endblock %}

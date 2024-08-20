@@ -1,0 +1,131 @@
+{% extends 'base.html' %}
+
+{% load static %}
+
+{% block links %}
+
+
+<link href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.12/cropper.min.css" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.12/cropper.min.js"></script>
+
+
+
+{% endblock %}
+
+
+{% block content %}
+
+
+
+
+<section style="background-color: #eee;">
+    <div class="container py-5">
+  
+      <div class="row">
+       
+        <div class="col-lg-8">
+          <div class="card mb-4">
+            <div class="card-body">
+              <div class="row">
+                <div class="col-sm-3">
+                  <p class="mb-0">Full Name</p>
+                </div>
+                <div class="col-sm-9">
+                  <p class="text-muted mb-0">{{user.full_name}}</p>
+                </div>
+              </div>
+              <hr>
+              <div class="row">
+                <div class="col-sm-3">
+                  <p class="mb-0">Email</p>
+                </div>
+                <div class="col-sm-9">
+                  <p class="text-muted mb-0">{{user.user.email}}</p>
+                </div>
+              </div>
+              <hr>
+              <div class="row">
+                <div class="col-sm-3">
+                  <p class="mb-0">Phone</p>
+                </div>
+                <div class="col-sm-9">
+                  <p class="text-muted mb-0">{{user.phone_number}}</p>
+                </div>
+              </div>
+              <hr>
+              <div class="row">
+                <div class="col-sm-3">
+                  <p class="mb-0">city</p>
+                </div>
+                <div class="col-sm-9">
+                  <p class="text-muted mb-0">{{user.city}}</p>
+                </div>
+              </div>
+              <hr>
+              <div class="row">
+                <div class="col-sm-3">
+                  <p class="mb-0">Address</p>
+                </div>
+                <div class="col-sm-9">
+                  <p class="text-muted mb-0">{{user.address_line1}}</p>
+                </div>
+              </div>
+              <hr>
+              <div class="row">
+                <div class="col-sm-3">
+                  <p class="mb-0">state</p>
+                </div>
+                <div class="col-sm-9">
+                  <p class="text-muted mb-0">{{user.state}}</p>
+                </div>
+              </div>
+              <hr>
+              <div class="row">
+                <div class="col-sm-3">
+                    <p class="mb-0">Status</p>
+                </div>
+                <div class="col-sm-9">
+                  {% if user.is_active %}
+                      <a href="{% url 'single-userstatus' user.id %}" class="status-link">
+                          <span class="badge bg-success">Active</span>
+                      </a>
+                  {% else %}
+                      <a href="{% url 'single-userstatus' user.id %}" class="status-link">
+                          <span class="badge bg-danger">Blocked</span>
+                      </a>
+                  {% endif %}
+              </div>
+              
+            </div>
+              <hr>
+              <div class="row">
+                <div class="col-sm-3">
+                  <p class="mb-0">Gender</p>
+                </div>
+                <div class="col-sm-9">
+                  <p class="text-muted mb-0">{{user.gender}}</p>
+                </div>
+              </div>
+            </div>
+          </div>
+         
+        </div>
+      </div>
+    </div>
+  </section>
+
+
+
+{% endblock %}
+
+
+
+
+{% block js %}
+
+
+
+
+
+
+{% endblock %}

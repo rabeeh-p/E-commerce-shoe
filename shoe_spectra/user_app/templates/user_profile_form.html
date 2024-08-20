@@ -1,0 +1,104 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Profile</title>
+    <link rel="stylesheet" href="{% static 'css/bootstrap.min.css' %}">
+
+
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+
+
+
+
+</head>
+
+<body>
+
+
+
+    <div class="col-md mb-6 mb-md-0">
+        <div class="card">
+            <h5 class="card-header">User Details</h5>
+            <div class="card-body">
+                <form class="browser-default-validation" method="post">
+                    {% csrf_token %}
+                    <!-- <input type="hidden" name="csrfmiddlewaretoken"
+                        value="9c3gVraiszQINlPl6UqMoWfREpvCwPQ85ofOAZADUw7yJJt8SFpPuDZPhqSmz0fV"> -->
+                    <div class="form-floating form-floating-outline mb-6">
+                        <label for="basic-default-name">Fullname</label>
+                        <input type="text" name="fullname" class="form-control" id="basic-default-name"
+                            placeholder="name" required="">
+                    </div>
+
+                    <div class="form-floating form-floating-outline mb-6">
+                        <label for="basic-default-bio">Address</label>
+                        <textarea class="form-control h-px-75" id="basic-default-bio" name="address"
+                            placeholder="Address" rows="3" required=""></textarea>
+                    </div>
+                    <div class="form-floating form-floating-outline mb-6">
+                        <input type="number" name="number" id="basic-default-email" class="form-control"
+                            placeholder="99.9" required="">
+                        <label for="basic-default-email">Phone Number</label>
+                    </div>
+
+                    <div class="form-floating form-floating-outline mb-6">
+                        <input type="text" name="city" class="form-control" id="basic-default-name"
+                            placeholder="enter your city" required="">
+                        <label for="basic-default-name">City</label>
+                    </div>
+                    <div class="form-floating form-floating-outline mb-6">
+                        <input type="text" name="state" class="form-control" id="basic-default-name" placeholder="state"
+                            required="">
+                        <label for="basic-default-name">State</label>
+                    </div>
+                    <div class="form-floating form-floating-outline mb-6">
+                        <input type="text" name="country" class="form-control" id="basic-default-name"
+                            placeholder="male or female or other" required="">
+                        <label for="basic-default-name">Country</label>
+                    </div>
+                    <div class="form-floating form-floating-outline mb-6">
+                        <input type="text" name="pin" class="form-control" id="basic-default-name"
+                            placeholder="pin code" required="">
+                        <label for="basic-default-name">Postal Code</label>
+                    </div>
+                    <div class="form-floating form-floating-outline mb-6">
+                        <input type="text" name="gender" class="form-control" id="basic-default-name"
+                            placeholder="male or female or other" required="">
+                        <label for="basic-default-name">Gender</label>
+                    </div>
+                   
+
+
+
+
+
+
+
+                    <button type="submit" class="btn btn-primary waves-effect waves-light">Submit</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+
+
+
+
+
+
+
+
+
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.3/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+
+    <script src="{% static 'js/bootstrap.bundle.min.js' %}"></script>
+</body>
+
+</html>
