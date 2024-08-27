@@ -23,18 +23,18 @@
 {% block css %}
 
 <style>
-    .product-main-image {
-    position: relative;
-    overflow: hidden; 
-}
+	.product-main-image {
+		position: relative;
+		overflow: hidden;
+	}
 
-#product-zoom {
-    transition: transform 0.9s ease; 
-}
+	#product-zoom {
+		transition: transform 0.9s ease;
+	}
 
-.product-main-image:hover #product-zoom {
-    transform: scale(1.2);
-}
+	.product-main-image:hover #product-zoom {
+		transform: scale(1.2);
+	}
 </style>
 
 
@@ -82,31 +82,29 @@
 
 							</div>
 						</div> -->
-                        <!-- End .row -->
+						<!-- End .row -->
 
-                        <div class="row">
-                            <figure class="product-main-image">
-                                <img id="product-zoom" src="{{ static.image.url }}"
-                                    data-zoom-image=""
-                                    alt="product image">
-                        
-                                <!-- <a href="#" id="btn-product-gallery" class="btn-product-gallery">
+						<div class="row">
+							<figure class="product-main-image">
+								<img id="product-zoom" src="{{ static.image.url }}" data-zoom-image=""
+									alt="product image">
+
+								<!-- <a href="#" id="btn-product-gallery" class="btn-product-gallery">
                                     <i class="icon-arrows"></i>
                                 </a> -->
-                            </figure>
-                            <!-- End .product-main-image -->
-                        
-                            <div id="product-zoom-gallery" class="product-image-gallery">
-                                {% for i in images %}
-                                <a class="product-gallery-item" href="#"
-                                    data-image="{{ i.image.url }}"
-                                    data-zoom-image="">
-                                    <img src="{{ i.image.url }}" alt="product side">
-                                </a>
-                                {% endfor %}
-                            </div>
-                        </div>
-                        
+							</figure>
+							<!-- End .product-main-image -->
+
+							<div id="product-zoom-gallery" class="product-image-gallery">
+								{% for i in images %}
+								<a class="product-gallery-item" href="#" data-image="{{ i.image.url }}"
+									data-zoom-image="">
+									<img src="{{ i.image.url }}" alt="product side">
+								</a>
+								{% endfor %}
+							</div>
+						</div>
+
 					</div><!-- End .product-gallery -->
 				</div><!-- End .col-md-6 -->
 
@@ -121,9 +119,25 @@
 							<a class="ratings-text" href="#product-review-link" id="review-link">( 2 Reviews )</a>
 						</div><!-- End .rating-container -->
 
-						<div class="product-price">
-							{{ variant.price }}
-						</div><!-- End .product-price -->
+						<div class="product-price mb-3">
+							<!-- If there is an active offer, show the original price as strikethrough and discounted price -->
+							{% if active_offer %}
+							<span class="old-price text-muted"><s>${{ variant.price }}</s></span>
+							<span class="discounted-price text-danger font-weight-bold">${{ discounted_price }}</span>
+							{% else %}
+							<span class="current-price font-weight-bold">${{ variant.price }}</span>
+							{% endif %}
+						</div>
+
+						{% if active_offer %}
+						<div class="special-offer p-3 border rounded mb-4">
+							<p class="offer-label text-success font-weight-bold">Special Offer:</p>
+							<p class="offer-details">{{ active_offer.discount_percentage }}% off!</p>
+							<p class="offer-validity text-muted">Offer valid from {{ active_offer.start_date }} to {{active_offer.end_date }}</p>
+						</div><!-- End .special-offer -->
+						{% else %}
+						<p class="no-offer text-muted">No active offers at the moment.</p>
+						{% endif %}
 
 						<div class="details-filter-row details-row-size">
 							<label>Color:</label>
@@ -131,7 +145,8 @@
 							<div class="product-nav product-nav-thumbs">
 								{% for i in variant.color %}
 								{%if i.status %}
-								<a href="{% url 'single-view' i.id %}" class="variant-image" data-variant-id="{{ i.id }}">
+								<a href="{% url 'single-view' i.id %}" class="variant-image"
+									data-variant-id="{{ i.id }}">
 									<img src="{{ i.image.url }}" alt="Product Description">
 								</a>
 								{% endif %}
@@ -176,7 +191,7 @@
 						<!-- Optionally, you can display a message indicating that the product is not available in any size -->
 						<p>This product is currently out of stock in all sizes.</p>
 						{% endif %}
-						
+
 
 						<div class="product-details-action">
 							<!-- <a href="#" class="btn-product btn-cart"><span>add to cart</span></a> -->
@@ -186,7 +201,8 @@
 							</button>
 							{% else %}
 							{% if user.is_authenticated %}
-							<form action="{% url 'add-to-cart' variant.variant_id %}" method="POST" style="display: inline;">
+							<form action="{% url 'add-to-cart' variant.variant_id %}" method="POST"
+								style="display: inline;">
 								{% csrf_token %}
 								<input type="hidden" name="size" id="hidden-size">
 								<input type="hidden" name="quantity" id="hidden-quantity">
@@ -221,7 +237,7 @@
 									<span>Login to Wishlist</span>
 								</a>
 								{% endif %}
-								
+
 							</div><!-- End .details-action-wrapper -->
 						</div><!-- End .product-details-action -->
 						<div class="product-details-footer">
@@ -229,21 +245,21 @@
 								<span>Category:</span>
 								<span href="#">{{variant.category}}</span>
 							</div>
-							
+
 						</div>
 						<div class="product-details-footer">
 							<div class="product-cat">
 								<span>Brand:</span>
 								<span href="#">{{variant.brand}}</span>
 							</div>
-							
+
 						</div>
 						<div class="product-details-footer">
 							<div class="product-cat">
 								<span>Gender:</span>
 								<span href="#">{{variant.gender}}</span>
 							</div>
-							
+
 						</div>
 					</div><!-- End .product-details -->
 				</div><!-- End .col-md-6 -->
@@ -345,7 +361,7 @@
 					</div><!-- End .reviews -->
 				</div><!-- .End .tab-pane -->
 			</div>
-            <!-- End .tab-content -->
+			<!-- End .tab-content -->
 		</div>
 
 	</div><!-- End .container -->
@@ -377,71 +393,71 @@
 
 
 <script>
-    $(document).ready(function() {
-    $('.product-gallery-item').on('click', function(e) {
-        e.preventDefault(); // Prevent the default anchor behavior
-        
-        // Get the image and zoom image from the clicked thumbnail
-        var newImage = $(this).data('image');
-        var newZoomImage = $(this).data('zoom-image');
-        
-        // Change the src attribute of the main product image
-        $('#product-zoom').attr('src', newImage);
-        $('#product-zoom').attr('data-zoom-image', newZoomImage);
-    });
-});
+	$(document).ready(function () {
+		$('.product-gallery-item').on('click', function (e) {
+			e.preventDefault(); // Prevent the default anchor behavior
 
-function updateQuantity() {
-        var select = document.getElementById("size");
-        var quantityDisplay = document.getElementById("quantity-display");
-        var selectedOption = select.options[select.selectedIndex];
+			// Get the image and zoom image from the clicked thumbnail
+			var newImage = $(this).data('image');
+			var newZoomImage = $(this).data('zoom-image');
+
+			// Change the src attribute of the main product image
+			$('#product-zoom').attr('src', newImage);
+			$('#product-zoom').attr('data-zoom-image', newZoomImage);
+		});
+	});
+
+	function updateQuantity() {
+		var select = document.getElementById("size");
+		var quantityDisplay = document.getElementById("quantity-display");
+		var selectedOption = select.options[select.selectedIndex];
 		var selectedSize = select.value;
-        var quantity = selectedOption.getAttribute("data-quantity");
-        quantityDisplay.innerText = quantity;
-		
+		var quantity = selectedOption.getAttribute("data-quantity");
+		quantityDisplay.innerText = quantity;
+
 		if (quantityDisplay) {
-        quantityDisplay.innerText = quantity;
-    }
+			quantityDisplay.innerText = quantity;
+		}
 
 		document.getElementById("hidden-size").value = selectedSize;
-    	document.getElementById("hidden-quantity").value = quantity;
-    }
-	
-
-    // // Update the hidden input with the selected size
-    // var selectedSizeInput = document.getElementById("selected-size");
-    // if (selectedSizeInput) {
-    //     selectedSizeInput.value = select.value;
-    // }
-
-    // Initialize the quantity display on page load
-    window.onload = function() {
-        updateQuantity();
-    }
+		document.getElementById("hidden-quantity").value = quantity;
+	}
 
 
+	// // Update the hidden input with the selected size
+	// var selectedSizeInput = document.getElementById("selected-size");
+	// if (selectedSizeInput) {
+	//     selectedSizeInput.value = select.value;
+	// }
+
+	// Initialize the quantity display on page load
+	window.onload = function () {
+		updateQuantity();
+	}
 
 
-	document.addEventListener('DOMContentLoaded', function() {
-    const sizeSelect = document.getElementById('size');
-    const qtyInput = document.getElementById('qty');
-    const hiddenSizeInput = document.getElementById('hidden-size');
-    const hiddenQtyInput = document.getElementById('hidden-quantity');
 
-    // Set the initial hidden inputs
-    hiddenSizeInput.value = sizeSelect.value;
-    hiddenQtyInput.value = qtyInput.value;
 
-    // Update hidden size input when size changes
-    sizeSelect.addEventListener('change', function() {
-        hiddenSizeInput.value = this.value;
-    });
+	document.addEventListener('DOMContentLoaded', function () {
+		const sizeSelect = document.getElementById('size');
+		const qtyInput = document.getElementById('qty');
+		const hiddenSizeInput = document.getElementById('hidden-size');
+		const hiddenQtyInput = document.getElementById('hidden-quantity');
 
-    // Update hidden quantity input when quantity changes
-    qtyInput.addEventListener('input', function() {
-        hiddenQtyInput.value = this.value;
-    });
-});
+		// Set the initial hidden inputs
+		hiddenSizeInput.value = sizeSelect.value;
+		hiddenQtyInput.value = qtyInput.value;
+
+		// Update hidden size input when size changes
+		sizeSelect.addEventListener('change', function () {
+			hiddenSizeInput.value = this.value;
+		});
+
+		// Update hidden quantity input when quantity changes
+		qtyInput.addEventListener('input', function () {
+			hiddenQtyInput.value = this.value;
+		});
+	});
 
 </script>
 

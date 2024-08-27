@@ -1,0 +1,38 @@
+{% extends 'userBase.html' %}\
+
+{% block css %}
+
+
+
+
+{% endblock %}
+
+{% block content %}
+
+
+<div class="container mt-4 mb-4">
+    <div class="row justify-content-center">
+        <div class="col-md-6 col-lg-4">
+            <div class="card shadow-sm">
+                <div class="card-body text-center">
+                    <h3 class="card-title mb-4">Password Reset Successful</h3>
+                    <p class="mb-4">Your password has been successfully updated. You can now log in with your new
+                        password to access your account.</p>
+
+                    <a href="{% url 'login-page' %}" class="btn btn-primary">Go to Login</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+{% endblock %}
+
+
+
+{% block js %}
+
+
+
+{% endblock %}

@@ -15,6 +15,16 @@
 
 
 <div class="card-body">
+
+    {% if errors %}
+        <div class="error-messages">
+            <ul>
+                {% for field, message in errors.items %}
+                    <li>{{ message }}</li>
+                {% endfor %}
+            </ul>
+        </div>
+    {% endif %}
     <form class="browser-default-validation" method="post" enctype="multipart/form-data">
         {% csrf_token %}
         <div class="form-floating form-floating-outline mb-6">
@@ -36,8 +46,8 @@
         </div>
 
         <div class="form-floating form-floating-outline mb-6">
-            <input type="number" name="price" id="basic-default-email" class="form-control" placeholder="99.9"
-                value="{{ product.price }}" required>
+            <input type="number" name="amount" id="price" class="form-control" placeholder="99.9"
+                value="{{ product.price }}" >
             <label for="basic-default-email">Price</label>
             {% if errors.price %}
             <span style="color: red;">{{ errors.price }}</span>
@@ -72,7 +82,7 @@
         </div>
 
         <div class="form-floating form-floating-outline mb-6">
-            <input type="file" class="form-control" id="upload-file-1" accept="image/*" required>
+            <input type="file" class="form-control" id="upload-file-1" accept="image/*" >
             <label for="upload-file-1">Product Main Pic</label>
             <img id="image-preview-1" style="display:none; max-width: 100%;">
             <button type="button" id="crop-button-1" style="display:none;">Crop</button>

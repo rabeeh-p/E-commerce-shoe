@@ -29,3 +29,22 @@ admin.site.register(Address)
 admin.site.register(Order)
 admin.site.register(OrderItem)
 admin.site.register(OrderAddress)
+
+
+
+
+
+# coupen
+
+admin.site.register(Coupon)
+admin.site.register(CouponUsage)
+
+
+# WALLET    
+admin.site.register(Wallet)
+admin.site.register(Transaction)
+
+
+# BRAND OFFER
+admin.site.register(Offer)
+

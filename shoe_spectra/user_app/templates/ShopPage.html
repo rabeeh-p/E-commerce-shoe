@@ -317,8 +317,15 @@
                             <div class="product-details">
                                 <h6>{{ p.name }}</h6>
                                 <div class="price">
-                                    <h6>{{ p.price }}</h6>
-                                    <h6 class="l-through">$210.00</h6>
+                                    <!-- <h6>{{ p.price }}</h6>
+                                    <h6 class="l-through">$210.00</h6> -->
+
+                                    {% if p.discounted_price %}
+                                    <h6>${{ p.discounted_price }}</h6>
+                                    <h6 class="l-through">${{ p.price }}</h6> <!-- Original price strikethrough -->
+                                {% else %}
+                                    <h6>${{ p.price }}</h6>
+                                {% endif %}
                                 </div>
                                 <div class="prd-bottom">
                                     <a href="#" class="social-info">

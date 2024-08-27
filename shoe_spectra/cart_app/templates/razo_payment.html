@@ -1,0 +1,178 @@
+{% extends 'userBase.html' %}
+
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+
+<!-- molla/wishlist.html  22 Nov 2019 09:55:05 GMT -->
+
+
+
+{% block links %}
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+
+<style>
+    .btn {
+        background-color: #3399cc;
+        color: #fff;
+        padding: 10px 20px;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        font-size: 16px;
+    }
+
+    .payment-container {
+            width: 350px;
+            padding: 20px;
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+
+        .payment-container h1 {
+            color: #333;
+            font-size: 22px;
+            margin-bottom: 20px;
+        }
+
+        .payment-container .btn {
+            background-color: #3399cc;
+            color: white;
+            padding: 12px 20px;
+            font-size: 16px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            width: 100%;
+            transition: background-color 0.3s ease;
+        }
+
+        .payment-container .btn:hover {
+            background-color: #287a99;}
+</style>
+
+{% endblock %}
+
+{% block content %}
+
+<!-- <h1>success conform </h1> -->
+
+
+    <!-- <h1>Complete Payment</h1>
+    <button id="pay-button" class="btn">Pay Now</button> -->
+
+    <!-- <div class="payment-container">
+        <h1>Success Confirm</h1>
+        <h2>Complete Payment</h2>
+        <button id="pay-button" class="btn">Pay Now</button>
+    </div> -->
+    
+        <div class="container d-flex justify-content-center align-items-center min-vh-100 my-5">
+            <!-- Responsive Payment Box -->
+            <div class="col-md-6 col-lg-4">
+                <div class="payment-container text-center p-4 border rounded">
+                    <!-- <h1>Success Confirm</h1> -->
+                    <h2>Complete Payment</h2>
+                    <button id="pay-button" class="btn btn-custom mt-3">Pay Now</button>
+                </div>
+            </div>
+        </div>
+
+
+{% endblock %}
+
+
+{%block js %}
+
+
+
+<script src="{% static 'assets/js/superfish.min.js' %}"></script>
+<script src="{% static 'newStyle/assets/js/owl.carousel.min.js' %}"></script>
+<!-- Main JS File -->
+<script src="{% static 'newStyle/assets/js/main.js' %}"></script>
+
+<script>
+    // document.getElementById('pay-button').onclick = function(e) { 
+    //     e.preventDefault();
+
+    //     var options = {
+    //         "key": "{{ razorpay_key_id }}", 
+    //         "amount": "{{ razorpay_amount }}", 
+    //         "currency": "INR",
+    //         "name": "Your Company",
+    //         "description": "Order Payment",
+    //         "order_id": "{{ razorpay_order_id }}", 
+    //         "handler": function (response) {
+    //             console.log('Payment successful', response);
+
+    //             // Redirect to success page
+    //             window.location.href = "{% url 'order_success' order_id %}";
+    //         },
+    //         "theme": {
+    //             "color": "#3399cc"
+    //         }
+    //     };
+
+    //     var rzp1 = new Razorpay(options);
+    //     rzp1.open();
+    // }
+
+
+    document.getElementById('pay-button').onclick = function(e) {
+    e.preventDefault();
+
+    var options = {
+        "key": "{{ razorpay_merchant_key }}",  // Razorpay key from backend
+        "amount": "{{ razorpay_amount }}",  // Amount in paise from backend
+        "currency": "INR",
+        "name": "Your Company",
+        "description": "Order Payment",
+        "order_id": "{{ razorpay_order_id }}",  // Razorpay order_id from backend
+        "handler": function (response) {
+            console.log('Payment successful', response);
+
+            // Create data object to send to the backend
+            var paymentData = {
+                razorpay_payment_id: response.razorpay_payment_id,
+                razorpay_order_id: response.razorpay_order_id,
+                razorpay_signature: response.razorpay_signature,
+                order_id: "{{ order_id }}"  // Your Django order ID from the backend
+            };
+
+            // Send payment data to the backend via AJAX
+            fetch("{% url 'razorpay_payment_verify' %}", {
+                method: "POST",
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': '{{ csrf_token }}'  // Add CSRF token for security
+                },
+                body: JSON.stringify(paymentData)
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    // Redirect to success page
+                    window.location.href = "{% url 'order_success' order_id %}";
+                } else {
+                    // Handle error (e.g., payment verification failed)
+                    alert('Payment verification failed: ' + data.message);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+        },
+        "theme": {
+            "color": "#3399cc"
+        }
+    };
+
+    var rzp1 = new Razorpay(options);
+    rzp1.open();
+};
+</script>
+
+{% endblock %}

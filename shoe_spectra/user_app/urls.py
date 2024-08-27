@@ -13,6 +13,13 @@ urlpatterns = [
     path('otp-resend/',views.resend_otp, name='otp-resend' ),
 
 
+    # FORGOT PASSWORD
+    path('forgot-password/', views.forgot_password, name='forgot-password'),
+    path('forgot-otp/', views.forgot_otp, name='forgot-otp'),
+    path('forgot-success/', views.success_forgot, name='forgot-success'),
+    path('forgot-set-newpassword/', views.set_new_password, name='forgot-set-newpassword'),
+
+
     # PRODUCT SECTION
     path('single-product/<int:id>/',views.SinglePage, name='single-page' ),
     path('shopping-product/',views.shopPage, name='shopping-page' ),
@@ -46,6 +53,11 @@ urlpatterns = [
 
     path('order/<int:order_id>/cancel/', views.cancel_order, name='cancel-order'),
     path('order/<int:order_id>/cancel-product/<int:item_id>/', views.cancel_product, name='cancel-product'),
+
+
+    #   wallet section
+    path('user-wallet/',views.user_wallet, name='user-wallet' ),
+
 
 
 

@@ -14,6 +14,8 @@ urlpatterns = [
     path('remove_from_cart/<int:item_id>/', views.remove_from_cart, name='remove_from_cart'),
     path('cart/update-item/<int:item_id>/', views.update_cart_item_quantity, name='update_cart_item_quantity'),
 
+    path('get_item_stock_quantity/<int:item_id>/', views.get_item_stock_quantity, name='get_item_stock_quantity'),
+
 
 
 
@@ -21,6 +23,12 @@ urlpatterns = [
     # CHECK OUT PAGE
     path('checkout-page',views.checkoutPage, name='checkout-page' ),
     path('order-success/<int:order_id>/', views.order_success, name='order_success'),
+    path('apply-coupen/', views.apply_coupon, name='apply-coupen'),
+
+
+    # path('payment_success/', views.payment_success, name='payment_success'),
+    path('payment_method/', views.razorpay_payment, name='razo-payment-method'),
+    path('razorpay-payment-verify/', views.razorpay_payment_verify, name='razorpay_payment_verify'),
 
     
 

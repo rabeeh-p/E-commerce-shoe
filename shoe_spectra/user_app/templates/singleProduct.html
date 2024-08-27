@@ -94,9 +94,38 @@
 							<a class="ratings-text" href="#product-review-link" id="review-link">( 2 Reviews )</a>
 						</div><!-- End .rating-container -->
 
-						<div class="product-price">
+						<!-- <div class="product-price">
 							{{obj.price}}
-						</div><!-- End .product-price -->
+						</div>
+						{% if active_offer %}
+						<p>Special Offer: {{ active_offer.discount_percentage }}% off!</p>
+						<p>Offer valid from {{ active_offer.start_date }} to {{ active_offer.end_date }}</p>
+						<p>Discounted Price: ${{ discounted_price }}</p>
+						{% else %}
+						<p>No active offers at the moment.</p>
+						{% endif %} -->
+						<div class="product-price mb-3">
+							<!-- If there is an active offer, show the original price as strikethrough and discounted price -->
+							{% if active_offer %}
+							<span class="old-price text-muted"><s>${{ obj.price }}</s></span>
+							<span class="discounted-price text-danger font-weight-bold ml-2">${{discounted_price|floatformat:2 }}</span>
+							{% else %}
+							<span class="current-price font-weight-bold">${{ obj.price }}</span>
+							{% endif %}
+						</div>
+
+						{% if active_offer %}
+						<div class="special-offer p-3 border rounded mb-4">
+							<p class="offer-label text-success font-weight-bold">Special Offer:</p>
+							<p class="offer-details">{{ active_offer.discount_percentage }}% off!</p>
+							<p class="offer-validity text-muted">Offer valid from {{ active_offer.start_date }} to
+								{{active_offer.end_date }}</p>
+							<p class="discounted-price text-danger font-weight-bold">Discounted Price:
+								${{discounted_price|floatformat:2 }}</p>
+						</div><!-- End .special-offer -->
+						{% else %}
+						<p class="no-offer text-muted">No active offers at the moment.</p>
+						{% endif %}
 						<div class="details-filter-row details-row-size">
 							<label>Color:</label>
 							<div class="product-nav product-nav-thumbs">
@@ -156,7 +185,9 @@
 							</a>
 							{% endif %} -->
 
-							{% if all_out_of_stock %}
+							
+
+							<!-- {% if all_out_of_stock %}
 							<button class="btn-product btn-cart" disabled>
 								<span>Not Available</span>
 							</button>
@@ -175,7 +206,30 @@
 								<span>Login</span>
 							</a>
 							{% endif %}
+							{% endif %} -->
+
+							{% if all_out_of_stock %}
+							<button class="btn-product btn-cart" disabled>
+								<span>Not Available</span>
+							</button>
+							{% else %}
+							{% if user.is_authenticated %}
+							<form action="{% url 'add-to-cart' variant_id.id %}" method="POST"
+								style="display: inline;">
+								{% csrf_token %}
+								<input type="hidden" name="size" id="hidden-size">
+								<input type="hidden" name="quantity" id="hidden-quantity">
+								<button type="submit" class="btn-product btn-cart">
+									<span>Add to Cart</span>
+								</button>
+							</form>
+							{% else %}
+							<a href="{% url 'login-page' %}" class="btn-product btn-cart">
+								<span>Login</span>
+							</a>
 							{% endif %}
+							{% endif %}
+
 
 
 							<!-- <a href="" class="btn-product btn-cart mx-5">
@@ -373,21 +427,61 @@
 		});
 	});
 
+	// function updateQuantity() {
+	// 	var select = document.getElementById("size");
+	// 	var quantityDisplay = document.getElementById("quantity-display");
+	// 	var selectedOption = select.options[select.selectedIndex];
+	// 	var quantity = selectedOption.getAttribute("data-quantity");
+	// 	quantityDisplay.innerText = quantity;
+	// }
+
+
+	// // Initialize the quantity display on page load
+	// window.onload = function () {
+	// 	updateQuantity();
+	// }
+
+
+
+	// document.addEventListener('DOMContentLoaded', function () {
+	// 	const sizeSelect = document.getElementById('size');
+	// 	const qtyInput = document.getElementById('qty');
+	// 	const hiddenSizeInput = document.getElementById('hidden-size');
+	// 	const hiddenQtyInput = document.getElementById('hidden-quantity');
+
+	// 	// Set the initial hidden inputs
+	// 	hiddenSizeInput.value = sizeSelect.value;
+	// 	hiddenQtyInput.value = qtyInput.value;
+
+	// 	// Update hidden size input when size changes
+	// 	sizeSelect.addEventListener('change', function () {
+	// 		hiddenSizeInput.value = this.value;
+	// 	});
+
+	// 	// Update hidden quantity input when quantity changes
+	// 	qtyInput.addEventListener('input', function () {
+	// 		hiddenQtyInput.value = this.value;
+	// 	});
+	// });
+
 	function updateQuantity() {
 		var select = document.getElementById("size");
 		var quantityDisplay = document.getElementById("quantity-display");
 		var selectedOption = select.options[select.selectedIndex];
+		var selectedSize = select.value;
 		var quantity = selectedOption.getAttribute("data-quantity");
 		quantityDisplay.innerText = quantity;
+
+		if (quantityDisplay) {
+			quantityDisplay.innerText = quantity;
+		}
+
+		document.getElementById("hidden-size").value = selectedSize;
+		document.getElementById("hidden-quantity").value = quantity;
 	}
-
-
-	// Initialize the quantity display on page load
 	window.onload = function () {
 		updateQuantity();
 	}
-
-
 
 	document.addEventListener('DOMContentLoaded', function () {
 		const sizeSelect = document.getElementById('size');
@@ -409,7 +503,6 @@
 			hiddenQtyInput.value = this.value;
 		});
 	});
-
 
 
 

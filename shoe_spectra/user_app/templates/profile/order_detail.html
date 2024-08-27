@@ -84,18 +84,52 @@
       <h5 class="card-title">Order Information</h5>
       <p><strong>Order ID:</strong> {{ order.id }}</p>
       <p><strong>Date:</strong> {{ order.order_date }}</p>
-      <p><strong>Status:</strong> {{ order.status }}</p>
+      <p><strong>Date:</strong> {{ order.order_date }}</p>
+      <p><strong>method:</strong> {{ order.payment_method }}</p>
+      <p><strong>payment status:</strong> {{ order.payment_success }}</p>
       <p><strong>Total Price:</strong> ${{ order.total_amount }}</p>
 
 
-      {% if order.status == 'Pending' %}
+      <!-- {% if order.status == 'Pending' %}
       <form action="{% url 'cancel-order' order.id %}" method="post">
         {% csrf_token %}
         <button type="submit" class="btn btn-danger">Cancel Order</button>
       </form>
       {% elif order.status == 'CANCELED' %}
       <div class="alert alert-warning mt-3">This order has been canceled .</div>
+      {% endif %} -->
+
+
+
+      {% if order.status == 'CANCELED' %}
+      <div class="alert alert-warning mt-3">This order has been canceled.</div>
+      {% elif order.payment_method == 'Razorpay' and not order.payment_success %}
+      <div class="alert alert-warning mt-3">The order could not be confirmed due to payment failure. This order is
+        considered canceled.</div>
+      {% elif order.status == 'Pending' and order.payment_method == 'Cash on Delivery'  %}
+      <form action="{% url 'cancel-order' order.id %}" method="post">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-danger">Cancel Order</button>
+      </form>
+      {% elif order.status == 'Pending' and order.payment_method == 'Razorpay' and order.payment_success  %}
+      <form action="{% url 'cancel-order' order.id %}" method="post">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-danger">Cancel Order</button>
+      </form>
+      {% else %}
+      <div class="alert alert-info mt-3">Order cannot be canceled at this stage.</div>
       {% endif %}
+
+      
+    
+
+
+
+
+
+
+
+
 
     </div>
   </div>
@@ -124,20 +158,46 @@
             {% for item in order_items %}
             <tr>
               <td>
-                <img src="{{ item.product_size.variant.product.image.url }}" alt="{{ item.product_size.variant.product.name }}" style="width: 50px; height: 50px; object-fit: cover;">
-            </td>
+                <img src="{{ item.product_size.variant.product.image.url }}"
+                  alt="{{ item.product_size.variant.product.name }}"
+                  style="width: 50px; height: 50px; object-fit: cover;">
+              </td>
               <td>{{ item.product_size.variant.product }}</td>
               <td>{{ item.product_size.size }}</td>
               <td>{{ item.quantity }}</td>
-              <td>{{ item.product_size.variant.product.price }}</td>
+              <!-- <td>{{ item.product_size.variant.product.price }}</td> -->
               <td>
-                {% if order.status == 'Pending' %}
-                <form action="{% url 'cancel-product' order.id item.id %}" method="post" onsubmit="return confirm('Are you sure you want to cancel this product?');">
-                    {% csrf_token %}
-                    <button type="submit" class="btn btn-danger btn-sm">Cancel</button>
-                </form>
+                {% if item.final_price %}
+                    ₹{{ item.final_price }} <!-- Display discounted price -->
+                {% else %}
+                    ₹{{ item.product_size.variant.product.price }} <!-- Display original price -->
                 {% endif %}
             </td>
+               
+              <td>
+                
+
+                {% if order.status == 'Pending' %}
+                {% if order.payment_method != 'Razorpay' or order.payment_success %}
+                <!-- Show the cancel button if the order is pending and payment is successful (or not Razorpay) -->
+                <form action="{% url 'cancel-product' order.id item.id %}" method="post"
+                  onsubmit="return confirm('Are you sure you want to cancel this product?');">
+                  {% csrf_token %}
+                  <button type="submit" class="btn btn-danger btn-sm">Cancel</button>
+                </form>
+                {% else %}
+                <!-- Show this message if the payment method is Razorpay and payment status is False -->
+                <div class="alert alert-warning mt-3">The order could not be confirmed due to payment failure. This
+                  product is considered canceled.</div>
+                {% endif %}
+                {% elif order.status == 'CANCELED' %}
+                <!-- Show this message if the order has been canceled -->
+                <div class="alert alert-warning mt-3">This order has been canceled.</div>
+                {% else %}
+                <!-- Show a message indicating that the product cannot be canceled at this stage -->
+                <div class="alert alert-info mt-3">This product cannot be canceled at this stage.</div>
+                {% endif %}
+              </td>
             </tr>
             {% endfor %}
           </tbody>

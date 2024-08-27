@@ -43,6 +43,12 @@ urlpatterns = [
     # EDIT VARIANTS and VARIAT DETAILS
     path('edit-variants/<int:id>/',views.editVariants, name='variants-edit' ),
     path('variant-image-edit/<int:id>/',views.editVariant_image, name='variants-image-edit' ),
+    path('variant-size-edit/<int:id>/',views.variant_size_edit, name='variants-size-edit' ),
+
+
+
+    # EDIT VARIANT IMAGES
+    path('variant-images-edit/<int:id>/',views.edit_variant_images, name='variants-images-edit' ),
 
 
     # SIZE ADD VARIANT
@@ -87,8 +93,22 @@ urlpatterns = [
     path('orders/<int:order_id>/', views.order_details, name='admin-order-details'),
 
 
+    # COUPEN SECTION
+    path('coupen-table/',views.coupen_section, name='coupen-list' ),
+    path('coupen-add/',views.add_coupon, name='coupen-add' ),
+    path('coupon-edit/<int:id>/', views.edit_coupon, name='coupon-edit'),
+    path('coupon-delete/<int:id>/', views.delete_coupon, name='coupon-delete'),
 
 
+
+    # OFFER SECTION 
+    path('offer-table/',views.offer_list, name='offer-list' ),
+    path('offer-add/',views.add_offer, name='offer-add' ),
+    path('offer-table/<int:offer_id>/edit/',views.edit_offer, name='offer-edit' ),
+    path('offer-table/<int:offer_id>/delete/',views.delete_offer, name='offer-delete' ),
+
+    # EXCEL SHEET
+    # path('admin-export_sales_report_exelSheet/',views.export_sales_report_exelSheet, name='admin-exelSheet' ),
 
 ]
 

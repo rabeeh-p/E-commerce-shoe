@@ -188,3 +188,7 @@ MESSAGE_TAGS = {
   
     messages.ERROR: 'alert alert-danger',     # Error messages
 }
+
+
+RAZORPAY_API_KEY = "rzp_test_Y1IK2jrJDfFSb5"
+RAZORPAY_API_SECRET = "rmosXgafQcUObgAVKu5Rpvs0"

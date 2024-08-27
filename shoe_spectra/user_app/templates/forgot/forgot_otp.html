@@ -1,0 +1,97 @@
+{% extends 'userBase.html' %}\
+
+{% block css %}
+
+
+
+
+{% endblock %}
+
+{% block content %}
+
+
+
+<!-- <h1>otp page</h1> -->
+<div class="container mt-4 mb-4">
+    <div class="row justify-content-center">
+        <div class="col-md-6 col-lg-4">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <h3 class="card-title text-center mb-4">OTP Verification</h3>
+                    {% if messages %}
+                    {% for message in messages %}
+                    <div class="alert alert-{{ message.tags }} mt-3">{{ message }}</div>
+                    {% endfor %}
+                    {% endif %}
+                    <form method="post">
+                        {% csrf_token %}
+                        <div class="mb-3">
+                            <label for="otp" class="form-label">Enter OTP</label>
+                            <input type="text" class="form-control" id="otp" name="otp"
+                                placeholder="Enter the OTP sent to your email" required>
+                            {% if error %}
+                            <div class="text-danger mt-2">{{ error }}</div>
+                            {% endif %}
+                        </div>
+                        <button type="submit" class="btn btn-primary w-100">Verify OTP</button>
+                    </form>
+                    {% if otp_expiry_time %}
+                    <div id="otp-timer" class="mt-3">
+                        <p>Your OTP will expire in: <span id="timer"></span></p>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+{% endblock %}
+
+
+
+{% block js %}
+
+<script>
+   document.addEventListener('DOMContentLoaded', function () {
+    const expiryTimeStr = '{{ otp_expiry_time }}';
+
+    if (expiryTimeStr) {
+        // Convert expiry time string to a Date object
+        const endTime = new Date(expiryTimeStr);
+
+        // Get the timer element
+        const timerElement = document.getElementById('timer');
+
+        function updateTimer() {
+            const now = new Date();
+            const timeLeft = endTime - now;
+
+            if (timeLeft <= 0) {
+                // If the time has expired
+                timerElement.textContent = 'OTP has expired';
+                document.querySelector('form').style.display = 'none';
+                return;
+            }
+
+            // Calculate minutes and seconds left
+            const minutes = Math.floor((timeLeft % (1000 * 3600)) / (1000 * 60));
+            const seconds = Math.floor((timeLeft % (1000 * 60)) / 1000);
+
+            // Display the time left
+            timerElement.textContent = `${minutes}m ${seconds}s`;
+        }
+
+        // Initial call to display the time immediately
+        updateTimer();
+
+        // Update the timer every second
+        setInterval(updateTimer, 1000);
+    }
+});
+    </script>
+    
+
+
+{% endblock %}

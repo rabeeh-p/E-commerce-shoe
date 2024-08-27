@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Razorpay Payment</title>
+    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+    <style>
+        .btn {
+            background-color: #3399cc;
+            color: #fff;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Complete Payment</h1>
+    <button id="pay-button" class="btn">Pay Now</button>
+
+    <script>
+        document.getElementById('pay-button').onclick = function(e) {
+            e.preventDefault();
+
+            var options = {
+                "key": "{{ razorpay_key_id }}", 
+                "amount": "{{ razorpay_amount }}", 
+                "currency": "INR",
+                "name": "Your Company",
+                "description": "Order Payment",
+                "order_id": "{{ razorpay_order_id }}", 
+                "handler": function (response) {
+                    console.log('Payment successful', response);
+
+                    // Redirect to success page
+                    window.location.href = "{% url 'order_success' order_id %}";
+                },
+                "theme": {
+                    "color": "#3399cc"
+                }
+            };
+
+            var rzp1 = new Razorpay(options);
+            rzp1.open();
+        }
+    </script>
+</body>
+</html>

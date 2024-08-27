@@ -1,0 +1,86 @@
+{% extends 'profile/detailsProfile.html' %}
+
+
+
+
+{% block profile %}
+
+
+   
+ 
+
+<div class="col-lg-8">
+    <div class="container mt-5">
+        <div class="row justify-content-center">
+            <div class="col-md-12">
+                <!-- Wallet Balance Card -->
+                <div class="card text-center shadow-lg mb-4">
+                    <div class="card-header bg-warning text-white">
+                        <h4>Your Wallet Balance</h4>
+                    </div>
+                    <div class="card-body">
+                        {% if balance %}
+                        <h1 class="card-title display-4">₹{{ balance }}</h1>
+                        <p class="card-text">Manage your wallet balance and transactions easily.</p>
+                    {% else %}
+                        <h1 class="card-title display-4">₹0.00</h1>
+                        <p class="card-text">Your wallet is empty. Add funds to get started.</p>
+                    {% endif %}
+                        <!-- <p class="card-text">Manage your wallet balance and transactions easily.</p> -->
+                        <button class="btn btn-warning text-white">Refill Wallet</button>
+                    </div>
+                    <div class="card-footer text-muted">
+                        <!-- Last updated 5 minutes ago -->
+                    </div>
+                </div>
+
+                <!-- Transaction Table -->
+                <div class="card shadow-lg">
+                    <div class="card-header bg-light">
+                        <h4>Transaction History</h4>
+                    </div>
+                    <div class="card-body">
+                        <table class="table table-striped">
+                            <thead class="thead-dark">
+                                <tr>
+                                    <th scope="col">Date</th>
+                                    <th scope="col">Description</th>
+                                    <th scope="col">Amount</th>
+                                    <th scope="col">Balance</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for transaction in transactions %}
+                                    <tr>
+                                        <td>{{ transaction.created_at }}</td>
+                                        <td>{{ transaction.description }}</td>
+                                        <td>
+                                            {% if transaction.transaction_type == 'credit' %}
+                                                +₹{{ transaction.amount }}
+                                            {% else %}
+                                                -₹{{ transaction.amount }}
+                                            {% endif %}
+                                        </td>
+                                        <td>₹{{ transaction.wallet.balance }}</td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+{% endblock %}
+
+
+{% block js %}
+
+
+
+
+{% endblock %}

@@ -3,18 +3,21 @@ from django.contrib.auth. models import User
 from django.contrib import messages
 from .utilities import generate_otp,send_otp_email
 from django.utils import timezone
-from datetime import timedelta
+from datetime import timedelta,datetime
 from django.contrib.auth import authenticate, login,logout as logout_fn
 from django.shortcuts import render, get_object_or_404
 from django.contrib.auth import update_session_auth_hash
 
 from django.http import JsonResponse
 from django.template.loader import render_to_string
+from decimal import Decimal
 
 from admin_app.models import *
 from django.db.models import Count, Q, F,Min, Max
 import re
 
+
+from django.utils.timezone import make_aware
 
 
 from .forms import UserProfileForm
@@ -27,13 +30,16 @@ def indexPage(request):
     if request.user.is_authenticated:
         try:
             profile_obj = UserProfile.objects.get(user=request.user)
-            
-            
             if not profile_obj.is_active:
                 messages.error(request, 'Your account is blocked.')
+                logout_fn(request) 
                 return redirect('login-page')
         except UserProfile.DoesNotExist:
             messages.error(request, 'Profile not found.')
+
+    
+
+  
 
     cart_item_count = 0
 
@@ -59,6 +65,8 @@ def indexPage(request):
 
     products = Product.objects.filter(
         status=True,
+        category__status=True,   # Ensure category status is True
+        brand__status=True,  
         variants__status=True,
         variants__sizes__quantity__gt=0
     ).annotate(
@@ -68,6 +76,16 @@ def indexPage(request):
         active_variant_count__gt=0,
         active_size_count__gt=0 
     ).distinct().order_by('-updated_at')
+
+    now = timezone.now().date()
+
+    for product in products:
+        active_offer = product.brand.offers.filter(start_date__lte=now, end_date__gte=now).first()
+        if active_offer:
+            discount = active_offer.discount_percentage
+            product.discounted_price = product.price * (1 - discount / 100)
+        else:
+            product.discounted_price = None
 
 
 
@@ -84,6 +102,8 @@ def loginPage(request):
             return redirect('admin-page')  
         else:
             return redirect('index-page')
+
+   
     
     if request.method == 'POST':
         username = request.POST['name']
@@ -91,13 +111,26 @@ def loginPage(request):
 
         user = authenticate(request, username=username, password=password)
         
-        if user is not None:  
-            login(request, user)
-            return redirect('profile-form')  # Redirect 
-        else:
+        # if user is not None:  
+        #     login(request, user)
+        #     return redirect('profile-form')  # Redirect 
+        # else:
             
-            messages.error(request,'Invalid username or password')
-            return render(request, 'login.html',)
+        #     messages.error(request,'Invalid username or password')
+        #     return render(request, 'login.html',)
+
+        if user is not None:
+            # Check if the user is a superuser
+            if user.is_superuser:
+                messages.error(request, "Superadmins can't log in this way.")
+                return redirect('login-page')  
+
+            login(request, user)
+            return redirect('profile-form') 
+
+        else:
+            messages.error(request, 'Invalid username or password.')
+            return render(request, 'login.html')
 
 
     return render(request,'login.html',{'page':'Login'})
@@ -235,32 +268,147 @@ def resend_otp(request):
 
 
 
+def forgot_password(request):
+    if request.method == 'POST':
+        email = request.POST.get('email')
+
+        try:
+            user = User.objects.get(email=email)
+        except User.DoesNotExist:
+            return render(request, 'forgot.html', {'error': 'This email is not registered.'})
+        
+        otp = generate_otp()
+        otp_created_at = timezone.now()  
+        otp_expiry_duration = timedelta(minutes=5) 
+        otp_expiry_time = otp_created_at + otp_expiry_duration
+
+        # Store OTP, email, and times in the session
+        request.session['otp'] = otp
+        request.session['email'] = email
+        request.session['otp_created_at'] = otp_created_at.isoformat()
+        request.session['otp_expiry_time'] = otp_expiry_time.isoformat()
+        
+        # Send OTP email
+        send_otp_email(email, otp)
+        return redirect('forgot-otp')
+    
+    return render(request, 'forgot/forgot.html')
+
+
+
+def forgot_otp(request):
+    if request.method == 'POST':
+        entered_otp = request.POST.get('otp')
+        sent_otp = request.session.get('otp')
+        otp_created_at_str = request.session.get('otp_created_at')
+        otp_expiry_time_str = request.session.get('otp_expiry_time')
+
+        if sent_otp is None or otp_created_at_str is None or otp_expiry_time_str is None:
+            return render(request, 'forgot/forgot_otp.html', {'error': 'Session expired. Please request a new OTP.'})
+
+        # Convert ISO 8601 strings back to datetime objects
+        otp_created_at = timezone.datetime.fromisoformat(otp_created_at_str)
+        otp_expiry_time = timezone.datetime.fromisoformat(otp_expiry_time_str)
+        current_time = timezone.now()
+
+        if current_time > otp_expiry_time:
+            return render(request, 'forgot/forgot_otp.html', {'error': 'OTP has expired. Please request a new one.'})
+
+        if int(entered_otp) == int(sent_otp):
+            return redirect('forgot-set-newpassword')
+        else:
+            return render(request, 'forgot/forgot_otp.html', {'error': 'Invalid OTP'})
+        
+    otp_expiry_time = request.session.get('otp_expiry_time', None)
+    return render(request, 'forgot/forgot_otp.html', {'otp_expiry_time': otp_expiry_time})
+
+
+
+
+def set_new_password(request):
+    if request.method == 'POST':
+        new_password = request.POST.get('new_password').strip()
+        confirm_password = request.POST.get('confirm_password').strip()
+        email = request.session.get('email') 
+
+        if not new_password or not confirm_password:
+            messages.error(request, 'Both fields are required.')
+            return render(request, 'forgot/set_new_password.html')
+
+        if not email:
+            return redirect('forgot_password')  # Redirect if no email in session
+        
+        if ' ' in new_password or ' ' in confirm_password:
+            messages.error(request, 'Passwords should not contain spaces.')
+            return render(request, 'forgot/set_new_password.html')
+        
+
+        if len(new_password) < 8:
+            messages.error(request, 'Password must be at least 8 characters long.')
+            return render(request, 'forgot/set_new_password.html')
+        
+        if new_password != confirm_password:
+            messages.error(request, 'Passwords do not match.')
+            return render(request, 'forgot/set_new_password.html')
+        
+        if not email:
+            return redirect('forgot_password') 
+
+        try:
+            user = User.objects.get(email=email)
+            user.set_password(new_password)
+            user.save()
+            update_session_auth_hash(request, user)  # Keep the user logged in
+            return redirect('forgot-success')  # Redirect to success page
+        except User.DoesNotExist:
+            messages.error(request, 'User not found.')
+            return render(request, 'forgot/set_new_password.html')
+
+    return render(request, 'forgot/set_new_password.html')
+
+
+def success_forgot(request):
+    return render(request,'forgot/success.html',{'page':"success"})
+
+
+
+
 # SINGLE PRODUCT
 
 def SinglePage(request,id):
-    print('first')
+    if request.user.is_authenticated:
+        try:
+            profile_obj = UserProfile.objects.get(user=request.user)
+            if not profile_obj.is_active:
+                messages.error(request, 'Your account is blocked.')
+                logout_fn(request) 
+                return redirect('login-page')
+        except UserProfile.DoesNotExist:
+            messages.error(request, 'Profile not found.')
+
 
     obj= Product.objects.get(id=id)
-
     variant_items = ProductVariant.objects.filter(product=obj)
-
     first_item = ProductVariant.objects.filter(product=obj).first()
-
     images_obj= VariantImage.objects.filter(variant= first_item)
-    # size_obj= ShoeSize.obj
     size_obj= ProductSize.objects.filter(variant=first_item)
+
     for i in size_obj:
         print(i.size,'sizeeee')
 
     all_out_of_stock = all(not s.status for s in size_obj)
-    
+
 
     if request.user.is_authenticated:
-
         user_wishlist = Wishlist.objects.filter(user=request.user).values_list('product_id', flat=True)
     else:
-      
         user_wishlist=[]
+
+    active_offer = obj.get_active_offer()
+    if active_offer:
+        discounted_price = obj.price - (obj.price * (active_offer.discount_percentage / 100))
+    else:
+        discounted_price = obj.price
 
     # all_out_of_stock = all(size.quantity <= 0 for size in sizes)
 
@@ -273,6 +421,8 @@ def SinglePage(request,id):
         'user_wishlist': list(user_wishlist),
         'variant_id':first_item,
         'all_out_of_stock': all_out_of_stock,
+        'active_offer': active_offer,
+        'discounted_price': discounted_price,
         
         
     }
@@ -282,7 +432,16 @@ def SinglePage(request,id):
 
 
 def SingleView(request, variantId):
-    print('single viewwwwww')
+    if request.user.is_authenticated:
+        try:
+            profile_obj = UserProfile.objects.get(user=request.user)        
+            if not profile_obj.is_active:
+                messages.error(request, 'Your account is blocked.')
+                logout_fn(request) 
+                return redirect('login-page')
+        except UserProfile.DoesNotExist:
+            messages.error(request, 'Profile not found.')
+    
 
     selected_variant = get_object_or_404(ProductVariant, id=variantId)
     print(selected_variant.id,'idddddd')
@@ -300,6 +459,16 @@ def SingleView(request, variantId):
     else:
       
         user_wishlist=[]
+
+    
+    product = selected_variant.product
+
+    # Active offer logic
+    active_offer = product.get_active_offer()  
+    if active_offer:
+        discounted_price = product.price - (product.price * (active_offer.discount_percentage / 100))
+    else:
+        discounted_price = product.price
    
     
     images = VariantImage.objects.filter(variant=selected_variant)
@@ -326,7 +495,9 @@ def SingleView(request, variantId):
         # 'sizes_by_variant': sizes_by_variant,
         'all_out_of_stock': all_out_of_stock,
         'user_wishlist': list(user_wishlist),
-        'obj':selected_variant.product
+        'obj':selected_variant.product,
+        'discounted_price': discounted_price,
+        'active_offer': active_offer,
         
     }
 
@@ -344,11 +515,10 @@ def profile(request):
 
     if request.user.is_authenticated:
         try:
-            profile_obj = UserProfile.objects.get(user=request.user)
-            
-            
+            profile_obj = UserProfile.objects.get(user=request.user)            
             if not profile_obj.is_active:
                 messages.error(request, 'Your account is blocked.')
+                logout_fn(request) 
                 return redirect('login-page')
         except UserProfile.DoesNotExist:
             messages.error(request, 'Profile not found.')
@@ -371,16 +541,18 @@ def profile(request):
 # FORM DETAILS
 def user_profile(request):
 
+    
+
     try:
         user_profile = UserProfile.objects.get(user=request.user)
     except UserProfile.DoesNotExist:
         user_profile = None  
 
     
-    if user_profile and not user_profile.is_active:
-        messages.error(request, 'Your account is blocked. Please contact support.')
-        logout(request)  
-        return redirect('login-page')  
+    # if user_profile and not user_profile.is_active:
+    #     messages.error(request, 'Your account is blocked. Please contact support.')
+    #     logout(request)  
+    #     return redirect('login-page')  
 
     
     if user_profile:
@@ -447,6 +619,22 @@ def user_profile(request):
 
 
 def change_password(request):
+
+    if request.user.is_authenticated:
+        try:
+            profile_obj = UserProfile.objects.get(user=request.user)
+            if not profile_obj.is_active:
+                messages.error(request, 'Your account is blocked.')
+                logout_fn(request) 
+                return redirect('login-page')
+        except UserProfile.DoesNotExist:
+            messages.error(request, 'Profile not found.')
+
+
+
+
+
+
     if request.method == 'POST':
         current_password = request.POST.get('currentPassword').strip()
         new_password = request.POST.get('newPassword').strip()
@@ -486,6 +674,18 @@ def password_change_success(request):
 
 
 def update_profile(request):
+    if request.user.is_authenticated:
+        try:
+            profile_obj = UserProfile.objects.get(user=request.user)
+            if not profile_obj.is_active:
+                messages.error(request, 'Your account is blocked.')
+                logout_fn(request) 
+                return redirect('login-page')
+        except UserProfile.DoesNotExist:
+            messages.error(request, 'Profile not found.')
+
+
+
     user_profile = get_object_or_404(UserProfile, user=request.user)
     
     if request.method == 'POST':
@@ -535,7 +735,18 @@ def update_profile(request):
 
 
 def profile_orderDetails(request):
-    user_orders = Order.objects.filter(user=request.user)
+    if request.user.is_authenticated:
+        try:
+            profile_obj = UserProfile.objects.get(user=request.user)
+            if not profile_obj.is_active:
+                messages.error(request, 'Your account is blocked.')
+                logout_fn(request) 
+                return redirect('login-page')
+        except UserProfile.DoesNotExist:
+            messages.error(request, 'Profile not found.')
+
+    # user_orders = Order.objects.filter(user=request.user)
+    user_orders = Order.objects.filter(user=request.user).order_by('-order_date')
 
     context = {
         'orders': user_orders,
@@ -547,6 +758,15 @@ def profile_orderDetails(request):
 
 
 def order_detail(request, order_id):
+    if request.user.is_authenticated:
+        try:
+            profile_obj = UserProfile.objects.get(user=request.user)
+            if not profile_obj.is_active:
+                messages.error(request, 'Your account is blocked.')
+                logout_fn(request) 
+                return redirect('login-page')
+        except UserProfile.DoesNotExist:
+            messages.error(request, 'Profile not found.')
     
 
 
@@ -576,21 +796,71 @@ def order_detail(request, order_id):
 
 
 
+
+# FINAL ONE
 def cancel_order(request, order_id):
+
+
+    if request.user.is_authenticated:
+        try:
+            profile_obj = UserProfile.objects.get(user=request.user)
+            if not profile_obj.is_active:
+                messages.error(request, 'Your account is blocked.')
+                logout_fn(request) 
+                return redirect('login-page')
+        except UserProfile.DoesNotExist:
+            messages.error(request, 'Profile not found.')
+
+
+
+
     order = get_object_or_404(Order, id=order_id, user=request.user)
     
+   
     if order.status not in ['CANCELED', 'DELIVERED']:  
+        
         order.status = 'CANCELED'
         order.save()
 
+        
         for item in order.order_items.all():
             product_size = item.product_size
             product_size.quantity += item.quantity  
             if product_size.quantity > 0:
-                product_size.status = True
+                product_size.status = True  
             product_size.save()
 
+        
+        if order.payment_method == 'Razorpay':
+            
+            total_paid_amount = Decimal(request.session.get('total_price', '0'))
+            
+            total_paid_amount = total_paid_amount.quantize(Decimal('0.01'))
+
+            print(total_paid_amount, ' - Total amount paid for refund')
+
+            
+            wallet = request.user.wallet
+            wallet.balance = F('balance') + total_paid_amount
+            wallet.save()
+
+            # Log the refund transaction
+            Transaction.objects.create(
+                wallet=wallet,
+                amount=total_paid_amount,
+                transaction_type='credit',
+                purpose='refund',
+                description=f'Refund for canceled order {order.id}'
+            )
+
+            messages.success(request, f'₹{total_paid_amount} has been credited to your wallet.')
+
+    else:
+        messages.error(request, 'Order cannot be canceled as it is already canceled or delivered.')
+
     return redirect('profile-order')
+
+
 
 
 
@@ -601,19 +871,94 @@ def cancel_product(request, order_id, item_id):
     order_item = get_object_or_404(OrderItem, id=item_id, order=order)
 
     if order.status == 'Pending':
-        
 
         product_size = order_item.product_size
         product_size.quantity = F('quantity') + order_item.quantity
         product_size.save()
 
+        refund_amount = order_item.quantity * order_item.product_size.variant.product.price
 
-        order.total_amount -= order_item.quantity * order_item.product_size.variant.product.price
+        order.total_amount -= refund_amount
         order.save()
 
         order_item.delete()
 
+        if not order.order_items.exists():
+            original_total = order.total_amount + refund_amount
+
+            if 'applied_coupon' in request.session:
+                coupon_data = request.session.get('applied_coupon')
+                coupon_code = coupon_data.get('code')
+                coupon_discount = Decimal(coupon_data.get('coupon_discount'))
+
+                total_price_after_discount = original_total - coupon_discount
+
+                order.total_amount = total_price_after_discount
+                order.save()
+
+                request.session.pop('applied_coupon', None)
+
+            # Refund to wallet if payment method was Razorpay
+            if order.payment_method == 'Razorpay':
+                wallet = request.user.wallet
+                wallet.balance = F('balance') + Decimal(refund_amount)
+                wallet.save()
+
+                # Log the refund transaction
+                Transaction.objects.create(
+                    wallet=wallet,
+                    amount=Decimal(refund_amount),
+                    transaction_type='credit',
+                    purpose='refund',
+                    description=f'Refund for canceled order item {order_item.id} and coupon adjustment'
+                )
+
+                messages.success(request, f'₹{refund_amount} has been credited to your wallet.')
+
+        else:
+            if order.payment_method == 'Razorpay':
+                wallet = request.user.wallet
+                wallet.balance = F('balance') + Decimal(refund_amount)
+                wallet.save()
+
+                Transaction.objects.create(
+                    wallet=wallet,
+                    amount=Decimal(refund_amount),
+                    transaction_type='credit',
+                    purpose='refund',
+                    description=f'Refund for canceled order item {order_item.id}'
+                )
+
+                messages.success(request, f'₹{refund_amount} has been credited to your wallet.')
+
     return redirect('profile-order-details', order_id=order.id)
+
+
+
+def user_wallet(request):
+
+    if request.user.is_authenticated:
+        try:
+            profile_obj = UserProfile.objects.get(user=request.user)
+            if not profile_obj.is_active:
+                messages.error(request, 'Your account is blocked.')
+                logout_fn(request) 
+                return redirect('login-page')
+        except UserProfile.DoesNotExist:
+            messages.error(request, 'Profile not found.')
+
+    wallet, created = Wallet.objects.get_or_create(user=request.user)
+    print(wallet.balance,'wallett')    
+    transactions = wallet.transactions.all().order_by('-created_at')  # Get all transactions ordered by date
+    print(transactions,'traaaa')
+    for i in transactions:
+        print(i.amount,'amount')
+    # Pass the balance and transaction data to the template
+    context = {
+        'balance': wallet.balance,
+        'transactions': transactions,
+    }
+    return render(request,'profile/wallet.html',context)
 
 
 def address_list(request):
@@ -629,6 +974,17 @@ def single_address(request, address_id):
 
 
 def edit_address(request, address_id):
+    if request.user.is_authenticated:
+        try:
+            profile_obj = UserProfile.objects.get(user=request.user)
+            if not profile_obj.is_active:
+                messages.error(request, 'Your account is blocked.')
+                logout_fn(request) 
+                return redirect('login-page')
+        except UserProfile.DoesNotExist:
+            messages.error(request, 'Profile not found.')
+
+
     address = get_object_or_404(Address, id=address_id, user=request.user)
     
     if request.method == "POST":
@@ -690,6 +1046,16 @@ def delete_address(request, address_id):
 
 
 def add_address(request):
+    if request.user.is_authenticated:
+        try:
+            profile_obj = UserProfile.objects.get(user=request.user)
+            if not profile_obj.is_active:
+                messages.error(request, 'Your account is blocked.')
+                logout_fn(request) 
+                return redirect('login-page')
+        except UserProfile.DoesNotExist:
+            messages.error(request, 'Profile not found.')
+
     if request.method == "POST":
         fullname = request.POST.get('fullname').strip()
         address_line1 = request.POST.get('address_line1').strip()
@@ -736,10 +1102,22 @@ def add_address(request):
 
 def shopPage(request):
 
+    if request.user.is_authenticated:
+        try:
+            profile_obj = UserProfile.objects.get(user=request.user)
+            if not profile_obj.is_active:
+                messages.error(request, 'Your account is blocked.')
+                logout_fn(request) 
+                return redirect('login-page')
+        except UserProfile.DoesNotExist:
+            messages.error(request, 'Profile not found.')
+
     
 
     product_obj = Product.objects.filter(
         status=True,
+        category__status=True,   # Ensure category status is True
+        brand__status=True,  
         variants__status=True,
         variants__sizes__quantity__gt=0
     ).annotate(
@@ -749,6 +1127,9 @@ def shopPage(request):
         active_variant_count__gt=0,
         active_size_count__gt=0 
     ).distinct().order_by('-updated_at')
+
+
+
 
 
     category_obj= Category.objects.all()
@@ -816,6 +1197,21 @@ def shopPage(request):
         except ValueError:
             pass
 
+
+    
+    today = date.today()
+    for product in product_obj:
+        offer = Offer.objects.filter(
+            brand=product.brand,
+            start_date__lte=today,
+            end_date__gte=today
+        ).first()
+
+        if offer:
+            discount_amount = (product.price * offer.discount_percentage) / 100
+            product.discounted_price = round(product.price - discount_amount, 2)
+        else:
+            product.discounted_price = None
 
     # Check if the filtered products queryset is empty
     if not product_obj.exists():

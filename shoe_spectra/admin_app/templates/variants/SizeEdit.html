@@ -1,0 +1,79 @@
+{% extends 'base.html' %}
+
+{% block links %}
+
+
+<link href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.12/cropper.min.css" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.12/cropper.min.js"></script>
+
+
+
+{% endblock %}
+
+
+{% block content %}
+{% if errors %}
+        <div class="alert alert-danger">
+            <ul>
+                {% for error in errors %}
+                    <li>{{ error }}</li>
+                {% endfor %}
+            </ul>
+        </div>
+    {% endif %}
+
+    {% if messages %}
+    <div class="alert alert-dismissible fade show" role="alert">
+        {% for message in messages %}
+            <div class="alert {% if message.tags == 'error' %}alert-danger{% elif message.tags == 'success' %}alert-success{% endif %}">
+                {{ message }}
+            </div>
+        {% endfor %}
+    </div>
+{% endif %}
+
+<div class="col-md-6 mb-6 mb-md-0">  
+    <div class="card">
+        <h5 class="card-header">Edit </h5>
+        <div class="card-body">
+            <form class="browser-default-validation" method="post">
+                {% csrf_token %}
+                <div class="form-floating form-floating-outline mb-6">
+                    <select class="form-select" name="size" id="basic-default-country" required>
+                        <option value="">Select size</option>
+                        {% for size in sizes %}
+                        <option value="{{ size.id }}" {% if size.id == size_obj.size.id %}selected{% endif %}>{{ size.size }}</option>
+                        {% endfor %}
+                    </select>
+                    <label for="basic-default-country">Size</label>
+                </div>
+
+                <div class="form-floating form-floating-outline mb-6">
+                    <input type="number" name="quantity" class="form-control" value="{{size_obj.quantity}}" id="basic-default-name"
+                        placeholder="" required="">
+                    <label for="basic-default-name">quantity</label>
+                </div>
+
+      
+                <button type="submit" class="btn btn-primary waves-effect waves-light">Submit</button>
+            </form>
+        </div>
+    </div>
+</div>
+
+
+
+{% endblock %}
+
+
+
+
+{% block js %}
+
+
+
+
+
+
+
+{% endblock %}

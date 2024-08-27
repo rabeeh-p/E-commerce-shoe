@@ -21,6 +21,15 @@
         {% endfor %}
     </div>
 {% endif %}
+{% if errors %}
+        <div class="alert alert-danger">
+            <ul>
+                {% for error in errors %}
+                    <li>{{ error }}</li>
+                {% endfor %}
+            </ul>
+        </div>
+    {% endif %}
 
 <div class="col-md-6 mb-6 mb-md-0">  
     <div class="card">
@@ -40,7 +49,7 @@
                 </div>
 
                 <div class="form-floating form-floating-outline mb-6">
-                    <input type="text" name="quantity" class="form-control" id="basic-default-name"
+                    <input type="number" name="quantity" class="form-control" id="basic-default-name"
                         placeholder="" required="">
                     <label for="basic-default-name">quantity</label>
                 </div>

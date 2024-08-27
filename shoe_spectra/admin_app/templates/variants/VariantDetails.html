@@ -91,7 +91,7 @@
                                         {% endif %}
                                     </td>
                                     <td>
-                                        <a href="">Edit</a>
+                                        <a href="{% url 'variants-size-edit' n.id %}">Edit</a>
                                     </td>
                                 </tr>
                                 {% endfor %}
@@ -127,10 +127,16 @@
                     <h5 class="card-title">Additional Image</h5>
                     <div class="d-flex justify-content-center flex-wrap">
                         {% for i in images %}
-                        <img src="{{ i.image.url }}" class="m-2" alt="Description of image">
+                            <div class="m-2 text-center">
+                                <img src="{{ i.image.url }}" alt="Description of image">
+                                <div>
+
+                                    <a href="{% url 'variants-images-edit' i.id %}">Edit</a>
+                                </div>
+                            </div>
                         {% endfor %}
                     </div>
-                    <a href="">Edit</a>
+                    <!-- <a href="">Edit</a> -->
                 </div>
             </div>
         </div>
