@@ -5,6 +5,8 @@
 {% block css %}
 
 <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+<script src="{% static 'assets/vendor/js/template-customizer.js' %}"></script>
+
 
 <style>
     .btn {
@@ -475,33 +477,6 @@ $(document).ready(function() {
     });
 });
 
-
-// $(document).ready(function() {
-//     $('a[data-model-type]').on('click', function(event) {
-//         event.preventDefault(); // Prevent the default anchor behavior
-//         const modelType = $(this).data('model-type'); // Get model type from the data attribute
-//         const itemId = $(this).data('item-id'); // Get the item ID from the data attribute
-
-//         // AJAX request to toggle status
-//         $.ajax({
-//             url: `/admin-page/product_status/`,  // Ensure this URL matches your Django URL pattern
-//             type: 'POST',
-//             data: {
-//                 'csrfmiddlewaretoken': '{{ csrf_token }}',  // Include the CSRF token
-//                 'model_type': modelType,  // Send the model type
-//                 'item_id': itemId  // Send the item ID
-//             },
-//             success: function(response) {
-//                 // Refresh the page on success
-//                 location.reload(); // Force page refresh to reflect updated status
-//             },
-//             error: function(xhr, status, error) {
-//                 alert('An error occurred while processing the request.');
-//                 console.error('AJAX Error: ', status, error);
-//             }
-//         });
-//     });
-// });
 
 
 

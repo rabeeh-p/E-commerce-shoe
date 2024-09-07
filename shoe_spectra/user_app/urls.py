@@ -44,6 +44,8 @@ urlpatterns = [
     path('password-change-success/', views.password_change_success, name='password_change_success'),
 
 
+    # REFERAL AND COUPON
+    path('profile/user-refereal-coupon', views.user_coupon_and_refferal, name='user-referal-coupon'),
 
 
 
@@ -55,8 +57,29 @@ urlpatterns = [
     path('order/<int:order_id>/cancel-product/<int:item_id>/', views.cancel_product, name='cancel-product'),
 
 
+
+
+
+
+    #  RETRY ORDER
+    path('order/payment-page/retry', views.razorpay_payment_verify_retry, name='retry-payment-verify'),
+
+
+
     #   wallet section
     path('user-wallet/',views.user_wallet, name='user-wallet' ),
+
+
+    # RETURN ORDER SECTION
+    path('order/<int:order_id>/return/', views.return_order, name='return-order'),
+    path('return-product/<int:order_id>/<int:order_item_id>/', views.return_product, name='return-product'),
+
+
+
+    # BILL
+    path('invoice/<int:order_id>/', views.invoice_view, name='invoice-view'),
+    path('invoice/<int:order_id>/download/', views.download_invoice, name='download-invoice'),
+
 
 
 

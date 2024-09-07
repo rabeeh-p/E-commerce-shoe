@@ -8,6 +8,8 @@
 
 
 
+
+
 {% endblock %}
 
 
@@ -159,88 +161,6 @@
   </div>
 </div>
 
-<!-- <div class="card mt-5">
-  <div class="card-header">
-    <h5 class="mb-0">Variants</h5>
-    <div class="d-flex justify-content-between align-items-center row pt-4 gap-4 gap-md-0">
-      <div class="col-md-4 product_status"></div>
-      <div class="col-md-4 product_category"></div>
-      <div class="col-md-4 product_stock"></div>
-    </div>
-  </div>
-  <div class="card-datatable table-responsive">
-    <div id="DataTables_Table_0_wrapper" class="dataTables_wrapper dt-bootstrap5 no-footer">
-      <div class="card-header d-flex border-top rounded-0 flex-wrap py-3 pb-5 pb-md-4">
-        <div class="me-5 ms-n2">
-          <div id="DataTables_Table_0_filter" class="dataTables_filter"><label><input type="search"
-                class="form-control form-control-sm" placeholder="Search" aria-controls="DataTables_Table_0"></label>
-          </div>
-        </div>
-        <div class="d-flex justify-content-start justify-content-md-end align-items-baseline">
-          <div
-            class="dt-action-buttons d-flex align-items-start align-items-md-center justify-content-sm-center gap-4 pt-0">
-            <button class="btn btn-secondary add-new btn-warning waves-effect waves-light" tabindex="0"
-              aria-controls="DataTables_Table_0" type=""><a href="{% url 'variants-add' product.id %}"
-                style="text-decoration: none; color: inherit;"><span><i
-                    class="ri-add-line ri-16px me-0 me-sm-1_5"></i><span class="d-none d-sm-inline-block">Add
-                    Variant</span></span></a></button>
-
-
-          </div>
-        </div>
-      </div>
-      <table class="datatables-products table dataTable no-footer dtr-column" id="DataTables_Table_0"
-        aria-describedby="DataTables_Table_0_info">
-        <thead>
-          <tr>
-            <th class="control sorting_disabled dtr-hidden" rowspan="1" colspan="1"
-              style="width: 17.625px; display: none;" aria-label=""></th>
-            <th class="sorting_disabled dt-checkboxes-cell dt-checkboxes-select-all" rowspan="1" colspan="1"
-              style="width: 17.625px;" data-col="1" aria-label="">No</th>
-            <th class="sorting sorting_asc" tabindex="0" aria-controls="DataTables_Table_0" rowspan="1" colspan="1"
-              style="width: 114.025px;" aria-label="product: activate to sort column descending" aria-sort="ascending">
-              color</th>
-            <th class="sorting" tabindex="0" aria-controls="DataTables_Table_0" rowspan="1" colspan="1"
-              style="width: 124.062px;" aria-label="category: activate to sort column ascending">quantity</th>
-            <th class="sorting" tabindex="0" aria-controls="DataTables_Table_0" rowspan="1" colspan="1"
-              style="width: 124.062px;" aria-label="category: activate to sort column ascending">Status</th>
-            <th class="sorting" tabindex="0" aria-controls="DataTables_Table_0" rowspan="1" colspan="1"
-              style="width: 124.062px;" aria-label="category: activate to sort column ascending">Edit</th>
-          </tr>
-        </thead>
-        <tbody>
-          {% for v in variant %}
-          <tr class="odd">
-            <td valign="top" class="dtr-control sorting_1" style="display: none;"></td>
-            <td valign="top" class="dt-checkboxes-cell">{{forloop.counter}}</td>
-            <td valign="top">{{v.color}}</td>
-            <td valign="top">{{v.quantity}}</td>
-            <td valign="top">
-              <a href="{% url 'single-variant-status' v.id %}" class="status-link">
-                  {% if v.status == True %}
-                      <span class="badge bg-success">Available</span>
-                  {% else %}
-                      <span class="badge bg-warning">Unavailable</span>
-                  {% endif %}
-              </a>
-          </td>
-            <td valign="top">
-              <a href="{% url 'variants-edit' v.id %}">
-                <button class="view-button">View</button>
-              </a>
-            </td>
-          </tr>
-          {% endfor %}
-
-
-
-
-        </tbody>
-      </table>
-
-    </div>
-  </div>
-</div> -->
 
 
 {% endblock %}

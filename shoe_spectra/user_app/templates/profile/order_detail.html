@@ -5,59 +5,10 @@
 
 
 <link rel="canonical" href="https://themeselection.com/item/materio-bootstrap-html-admin-template/">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
-<!-- ? PROD Only: Google Tag Manager (Default ThemeSelection: GTM-5DDHKGP, PixInvent: GTM-5J3LMKC) -->
-<script>(function (w, d, s, l, i) {
-    w[l] = w[l] || []; w[l].push({
-      'gtm.start':
-        new Date().getTime(), event: 'gtm.js'
-    }); var f = d.getElementsByTagName(s)[0],
-      j = d.createElement(s), dl = l != 'dataLayer' ? '&l=' + l : ''; j.async = true; j.src =
-        '../../../../www.googletagmanager.com/gtm5445.html?id=' + i + dl; f.parentNode.insertBefore(j, f);
-  })(window, document, 'script', 'dataLayer', 'GTM-5DDHKGP');</script>
-<!-- End Google Tag Manager -->
-
-<!-- Favicon -->
-<!-- <link rel="icon" type="image/x-icon" href="https://demos.themeselection.com/materio-bootstrap-html-admin-template/assets/img/favicon/favicon.ico" /> -->
-
-<!-- Fonts -->
-<link rel="preconnect" href="https://fonts.googleapis.com/">
-<link rel="preconnect" href="https://fonts.gstatic.com/" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&amp;ampdisplay=swap"
-  rel="stylesheet">
-
-<!-- Icons -->
-<link rel="stylesheet" href="{% static 'Met_style/assets/vendor/fonts/remixicon/remixicon.css' %}" />
-<link rel="stylesheet" href="{% static 'Met_style/assets/vendor/fonts/flag-icons.css' %}" />
-
-<!-- Menu waves for no-customizer fix -->
-<link rel="stylesheet" href="{% static 'Met_style/assets/vendor/libs/node-waves/node-waves.css' %}" />
-
-<!-- Core CSS -->
-<!-- <link rel="stylesheet" href="{% static 'assets/vendor/css/rtl/core.css' %}" class="template-customizer-core-css" />
-<link rel="stylesheet" href="{% static 'assets/vendor/css/rtl/theme-default.css' %}" class="template-customizer-theme-css" /> -->
-<link rel="stylesheet" href="{% static 'Met_style/assets/css/demo.css' %}" />
-
-<!-- Vendors CSS -->
-<link rel="stylesheet" href="{% static 'Met_style/assets/vendor/libs/perfect-scrollbar/perfect-scrollbar.css' %}" />
-<link rel="stylesheet" href="{% static 'Met_style/assets/vendor/libs/typeahead-js/typeahead.css' %}" />
-<link rel="stylesheet" href="{% static 'Met_style/assets/vendor/libs/datatables-bs5/datatables.bootstrap5.css' %}">
-<link rel="stylesheet"
-  href="{% static 'Met_style/assets/vendor/libs/datatables-responsive-bs5/responsive.bootstrap5.css' %}">
-<link rel="stylesheet"
-  href="{% static 'Met_style/assets/vendor/libs/datatables-checkboxes-jquery/datatables.checkboxes.css' %}">
-
-<!-- Page CSS -->
-<link rel="stylesheet" href="{% static 'Met_style/assets/vendor/css/pages/page-profile.css' %}" />
-
-<!-- Helpers -->
-<script src="{% static 'Met_style/assets/vendor/js/helpers.js' %}"></script>
-<!--! Template customizer & Theme config files MUST be included after core stylesheets and helpers.js in the <head> section -->
-<!--? Template customizer: To hide customizer set displayCustomizer value false in config.js.  -->
-<script src="{% static 'Met_style/assets/vendor/js/template-customizer.js' %}"></script>
-<!--? Config:  Mandatory theme config file contain global vars & default theme options, Set your preferred theme option in this file.  -->
-<script src="{% static 'Met_style/assets/js/config.js' %}"></script>
 
 {% endblock %}
 
@@ -78,64 +29,155 @@
 <div class="container mt-4 mb-4">
   <h2>Order Details</h2>
 
-  <!-- Order Summary Card -->
-  <div class="card mb-4">
-    <div class="card-body">
-      <h5 class="card-title">Order Information</h5>
-      <p><strong>Order ID:</strong> {{ order.id }}</p>
-      <p><strong>Date:</strong> {{ order.order_date }}</p>
-      <p><strong>Date:</strong> {{ order.order_date }}</p>
-      <p><strong>method:</strong> {{ order.payment_method }}</p>
-      <p><strong>payment status:</strong> {{ order.payment_success }}</p>
-      <p><strong>Total Price:</strong> ${{ order.total_amount }}</p>
+  
 
 
-      <!-- {% if order.status == 'Pending' %}
-      <form action="{% url 'cancel-order' order.id %}" method="post">
-        {% csrf_token %}
-        <button type="submit" class="btn btn-danger">Cancel Order</button>
-      </form>
-      {% elif order.status == 'CANCELED' %}
-      <div class="alert alert-warning mt-3">This order has been canceled .</div>
-      {% endif %} -->
+  <div class="container mt-5">
+    <div class="card shadow-sm mb-4">
+      <div class="card-body">
+        <h5 class="card-title text-center mb-4">Order Information</h5>
+
+        <div class="row mb-2">
+          <div class="col-md-6">
+            <p><strong>Order ID:</strong> {{ order.id }}</p>
+          </div>
+          <div class="col-md-6">
+            <p><strong>Order Status:</strong>
+              <span class="badge 
+              {% if order.status == 'DELIVERED' %}
+                  bg-success
+              {% elif order.status == 'PENDING' %}
+                  bg-warning text-dark
+              {% elif order.status == 'CANCELED' %}
+                  bg-danger
+              {% else %}
+                  bg-secondary
+              {% endif %}">
+                {{ order.status }}
+              </span>
+            </p>
+          </div>
+        </div>
+
+        
+        <div class="row mb-2">
+          <div class="col-md-6">
+            <p><strong>Date:</strong> {{ order.order_date }}</p>
+          </div>
+          <div class="col-md-6">
+            <p><strong>Payment Method:</strong> {{ order.payment_method }}</p>
+          </div>
+        </div>
+
+        <div class="row mb-2">
+          <div class="col-md-6">
+            <p><strong>Payment Status:</strong>
+              <span class="badge 
+                    {% if order.payment_success %}
+                        bg-success
+                    {% else %}
+                        bg-danger
+                    {% endif %}">
+                {% if order.payment_success %} Success {% else %} Pending {% endif %}
+              </span>
+            </p>
+          </div>
+          
+        </div>
+
+        <div class="row mb-2">
+          
+
+          <div class="col-md-6">
+            {% if order.original_price > 0 %}
+                <p><strong>Original Price:</strong> Rs{{ order.original_price }}</p>
+            {% endif %}
+        </div>
+         
+        </div>
+        {% if order.coupon_code %} <!-- Check if coupon_code exists -->
+        <div class="row mb-2">
+          <div class="col-md-6">
+            <p><strong>Coupon Code:</strong> {{ order.coupon_code }}</p> <!-- Display coupon code -->
+          </div>
+        </div>
+        {% endif %}
+
+        <div class="row mb-2">
+          <div class="col-md-6">
+            <p><strong>Shipping charge</strong> Rs50</p> <!-- Display coupon code -->
+          </div>
+        </div>
+
+        <div class="row mb-2">
+          
+          <div class="col-md-6">
+            {% if order.discounted_price > 0 %}
+                <p><strong>Discounted Price:</strong> Rs{{ order.discounted_price }}</p>
+            {% endif %}
+        </div>
+          <div class="col-md-6">
+            <p><strong>Final Price:</strong> Rs{{ order.final_price }}</p>
+          </div>
+        </div>
 
 
+        <div class="d-flex justify-content-between align-items-center mt-4">
+          {% if order.payment_method == 'Razorpay' and order.payment_success == True %}
+          <a href="{% url 'invoice-view' order.id %}" class="btn btn-outline-primary">View Invoice</a>
+          {% elif order.status == 'DELIVERED' %}
+          <a href="{% url 'invoice-view' order.id %}" class="btn btn-outline-primary">View Invoice</a>
+          {% else %}
+          <p>Invoice will be available after the order is delivered or the payment is confirmed.</p>
+          {% endif %}
+        </div>
 
-      {% if order.status == 'CANCELED' %}
-      <div class="alert alert-warning mt-3">This order has been canceled.</div>
-      {% elif order.payment_method == 'Razorpay' and not order.payment_success %}
-      <div class="alert alert-warning mt-3">The order could not be confirmed due to payment failure. This order is
-        considered canceled.</div>
-      {% elif order.status == 'Pending' and order.payment_method == 'Cash on Delivery'  %}
-      <form action="{% url 'cancel-order' order.id %}" method="post">
-        {% csrf_token %}
-        <button type="submit" class="btn btn-danger">Cancel Order</button>
-      </form>
-      {% elif order.status == 'Pending' and order.payment_method == 'Razorpay' and order.payment_success  %}
-      <form action="{% url 'cancel-order' order.id %}" method="post">
-        {% csrf_token %}
-        <button type="submit" class="btn btn-danger">Cancel Order</button>
-      </form>
-      {% else %}
-      <div class="alert alert-info mt-3">Order cannot be canceled at this stage.</div>
-      {% endif %}
+        <!-- Order Actions -->
+        <hr class="my-4">
+        <h6 class="text-center mb-4">Order Actions</h6>
 
-      
-    
+        {% if order.status == 'CANCELED' %}
+        <div class="alert alert-warning text-center">This order has been canceled.</div>
+        {% elif order.payment_method == 'Razorpay' and not order.payment_success %}
+        <div class="alert alert-warning text-center">
+          The order could not be confirmed due to payment failure.
+          <button id="retry-payment-btn" class="btn btn-primary mt-2">Retry Payment</button>
+        </div>
+        {% elif order.status == 'Pending' and order.payment_method == 'Cash on Delivery' %}
+        
+        <form action="{% url 'cancel-order' order.id %}" method="post" class="text-center"
+          onsubmit="return confirm('Are you sure you want to cancel this order?');">
+          {% csrf_token %}
+          <button type="submit" class="btn btn-danger">Cancel Order</button>
+        </form>
+        {% elif order.status == 'Pending' and order.payment_method == 'Razorpay' and order.payment_success %}
 
 
+        <form id="cancel-order-form-{{ order.id }}" action="{% url 'cancel-order' order.id %}" method="post"
+          class="text-center">
+          {% csrf_token %}
+          <button type="button" class="btn btn-danger" onclick="confirmCancelOrder('{{ order.id }}')">Cancel
+            Order</button>
+        </form>
+        {% elif order.status == 'DELIVERED' %}
 
 
-
-
-
-
-
+        <form id="return-order-form-{{ order.id }}" action="{% url 'return-order' order.id %}" method="post"
+          class="text-center">
+          {% csrf_token %}
+          <button type="button" class="btn btn-warning" onclick="confirmReturnOrder('{{ order.id }}')">Return
+            Order</button>
+        </form>
+        {% elif order.status == 'RETURNED' %}
+        <div class="alert alert-success text-center mt-3">
+          This order has already been returned.
+        </div>
+        {% else %}
+        <div class="alert alert-info text-center mt-3">Order cannot be canceled at this stage.</div>
+        {% endif %}
+      </div>
     </div>
   </div>
-
-
-
 
 
   <!-- Order Items Table -->
@@ -158,43 +200,44 @@
             {% for item in order_items %}
             <tr>
               <td>
-                <img src="{{ item.product_size.variant.product.image.url }}"
-                  alt="{{ item.product_size.variant.product.name }}"
+                <img src="{{ item.product_size.variant.image.url }}" alt="{{ item.product_size.variant.product.name }}"
                   style="width: 50px; height: 50px; object-fit: cover;">
               </td>
-              <td>{{ item.product_size.variant.product }}</td>
+              <td>{{ item.product_size.variant.product }} {{ item.product_size.variant.color }}</td>
               <td>{{ item.product_size.size }}</td>
               <td>{{ item.quantity }}</td>
               <!-- <td>{{ item.product_size.variant.product.price }}</td> -->
               <td>
                 {% if item.final_price %}
-                    ₹{{ item.final_price }} <!-- Display discounted price -->
+                ₹{{ item.final_price }} <!-- Display discounted price -->
                 {% else %}
-                    ₹{{ item.product_size.variant.product.price }} <!-- Display original price -->
+                ₹{{ item.product_size.variant.product.price }} <!-- Display original price -->
                 {% endif %}
-            </td>
-               
+              </td>
+
               <td>
-                
+
 
                 {% if order.status == 'Pending' %}
                 {% if order.payment_method != 'Razorpay' or order.payment_success %}
-                <!-- Show the cancel button if the order is pending and payment is successful (or not Razorpay) -->
                 <form action="{% url 'cancel-product' order.id item.id %}" method="post"
                   onsubmit="return confirm('Are you sure you want to cancel this product?');">
                   {% csrf_token %}
                   <button type="submit" class="btn btn-danger btn-sm">Cancel</button>
                 </form>
                 {% else %}
-                <!-- Show this message if the payment method is Razorpay and payment status is False -->
                 <div class="alert alert-warning mt-3">The order could not be confirmed due to payment failure. This
                   product is considered canceled.</div>
                 {% endif %}
                 {% elif order.status == 'CANCELED' %}
-                <!-- Show this message if the order has been canceled -->
                 <div class="alert alert-warning mt-3">This order has been canceled.</div>
+                {% elif order.status == 'DELIVERED' %}
+                <form action="{% url 'return-product' order.id item.id %}" method="post"
+                  onsubmit="return confirm('Are you sure you want to return this product?');">
+                  {% csrf_token %}
+                  <button type="submit" class="btn btn-warning btn-sm">Return</button>
+                </form>
                 {% else %}
-                <!-- Show a message indicating that the product cannot be canceled at this stage -->
                 <div class="alert alert-info mt-3">This product cannot be canceled at this stage.</div>
                 {% endif %}
               </td>
@@ -218,47 +261,106 @@
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 {% block js %}
 
-<!-- Core JS -->
-<!-- build:js assets/vendor/js/core.js -->
-<script src="{% static 'Met_style/assets/vendor/libs/jquery/jquery.js' %}"></script>
-<script src="{% static 'Met_style/assets/vendor/libs/popper/popper.js' %}"></script>
-<script src="{% static 'Met_style/assets/vendor/js/bootstrap.js' %}"></script>
-<script src="{% static 'Met_style/assets/vendor/libs/node-waves/node-waves.js' %}"></script>
-<script src="{% static 'Met_style/assets/vendor/libs/perfect-scrollbar/perfect-scrollbar.js' %}"></script>
-<script src="{% static 'Met_style/assets/vendor/libs/hammer/hammer.js' %}"></script>
-<script src="{% static 'Met_style/assets/vendor/libs/i18n/i18n.js' %}"></script>
-<script src="{% static 'Met_style/assets/vendor/libs/typeahead-js/typeahead.js' %}"></script>
-<script src="{% static 'Met_style/assets/vendor/js/menu.js' %}"></script>
-
-<!-- endbuild -->
-
-<!-- Vendors JS -->
-<script src="{% static 'Met_style/assets/vendor/libs/apex-charts/apexcharts.js' %}"></script>
-<script src="{% static 'Met_style/assets/vendor/libs/cleavejs/cleave.js' %}"></script>
-<script src="{% static 'Met_style/assets/vendor/libs/cleavejs/cleave-phone.js' %}"></script>
-
-<!-- Main JS -->
-<script src="{% static 'Met_style/assets/js/main.js' %}"></script>
 
 
-<!-- Page JS -->
-<script src="{% static 'Met_style/assets/js/dashboards-crm.js' %}"></script>
+
+
+
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+<script>
+  document.getElementById('retry-payment-btn').addEventListener('click', function (e) {
+    e.preventDefault();
+
+    var options = {
+      "key": "{{ razorpay_key }}", // Replace with your Razorpay API Key
+      "amount": "{{ order.total_amount|floatformat:2|floatformat:0 }}", // Amount in paise
+      "currency": "INR",
+      "name": "Your Website Name",
+      "description": "Retry Payment for Order #{{ order.id }}",
+      "order_id": "{{ razorpay_order_id }}", // Razorpay Order ID
+      "handler": function (response) {
+        // Handle success
+        verifyPayment(response.razorpay_payment_id, response.razorpay_order_id, response.razorpay_signature, "{{ order.id }}");
+      },
+      "prefill": {
+        "name": "{{ order.user.get_full_name }}",
+        "email": "{{ order.user.email }}",
+        "contact": "{{ order.user.profile.phone_number }}"
+      },
+      "theme": {
+        "color": "#3399cc"
+      }
+    };
+
+    var rzp1 = new Razorpay(options);
+    rzp1.open();
+  });
+
+  function verifyPayment(payment_id, order_id, signature, order_id_db) {
+    fetch("{% url 'retry-payment-verify' %}", {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-CSRFToken': '{{ csrf_token }}'
+      },
+      body: JSON.stringify({
+        razorpay_payment_id: payment_id,
+        razorpay_order_id: order_id,
+        razorpay_signature: signature,
+        order_id: order_id_db
+      })
+    })
+      .then(response => response.json())
+      .then(data => {
+        if (data.status === 'success') {
+          alert("Payment successful. Order ID: " + data.order_id);
+          window.location.href = "{% url 'profile-order' %}"; // Redirect to order detail page
+        } else {
+          alert("Payment verification failed. Please try again.");
+        }
+      })
+      .catch(error => {
+        console.error("Error:", error);
+      });
+  }
+
+
+  function confirmReturnOrder(orderId) {
+    Swal.fire({
+      title: 'Are you sure?',
+      text: "Do you really want to return this order?",
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#3085d6',
+      cancelButtonColor: '#d33',
+      confirmButtonText: 'Yes, return it!'
+    }).then((result) => {
+      if (result.isConfirmed) {
+        // Avoid property assignment error by using correct form ID reference
+        document.getElementById('return-order-form-' + orderId).submit();
+      }
+    });
+  }
+
+  function confirmCancelOrder(orderId) {
+    Swal.fire({
+      title: 'Are you sure?',
+      text: "Do you really want to cancel this order?",
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#3085d6',
+      cancelButtonColor: '#d33',
+      confirmButtonText: 'Yes, cancel it!'
+    }).then((result) => {
+      if (result.isConfirmed) {
+        // Submit the form if confirmed
+        document.getElementById('cancel-order-form-' + orderId).submit();
+      }
+    });
+  }
+</script>
+
 
 {% endblock %}

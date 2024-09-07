@@ -186,12 +186,7 @@
                                         <option value="100">100</option>
                                     </select></label></div>
                             <div class="dt-buttons btn-group flex-wrap d-flex">
-                                <!-- <div class="btn-group"><button
-                                        class="btn btn-secondary buttons-collection dropdown-toggle btn-outline-secondary me-4 waves-effect waves-light"
-                                        tabindex="0" aria-controls="DataTables_Table_0" type="button"
-                                        aria-haspopup="dialog" aria-expanded="false"><span><i
-                                                class="ri-download-line ri-16px me-2"></i><span
-                                                class="d-none d-sm-inline-block">Export </span></span></button></div> -->
+                               
                                 <button class="btn btn-secondary add-new btn-warning waves-effect waves-light"
                                     tabindex="0" aria-controls="DataTables_Table_0" type=""><a href="{% url 'add2-page' %}" style="text-decoration: none; color: inherit;"><span><i
                                             class="ri-add-line ri-16px me-0 me-sm-1_5"></i><span
@@ -236,14 +231,7 @@
                             <td valign="top">{{p.category.name}}</td>   <!-- category -->
                             <td valign="top">{{p.brand.name}}</td>              <!-- brand -->
                             <!-- <td valign="top">{{p.stock}}</td>                qty -->
-                            <!-- <td valign="top">
-                                {% if p.status == True %}
-                                <span class="badge bg-success">Available</span>
-                                {% else %} 
-                                <span class="badge bg-warning">Unavailable</span>
-                                {% endif  %}
                             
-                            </td>  -->
                             <td valign="top">
                                 <a href="{% url 'mainStatus' p.id %}" class="status-link">
                                     {% if p.status == True %}

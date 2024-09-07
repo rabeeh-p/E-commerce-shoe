@@ -2,170 +2,293 @@
 {% load static %}
 
 
-{% block link %}
-
+{% block links %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="{% static 'assets/vendor/js/template-customizer.js' %}"></script>
 
 
 {% endblock %}
 
 {% block css %}
 <style>
-  .container {
-      margin-top: 30px;
-  }
-  .table th, .table td {
-      text-align: center;
-  }
-  .form-row {
+    .container {
+        margin-top: 30px;
+    }
+
+    .table th,
+    .table td {
+        text-align: center;
+    }
+
+    .form-row {
         display: flex;
         flex-wrap: wrap;
         align-items: center;
     }
+
     .form-group {
         margin-bottom: 0;
     }
+
     .btn {
         width: 100%;
+    }
+
+
+    .chart-container {
+        width: 100%;
+        max-width: 700px;
+        padding: 20px;
+        background-color: #f4f4f4;
+        border-radius: 8px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        margin: 0 auto;
+    }
+
+    .filter-label {
+        display: block;
+        margin-bottom: 8px;
+        font-size: 16px;
+        color: #333;
+    }
+
+    .filter-select {
+        width: 100%;
+        padding: 8px;
+        font-size: 16px;
+        border-radius: 4px;
+        border: 1px solid #ddd;
+        background-color: #fff;
+        margin-bottom: 20px;
+    }
+
+    canvas {
+        width: 100% !important;
+        height: auto !important;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        background-color: #fff;
+    }
+
+    .chart-container canvas {
+        display: block;
+        margin: 0 auto;
+    }
+
+    .top-products-section {
+        margin-top: 20px;
+    }
+
+    .top-products-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-bottom: 20px;
+    }
+
+    .top-products-table th,
+    .top-products-table td {
+        border: 1px solid #ddd;
+        padding: 8px;
+        text-align: left;
+    }
+
+    .top-products-table th {
+        background-color: #f2f2f2;
+        font-weight: bold;
+    }
+
+    .top-products-table tr:nth-child(even) {
+        background-color: #f9f9f9;
     }
 </style>
 
 {% endblock %}
 
 {% block content %}
-     
-  <div class="row gy-6">
-    <!-- Congratulations card -->
+
+<div class="row gy-6">
     <div class="col-xl-8 col-lg-7 align-self-end mt-md-7 mt-lg-4 pt-md-2 pt-lg-0">
-      <div class="card">
-        <div class="row">
-          <div class="col-12 col-md-6">
-            <div class="card-body">
-              <h4 class="card-title mb-9 ">{{name}}  <span class="fw-bold"></span>🎉</h4>
-              <!-- <p class="mb-0"> You have done 72% 😎 more sales today. Check your new raising badge in your profile.</p> -->
-            </div>
-          </div>
-          <div class="col-12 col-md-6 position-relative text-center">
-            <!-- <img src="{% static 'assets/img/illustrations/illustration-john-2.png' %}" class="card-img-position bottom-0 w-auto end-0 scaleX-n1-rtl" alt="View Profile"> -->
-          </div>
-        </div>
-      </div>
-    </div>
-    <!--/ Congratulations card -->
-    <!-- Cards with icon profit and loss info -->
-
-
-    <div class="container">
-      <h2 class="mb-4">Sales Report</h2>
-
-
-      <div class="sales-summary">
-          <p><strong>Total Orders:</strong> {{ overall_order_amount }}</p>
-          <p><strong>Total Sales:</strong> {{ overall_sales_count|floatformat:2 }}</p>
-        <p><strong>Total Discount:</strong> ${{ overall_discount|floatformat:2 }}</p>
-    </div>
-      
-      <!-- Form for date range -->
-      <form method="GET" class="mb-4">
-        <div class="form-row align-items-end">
-            <div class="form-group col-md-4 col-lg-3 mb-3 mb-lg-0">
-                <label for="filter_type">Filter By:</label>
-                <select name="filter_type" class="form-control" onchange="this.form.submit()">
-                    <option value="custom" {% if filter_type == 'custom' %}selected{% endif %}>Custom Date Range</option>
-                    <option value="1_day" {% if filter_type == '1_day' %}selected{% endif %}>Last 1 Day</option>
-                    <option value="1_week" {% if filter_type == '1_week' %}selected{% endif %}>Last 1 Week</option>
-                    <option value="1_month" {% if filter_type == '1_month' %}selected{% endif %}>Last 1 Month</option>
-                </select>
-            </div>
-
-            {% if filter_type == 'custom' %}
-            <div class="form-group col-md-4 col-lg-3 mb-3 mb-lg-0 mx-2">
-                <label for="start_date">Start Date:</label>
-                <input type="date" class="form-control" name="start_date" value="{{ start_date|date:'Y-m-d' }}">
-            </div>
-
-            <div class="form-group col-md-4 col-lg-3 mb-3 mb-lg-0">
-                <label for="end_date">End Date:</label>
-                <input type="date" class="form-control" name="end_date" value="{{ end_date|date:'Y-m-d' }}">
-            </div>
-            {% endif %}
-
-        </div>
-    </form>
-    <!-- <form method="GET" action="">
-        <input type="hidden" name="start_date" value="{{ start_date }}">
-        <input type="hidden" name="end_date" value="{{ end_date }}">
-        <input type="hidden" name="filter_type" value="{{ filter_type }}">
-        <button type="submit" name="pdf" value="1">Download PDF Report</button>
-    </form> -->
-
-    <div class=" col-md-4 col-lg-2 mx-2">
-      <form method="GET" action="" class="mb-4">
-        <input type="hidden" name="start_date" value="{{ start_date }}">
-        <input type="hidden" name="end_date" value="{{ end_date }}">
-        <input type="hidden" name="filter_type" value="{{ filter_type }}">
-        <button type="submit" name="pdf"  value="1" class="btn btn-success">Download PDF</button>
-    </form>
-   
-     </div>
-    
-  
-      <!-- Total Sales -->
-      <!-- <h3 class="mb-4">Total Sales: {{ total_sales }}</h3> -->
-  
-      {% if error_message %}
-        <div class="alert alert-danger">{{ error_message }}</div>
-    {% endif %}
-
-    {% if no_orders_message %}
-        <div class="alert alert-info">{{ no_orders_message }}</div>
-    {% else %}
-        <!-- Custom Width Card -->
-        <div class="mb-4">
-            <div class="card custom-width">
-                <div class="card-body">
-                    <h3 class="card-title">Total Sales</h3>
-                    <p class="card-text h4">${{ total_sales }}</p>
+        <div class="card">
+            <div class="row">
+                <div class="col-12 col-md-6">
+                    <div class="card-body">
+                        <h4 class="card-title mb-9 ">{{name}} <span class="fw-bold"></span>🎉</h4>
+                    </div>
+                </div>
+                <div class="col-12 col-md-6 position-relative text-center">
                 </div>
             </div>
         </div>
-
-        <!-- Sales Report Table -->
-        <table class="table table-striped table-bordered table-responsive">
-            <thead class="thead-dark">
-                <tr>
-                    <th>Order ID</th>
-                    <th>User</th>
-                    <th>Final Price</th>
-                    <th>Payment Method</th>
-                    <th>Order Date</th>
-                    <th>Status</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for order in completed_orders %}
-                <tr>
-                    <td>{{ order.id }}</td>
-                    <td>{{ order.user.username }}</td>
-                    <td>${{ order.final_price }}</td>
-                    <td>{{ order.payment_method }}</td>
-                    <td>{{ order.order_date|date:"Y-m-d H:i:s" }}</td>
-                    <td>{{ order.status }}</td>
-                </tr>
-                {% empty %}
-                <tr>
-                    <td colspan="6" class="text-center">No orders found</td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-    {% endif %}
-  </div>
-
-   
-  
-            
-
-{% endblock %}
+    </div>
 
 
 
+    <div class="chart-container mt-5">
+        <label for="timeFilter" class="filter-label">Filter by:</label>
+        <select id="timeFilter" class="filter-select" onchange="updateChart()">
+            <option value="day">Day</option>
+            <option value="week">Week</option>
+            <option value="month">Month</option>
+            <option value="year">Year</option>
+        </select>
+        <canvas id="orderChart" width="400" height="200"></canvas>
+    </div>
+
+
+
+    <div class="container">
+        <div class="top-products-section text-center mb-4">
+            <h2 class="mb-4">Top 10 Best Selling Products</h2>
+            <table class="table table-striped top-products-table">
+                <thead>
+                    <tr>
+                        <th>Product Image</th>
+                        <th>Product Name</th>
+                        <th>Total Sold</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for product in top_products_list %}
+                    <tr>
+                        <td>
+                            {% if product.image %}
+                            <img src="{{ product.image }}" alt="{{ product.name }}" style="width: 100px; height: auto;">
+                            {% else %}
+                            No Image
+                            {% endif %}
+                        </td>
+                        <td>{{ product.name }}</td>
+                        <td>{{ product.total_sold }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="container mt-4">
+        <h3 class="mb-4 text-center">Best Selling Categories</h3>
+        <div class="row">
+            {% for category in top_categories_list %}
+            <div class="col-md-4 mb-4">
+                <div class="card h-100 shadow-sm">
+                    <div class="card-body text-center">
+                        <h5 class="card-title">{{ category.name }}</h5>
+                        <p class="card-text">
+                            <strong>{{ category.total_sold }}</strong> items sold
+                        </p>
+                    </div>
+                    <div class="card-footer">
+                        <small class="text-muted">Updated {{ timezone.now|date:"Y-m-d" }}</small>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <div class="container mt-4">
+        <h3 class="mb-4 text-center">Best Selling Brands</h3>
+        <div class="row">
+            {% for brand in top_brands_list %}
+            <div class="col-md-4 mb-4">
+                <div class="card h-100 shadow-sm">
+                    <div class="card-body text-center">
+                        <h5 class="card-title">{{ brand.name }}</h5>
+                        <p class="card-text">
+                            <strong>{{ brand.total_sold }}</strong> items sold
+                        </p>
+                    </div>
+                    <div class="card-footer">
+                        <small class="text-muted">Updated {{ timezone.now|date:"Y-m-d" }}</small>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    
+    
+
+
+
+    {% endblock %}
+
+    {% block js %}
+
+
+    <script>
+        console.log("Starting script...");
+
+        const dayData = JSON.parse('{{ day_data|escapejs }}');
+        const weekData = JSON.parse('{{ week_data|escapejs }}');
+        const monthData = JSON.parse('{{ month_data|escapejs }}');
+        const yearData = JSON.parse('{{ year_data|escapejs }}');
+
+
+
+        const dayLabels = dayData.labels;
+        const weekLabels = weekData.labels;
+        const monthLabels = monthData.labels;
+        const yearLabels = yearData.labels;
+
+        const dayChartData = dayData.data;
+        const weekChartData = weekData.data;
+        const monthChartData = monthData.data;
+        const yearChartData = yearData.data;
+
+        var ctx = document.getElementById('orderChart').getContext('2d');
+        if (!ctx) {
+            console.error("Canvas element not found!");
+        }
+
+        var orderChart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: dayLabels,
+                datasets: [{
+                    label: 'Total Orders (Day)',
+                    data: dayChartData,
+                    backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                    borderColor: 'rgba(75, 192, 192, 1)',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+
+        function updateChart() {
+            const filter = document.getElementById('timeFilter').value;
+
+            if (filter === 'day') {
+                orderChart.data.labels = dayLabels;
+                orderChart.data.datasets[0].data = dayChartData;
+                orderChart.data.datasets[0].label = 'Total Orders (Day)';
+            } else if (filter === 'week') {
+                orderChart.data.labels = weekLabels;
+                orderChart.data.datasets[0].data = weekChartData;
+                orderChart.data.datasets[0].label = 'Total Orders (Week)';
+            } else if (filter === 'month') {
+                orderChart.data.labels = monthLabels;
+                orderChart.data.datasets[0].data = monthChartData;
+                orderChart.data.datasets[0].label = 'Total Orders (Month)';
+            } else if (filter === 'year') {
+                orderChart.data.labels = yearLabels;
+                orderChart.data.datasets[0].data = yearChartData;
+                orderChart.data.datasets[0].label = 'Total Orders (Year)';
+            }
+
+            orderChart.update();
+        }
+    </script>
+
+
+
+
+    {% endblock %}

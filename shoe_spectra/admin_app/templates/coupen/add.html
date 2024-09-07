@@ -45,6 +45,11 @@
                     <label for="basic-default-name">Discount Percentage</label>
                 </div>
                 <div class="form-floating form-floating-outline mb-6">
+                    <input type="number" class="form-control" id="basic-default-name" placeholder="amount" required=""
+                        name="min_amount" value="">
+                    <label for="basic-default-name">Minimum amount</label>
+                </div>
+                <div class="form-floating form-floating-outline mb-6">
                     <input type="date" class="form-control" id="basic-default-name" placeholder="date" required=""
                         name="expiry_date" value="{{ coupon.expiry_date|date:" Y-m-d" }}">
                     <label for="basic-default-name">Expiry Date</label>

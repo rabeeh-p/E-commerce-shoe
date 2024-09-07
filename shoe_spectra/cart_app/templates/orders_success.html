@@ -6,15 +6,21 @@
 {% block content %}
 
 
-<div class="container mt-5">
-    <div class="alert alert-success" role="alert">
-        <h4 class="alert-heading">Order Successful!</h4>
-        <p>Your order with ID <strong>{{ order_id }}</strong> has been placed successfully. Thank you for shopping with us.</p>
-        <hr>
-        <p class="mb-0">You will receive an email confirmation soon.</p>
-        <a href="{% url 'profile-order' %}" class="btn btn-primary mt-3">View Your Orders</a>
+
+
+<div class="container mt-5 mb-5">
+    <div class="d-flex justify-content-center">
+        <div class="alert alert-success text-center w-75">
+            <h4 class="alert-heading">Order Successful!</h4>
+            <p class="mb-3">Your order with ID <strong>{{ order_id }}</strong> has been placed successfully. Thank you for shopping with us.</p>
+            <hr>
+            <p class="mb-3">You will receive an email confirmation soon.</p>
+            <a href="{% url 'profile-order' %}" class="btn btn-success mt-3">View Your Orders</a>
+        </div>
     </div>
 </div>
+
+
 
 
 

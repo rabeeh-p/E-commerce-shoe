@@ -8,6 +8,21 @@ from django.contrib.auth import authenticate, login,logout as logout_fn
 from django.shortcuts import render, get_object_or_404
 from django.contrib.auth import update_session_auth_hash
 
+
+from io import BytesIO
+from django.http import HttpResponse
+from reportlab.lib.pagesizes import letter
+from reportlab.lib import colors
+from reportlab.lib.pagesizes import letter
+from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph, Spacer
+from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
+from reportlab.lib.units import inch
+from io import BytesIO
+from django.contrib.auth.decorators import login_required
+from django.views.decorators.cache import never_cache
+
+
+
 from django.http import JsonResponse
 from django.template.loader import render_to_string
 from decimal import Decimal
@@ -15,17 +30,22 @@ from decimal import Decimal
 from admin_app.models import *
 from django.db.models import Count, Q, F,Min, Max
 import re
-
-
+import razorpay
+from .utilities import generate_unique_code
 from django.utils.timezone import make_aware
-
+from django.conf import settings
+import json
 
 from .forms import UserProfileForm
-
+from razorpay.errors import BadRequestError
 # Create your views here.
 
+
+
 # USER HOME PAGE
+@never_cache
 def indexPage(request):
+    
 
     if request.user.is_authenticated:
         try:
@@ -37,8 +57,6 @@ def indexPage(request):
         except UserProfile.DoesNotExist:
             messages.error(request, 'Profile not found.')
 
-    
-
   
 
     cart_item_count = 0
@@ -47,12 +65,10 @@ def indexPage(request):
         # CART COUNT
         cart, created = Cart.objects.get_or_create(user=request.user)
         cart_item_count = cart.items.count()
-        print(cart_item_count,'counttttt')
 
         profile_exists = UserProfile.objects.filter(user=request.user).exists()
         if not profile_exists:
             return redirect('profile-form')
-        print(f'User: {request.user.username}, Profile Exists: {profile_exists}')
 
         user_wishlist = Wishlist.objects.filter(user=request.user).values_list('product_id', flat=True)
     else:
@@ -61,11 +77,10 @@ def indexPage(request):
     if request.user.is_superuser:
         return redirect('admin-page')
     
-    print(request.user)
 
     products = Product.objects.filter(
         status=True,
-        category__status=True,   # Ensure category status is True
+        category__status=True,   
         brand__status=True,  
         variants__status=True,
         variants__sizes__quantity__gt=0
@@ -86,14 +101,36 @@ def indexPage(request):
             product.discounted_price = product.price * (1 - discount / 100)
         else:
             product.discounted_price = None
+    
+    deals = Product.objects.filter(
+        product_offer__isnull=False,
+        product_offer__start_date__lte=now,
+        product_offer__end_date__gte=now,
+        product_offer__discount_percentage__gt=0, 
+        status=True, 
+        brand__status=True  
+    ).distinct().order_by('-product_offer__discount_percentage')[:10]
+
+
+    brand_offer_products = Product.objects.filter(
+        brand__offers__isnull=False,
+        brand__offers__start_date__lte=now,
+        brand__offers__end_date__gte=now,
+        brand__offers__discount_percentage__gt=0,  
+        status=True,  
+        brand__status=True,  
+        product_offer__isnull=True  
+    ).distinct().order_by('-brand__offers__discount_percentage')[:10]   
 
 
 
-    return render(request,'index.html',{'product': products,'user_wishlist':user_wishlist,'cart_item_count':cart_item_count})
+
+    return render(request,'index.html',{'product': products,'user_wishlist':user_wishlist,'cart_item_count':cart_item_count,'deals': deals,'brand_offer_products': brand_offer_products})
 
 
 
 # login page
+@never_cache
 def loginPage(request):
 
 
@@ -111,16 +148,9 @@ def loginPage(request):
 
         user = authenticate(request, username=username, password=password)
         
-        # if user is not None:  
-        #     login(request, user)
-        #     return redirect('profile-form')  # Redirect 
-        # else:
-            
-        #     messages.error(request,'Invalid username or password')
-        #     return render(request, 'login.html',)
+     
 
         if user is not None:
-            # Check if the user is a superuser
             if user.is_superuser:
                 messages.error(request, "Superadmins can't log in this way.")
                 return redirect('login-page')  
@@ -147,15 +177,24 @@ def logout(request):
 
 # register
 def registerPage(request):
+    if request.user.is_authenticated:
+        if request.user.is_staff:
+            return redirect('admin-page') 
+        else:
+            return redirect('index-page') 
+
+
+
     if request.session.get('otp_verified') :
         if request.session.get('otp_verified') == False:
             return redirect('otp-page') 
 
     if request.method == 'POST':
-        print('register page')
         username = request.POST['username']
         email = request.POST['email']
         password = request.POST['password']
+        referral_code = request.POST.get('referral_code', '')
+
 
         if len(username.strip()) == 0:
             messages.error(request, 'Username is required and cannot be just spaces.')
@@ -182,8 +221,11 @@ def registerPage(request):
         request.session['user_data'] = {
             'username': username,
             'email': email,
-            'password': password
+            'password': password,
+            'referral_code': referral_code
         }
+
+        
 
         
         otp = generate_otp()
@@ -234,6 +276,35 @@ def otpPage(request):
                 user.set_password(user_data['password'])
                 user.is_verified = True
                 user.save()
+
+                referral_code = user_data.get('referral_code')
+                if referral_code:
+                    wallet, created = Wallet.objects.get_or_create(user=user)
+                    wallet.add_balance(200)  
+                    
+                    Transaction.objects.create(
+                        wallet=wallet,
+                        amount=200,
+                        transaction_type='credit',
+                        purpose='welcome',
+                        description='Welcome credit for signing up with referral'
+                    )
+                    
+                    try:
+                        referrer_profile = UserProfile.objects.get(referral_code=referral_code)
+                        referrer_wallet, created = Wallet.objects.get_or_create(user=referrer_profile.user)
+                        
+                        referrer_wallet.add_balance(500)
+                        Transaction.objects.create(
+                            wallet=referrer_wallet,
+                            amount=500,
+                            transaction_type='credit',
+                            purpose='referral',
+                            description=f'Credit for referral code {referral_code}'
+                        )
+                    except UserProfile.DoesNotExist:
+                        pass  
+
                 messages.success(request, 'OTP verified and user registered successfully.')
                 request.session['otp_verified'] = True
                 return redirect('login-page')
@@ -254,7 +325,6 @@ def otpPage(request):
 # resend OTP
 def resend_otp(request):
     user_data = request.session.get('user_data')
-    print('clicked resent otp')
     if user_data:
         otp = generate_otp()
         request.session['otp'] = otp
@@ -358,8 +428,8 @@ def set_new_password(request):
             user = User.objects.get(email=email)
             user.set_password(new_password)
             user.save()
-            update_session_auth_hash(request, user)  # Keep the user logged in
-            return redirect('forgot-success')  # Redirect to success page
+            update_session_auth_hash(request, user) 
+            return redirect('forgot-success')  
         except User.DoesNotExist:
             messages.error(request, 'User not found.')
             return render(request, 'forgot/set_new_password.html')
@@ -388,14 +458,14 @@ def SinglePage(request,id):
 
 
     obj= Product.objects.get(id=id)
-    variant_items = ProductVariant.objects.filter(product=obj)
-    first_item = ProductVariant.objects.filter(product=obj).first()
+    # variant_items = ProductVariant.objects.filter(product=obj)
+    variant_items = ProductVariant.objects.filter(product=obj, status=True)
+    # first_item = ProductVariant.objects.filter(product=obj).first()
+    first_item = variant_items.first()
     images_obj= VariantImage.objects.filter(variant= first_item)
     size_obj= ProductSize.objects.filter(variant=first_item)
 
-    for i in size_obj:
-        print(i.size,'sizeeee')
-
+   
     all_out_of_stock = all(not s.status for s in size_obj)
 
 
@@ -410,7 +480,6 @@ def SinglePage(request,id):
     else:
         discounted_price = obj.price
 
-    # all_out_of_stock = all(size.quantity <= 0 for size in sizes)
 
     context={
         'obj':obj,
@@ -444,7 +513,6 @@ def SingleView(request, variantId):
     
 
     selected_variant = get_object_or_404(ProductVariant, id=variantId)
-    print(selected_variant.id,'idddddd')
 
     variant_size_obj= ProductSize.objects.filter(variant=selected_variant)
 
@@ -474,7 +542,6 @@ def SingleView(request, variantId):
     images = VariantImage.objects.filter(variant=selected_variant)
     static_image=images.first()
 
-    print(selected_variant.product.id,'colorrrr')
     color_obj= ProductVariant.objects.filter(product=selected_variant.product.id)
     context = {
         'variant': {
@@ -498,6 +565,7 @@ def SingleView(request, variantId):
         'obj':selected_variant.product,
         'discounted_price': discounted_price,
         'active_offer': active_offer,
+        'variant_id':selected_variant.product.id
         
     }
 
@@ -507,11 +575,14 @@ def SingleView(request, variantId):
 
 
 # ------------------------------ PROFILE SECTION --------------------
-
+@never_cache
+@login_required(login_url='login-page')
 def profile(request):
 
     user_details = request.user
-    print(user_details)  
+    if user_details.is_superuser:
+        # Redirect to the admin page
+        return redirect('admin-page')
 
     if request.user.is_authenticated:
         try:
@@ -529,7 +600,6 @@ def profile(request):
     except UserProfile.DoesNotExist:
         address_obj = None 
 
-    print(address_obj.state)
 
     return render(request,'profile/profile.html',{'obj':address_obj,'page':'Profile'})
 
@@ -541,6 +611,9 @@ def profile(request):
 # FORM DETAILS
 def user_profile(request):
 
+    if request.user.is_staff or request.user.is_superuser:
+        return redirect('admin-page')
+
     
 
     try:
@@ -549,10 +622,7 @@ def user_profile(request):
         user_profile = None  
 
     
-    # if user_profile and not user_profile.is_active:
-    #     messages.error(request, 'Your account is blocked. Please contact support.')
-    #     logout(request)  
-    #     return redirect('login-page')  
+    
 
     
     if user_profile:
@@ -575,8 +645,9 @@ def user_profile(request):
 
         errors = []
 
-        if not phone_number:
-            errors.append("Phone number cannot be empty or contain only spaces.")
+        if not phone_number or not phone_number.strip().isdigit() or len(phone_number.strip()) != 10:
+            errors.append("Phone number must be exactly 10 digits long and cannot be empty or contain only spaces.")
+
         if not fullname:
             errors.append("Full name cannot be empty or contain only spaces.")
         if not address_line1_1:
@@ -598,6 +669,8 @@ def user_profile(request):
        
             pass
 
+        referral_code = generate_unique_code()
+
         
         user_profile = UserProfile(
             user=request.user,
@@ -608,7 +681,8 @@ def user_profile(request):
             country=country,
             postal_code=postal_code,
             gender=gender,
-            full_name=fullname
+            full_name=fullname,
+            referral_code=referral_code
         )
         user_profile.save()
 
@@ -617,7 +691,8 @@ def user_profile(request):
     return render(request, 'userProfile_form.html',)
 
 
-
+@never_cache
+@login_required(login_url='login-page')
 def change_password(request):
 
     if request.user.is_authenticated:
@@ -672,7 +747,8 @@ def password_change_success(request):
 
 
 
-
+@never_cache
+@login_required(login_url='login-page')
 def update_profile(request):
     if request.user.is_authenticated:
         try:
@@ -701,8 +777,8 @@ def update_profile(request):
         # Validation
         if not full_name:
             return render(request, 'profile/Edit_profile_user.html', {'user_profile': user_profile, 'error': 'Full Name cannot be empty'})
-        if not phone_number:
-            return render(request, 'profile/Edit_profile_user.html', {'user_profile': user_profile, 'error': 'Phone Number cannot be empty'})
+        if not phone_number.isdigit() or len(phone_number) != 10:
+            return render(request, 'profile/Edit_profile_user.html', {'user_profile': user_profile, 'error': 'Phone Number must be 10 digits and numeric'})
         if not address_line1:
             return render(request, 'profile/Edit_profile_user.html', {'user_profile': user_profile, 'error': 'Address Line 1 cannot be empty'})
         if not city:
@@ -727,14 +803,17 @@ def update_profile(request):
         user_profile.gender = gender
         user_profile.save()
 
-        print('last one finish')
         return redirect('profile')  
     
     context = {'user_profile': user_profile}
     return render(request, 'profile/Edit_profile_user.html', context)
 
 
+@never_cache
+@login_required(login_url='login-page')
 def profile_orderDetails(request):
+    if request.user.is_superuser:
+        return redirect('admin-page')
     if request.user.is_authenticated:
         try:
             profile_obj = UserProfile.objects.get(user=request.user)
@@ -756,8 +835,13 @@ def profile_orderDetails(request):
     return render(request,'profile/order.html',context)
 
 
-
+@never_cache
+@login_required(login_url='login-page')
 def order_detail(request, order_id):
+
+    if request.user.is_superuser:
+        return redirect('admin-page')
+
     if request.user.is_authenticated:
         try:
             profile_obj = UserProfile.objects.get(user=request.user)
@@ -769,15 +853,11 @@ def order_detail(request, order_id):
             messages.error(request, 'Profile not found.')
     
 
-
     order = get_object_or_404(Order, id=order_id, user=request.user)
-
     order_items = OrderItem.objects.filter(order=order)
-
     all_canceled = True  
 
     for item in order_items:
-        print(item.product_size.variant.product, 'producttttt')
         if item.status != 'CANCELED': 
             all_canceled = False  
 
@@ -785,10 +865,39 @@ def order_detail(request, order_id):
         order.status = 'CANCELED'
         order.save()
 
+    payment_failed = order.payment_method == 'Razorpay' and not order.payment_success
+
+    razorpay_order_id = None
+    if order.status != 'CANCELED':
+        try:
+            client = razorpay.Client(auth=(settings.RAZORPAY_API_KEY, settings.RAZORPAY_API_SECRET))
+            amount_in_paise = int(order.total_amount * 100)
+            razorpay_order = client.order.create({
+                'amount': amount_in_paise,
+                'currency': 'INR',
+                'payment_capture': '1'
+            })
+            razorpay_order_id = razorpay_order['id']
+        # except razorpay.errors.RazorpayError as e:
+        #     print(f"Razorpay Error: {e}")  
+        except razorpay.errors.BadRequestError as e:
+            print(f"Razorpay BadRequestError: {e}")
+        except razorpay.errors.UnauthorizedError as e:
+            print(f"Razorpay UnauthorizedError: {e}")
+        except razorpay.errors.ServerError as e:
+            print(f"Razorpay ServerError: {e}")
+        except razorpay.errors.ConnectionError as e:
+            print(f"Razorpay ConnectionError: {e}")
+        except Exception as e:
+            print(f"Razorpay Unexpected Error: {e}")
+
+
     context = {
         'order': order,
         'order_items': order_items,
-        'page':'Order-Detail'
+        'page':'Order-Detail',
+        'payment_failed': payment_failed,
+        'razorpay_order_id': razorpay_order_id ,
     }
     
     return render(request, 'profile/order_detail.html', context)
@@ -796,11 +905,67 @@ def order_detail(request, order_id):
 
 
 
+def razorpay_payment_verify_retry(request):
+    if request.method == 'POST':
+        data = json.loads(request.body)
+        razorpay_payment_id = data.get('razorpay_payment_id')
+        razorpay_order_id = data.get('razorpay_order_id')
+        razorpay_signature = data.get('razorpay_signature')
+        order_id = data.get('order_id')
 
-# FINAL ONE
+        client = razorpay.Client(auth=(settings.RAZORPAY_API_KEY, settings.RAZORPAY_API_SECRET))
+
+        try:
+            client.utility.verify_payment_signature({
+                'razorpay_order_id': razorpay_order_id,
+                'razorpay_payment_id': razorpay_payment_id,
+                'razorpay_signature': razorpay_signature
+            })
+
+            order = get_object_or_404(Order, id=order_id)
+            order.status = 'Pending'
+            order.payment_success = True
+            order.save()
+
+            request.session.pop('order_id', None)
+            request.session.pop('razorpay_order_id', None)
+            request.session.pop('razorpay_amount', None)
+
+            cart_items = json.loads(request.session.get('cart_items', '[]'))
+            cart = Cart.objects.get(user=order.user)
+
+            order_items = OrderItem.objects.filter(order=order)
+
+            for order_item in order_items:
+                product_size = order_item.product_size  # Using the reserved product size
+
+                if product_size.quantity >= order_item.quantity:
+                    product_size.quantity -= order_item.quantity
+                    if product_size.quantity == 0:
+                        product_size.status = False
+                    product_size.save()
+            
+           
+            
+
+            # Cart.objects.filter(user=order.user).delete()  
+            request.session.pop('cart_items', None)
+
+            
+
+
+            return JsonResponse({'status': 'success', 'order_id': order.id})
+
+        except Exception as e:
+            Order.objects.filter(id=order_id).delete()
+            return JsonResponse({'status': 'error', 'message': 'Payment verification failed', 'details': str(e)})
+
+    return JsonResponse({'status': 'error', 'message': 'Invalid request method'})
+
+
+
+
 def cancel_order(request, order_id):
-
-
     if request.user.is_authenticated:
         try:
             profile_obj = UserProfile.objects.get(user=request.user)
@@ -811,49 +976,40 @@ def cancel_order(request, order_id):
         except UserProfile.DoesNotExist:
             messages.error(request, 'Profile not found.')
 
-
-
-
     order = get_object_or_404(Order, id=order_id, user=request.user)
-    
-   
-    if order.status not in ['CANCELED', 'DELIVERED']:  
-        
-        order.status = 'CANCELED'
-        order.save()
 
+    if order.status not in ['CANCELED', 'DELIVERED']:
+
+        order.status = 'CANCELED'
         
         for item in order.order_items.all():
             product_size = item.product_size
-            product_size.quantity += item.quantity  
+            product_size.quantity += item.quantity
             if product_size.quantity > 0:
                 product_size.status = True  
             product_size.save()
 
-        
         if order.payment_method == 'Razorpay':
+            shipping_charge = Decimal('50.00')
             
-            total_paid_amount = Decimal(request.session.get('total_price', '0'))
-            
-            total_paid_amount = total_paid_amount.quantize(Decimal('0.01'))
+            refund_amount = order.total_amount - shipping_charge
+            refund_amount = refund_amount.quantize(Decimal('0.01'))
 
-            print(total_paid_amount, ' - Total amount paid for refund')
-
-            
             wallet = request.user.wallet
-            wallet.balance = F('balance') + total_paid_amount
+            wallet.balance = F('balance') + refund_amount
             wallet.save()
 
-            # Log the refund transaction
             Transaction.objects.create(
                 wallet=wallet,
-                amount=total_paid_amount,
+                amount=refund_amount,
                 transaction_type='credit',
                 purpose='refund',
-                description=f'Refund for canceled order {order.id}'
+                description=f'Refund for canceled order {order.id} (excluding shipping charge)'
             )
+            messages.success(request, f'₹{refund_amount} has been credited to your wallet (excluding shipping charge).')
 
-            messages.success(request, f'₹{total_paid_amount} has been credited to your wallet.')
+        # order.total_amount = Decimal('50.00')
+        order.save()
 
     else:
         messages.error(request, 'Order cannot be canceled as it is already canceled or delivered.')
@@ -863,78 +1019,72 @@ def cancel_order(request, order_id):
 
 
 
-
-
-
 def cancel_product(request, order_id, item_id):
     order = get_object_or_404(Order, id=order_id, user=request.user)
     order_item = get_object_or_404(OrderItem, id=item_id, order=order)
 
     if order.status == 'Pending':
-
         product_size = order_item.product_size
         product_size.quantity = F('quantity') + order_item.quantity
         product_size.save()
 
-        refund_amount = order_item.quantity * order_item.product_size.variant.product.price
-
-        order.total_amount -= refund_amount
-        order.save()
+        product = order_item.product_size.variant.product
+        discounted_price = product.get_discounted_price()  # Ensure this is handled correctly
+        product_price = discounted_price if discounted_price is not None else product.price
+        item_total_price = order_item.quantity * product_price
 
         order_item.delete()
 
-        if not order.order_items.exists():
-            original_total = order.total_amount + refund_amount
+        subtotal = sum((item.product_size.variant.product.get_discounted_price() or item.product_size.variant.product.price) * item.quantity for item in order.order_items.all())
+        shipping_charge = Decimal('50.00')
+        total_amount_before_coupon = subtotal + shipping_charge
 
-            if 'applied_coupon' in request.session:
-                coupon_data = request.session.get('applied_coupon')
-                coupon_code = coupon_data.get('code')
-                coupon_discount = Decimal(coupon_data.get('coupon_discount'))
+        if order.discounted_price < order.original_price and order.discounted_price > 0:
+            discount_percentage = (order.original_price - order.discounted_price) / order.original_price
+            item_discount = item_total_price * discount_percentage
+            item_refund_amount = item_total_price - item_discount
 
-                total_price_after_discount = original_total - coupon_discount
-
-                order.total_amount = total_price_after_discount
-                order.save()
-
-                request.session.pop('applied_coupon', None)
-
-            # Refund to wallet if payment method was Razorpay
-            if order.payment_method == 'Razorpay':
-                wallet = request.user.wallet
-                wallet.balance = F('balance') + Decimal(refund_amount)
-                wallet.save()
-
-                # Log the refund transaction
-                Transaction.objects.create(
-                    wallet=wallet,
-                    amount=Decimal(refund_amount),
-                    transaction_type='credit',
-                    purpose='refund',
-                    description=f'Refund for canceled order item {order_item.id} and coupon adjustment'
-                )
-
-                messages.success(request, f'₹{refund_amount} has been credited to your wallet.')
-
+            new_discounted_price = subtotal * (1 - discount_percentage)
         else:
-            if order.payment_method == 'Razorpay':
-                wallet = request.user.wallet
-                wallet.balance = F('balance') + Decimal(refund_amount)
-                wallet.save()
+            item_refund_amount = item_total_price
+            new_discounted_price = subtotal  
 
-                Transaction.objects.create(
-                    wallet=wallet,
-                    amount=Decimal(refund_amount),
-                    transaction_type='credit',
-                    purpose='refund',
-                    description=f'Refund for canceled order item {order_item.id}'
-                )
+        new_original_price = subtotal
+        total_amount = new_discounted_price + shipping_charge if subtotal > 0 else shipping_charge
 
-                messages.success(request, f'₹{refund_amount} has been credited to your wallet.')
+        order.original_price = new_original_price
+        # order.discounted_price = new_discounted_price
+        # order.total_amount = total_amount
+        order.save()
+
+
+        if order.payment_method == 'Razorpay':
+            wallet = request.user.wallet
+            wallet.balance = F('balance') + item_refund_amount 
+            wallet.save()
+
+            Transaction.objects.create(
+                wallet=wallet,
+                amount=item_refund_amount,
+                transaction_type='credit',
+                purpose='refund',
+                description=f'Refund for canceled order item {item_id}'
+            )
+
+            messages.success(request, f'₹{item_refund_amount} has been credited to your wallet.')
+
+        return redirect('profile-order-details', order_id=order.id)
 
     return redirect('profile-order-details', order_id=order.id)
 
 
 
+
+
+
+
+@never_cache
+@login_required(login_url='login-page')
 def user_wallet(request):
 
     if request.user.is_authenticated:
@@ -948,31 +1098,31 @@ def user_wallet(request):
             messages.error(request, 'Profile not found.')
 
     wallet, created = Wallet.objects.get_or_create(user=request.user)
-    print(wallet.balance,'wallett')    
-    transactions = wallet.transactions.all().order_by('-created_at')  # Get all transactions ordered by date
-    print(transactions,'traaaa')
-    for i in transactions:
-        print(i.amount,'amount')
-    # Pass the balance and transaction data to the template
+    transactions = wallet.transactions.all().order_by('-created_at') 
+    
     context = {
         'balance': wallet.balance,
         'transactions': transactions,
+        'page':'wallet'
     }
     return render(request,'profile/wallet.html',context)
 
-
+@never_cache
+@login_required(login_url='login-page')
 def address_list(request):
     addresses = Address.objects.filter(user=request.user)
     return render(request, 'profile/addressDetails.html', {'addresses': addresses,'page':'address page'})
 
-
+@never_cache
+@login_required(login_url='login-page')
 def single_address(request, address_id):
     address = get_object_or_404(Address, id=address_id, user=request.user)
     
     return render(request, 'profile/singleAddress.html', {'address': address})
 
 
-
+@never_cache
+@login_required(login_url='login-page')
 def edit_address(request, address_id):
     if request.user.is_authenticated:
         try:
@@ -988,7 +1138,6 @@ def edit_address(request, address_id):
     address = get_object_or_404(Address, id=address_id, user=request.user)
     
     if request.method == "POST":
-        # Extract data from the request
         fullname = request.POST.get('fullname').strip()
         address_line1 = request.POST.get('address_line1').strip()
         address_line2 = request.POST.get('address_line2').strip()
@@ -1005,6 +1154,8 @@ def edit_address(request, address_id):
             errors['address_line1'] = 'Address Line 1 is required.'
         if not phone_number:
             errors['phone_number'] = 'Phone Number is required.'
+        elif not phone_number.isdigit() or len(phone_number) != 10:
+            errors['phone_number'] = 'Phone Number must be exactly 10 digits.'
         if not city:
             errors['city'] = 'City is required.'
         if not state:
@@ -1044,7 +1195,8 @@ def delete_address(request, address_id):
     
     return redirect('address-list')
 
-
+@never_cache
+@login_required(login_url='login-page')
 def add_address(request):
     if request.user.is_authenticated:
         try:
@@ -1097,6 +1249,295 @@ def add_address(request):
     else:
         return render(request, 'profile/Add_address.html')
 
+
+
+@never_cache
+@login_required(login_url='login-page')
+def user_coupon_and_refferal(request):
+    if request.user.is_superuser:
+        return redirect('admin-page')
+    user = request.user
+    
+    available_coupons = Coupon.objects.filter(
+        active=True, 
+        expiry_date__gt=timezone.now()
+    ).exclude(
+        id__in=CouponUsage.objects.filter(user=user).values_list('coupon_id', flat=True)
+    )
+
+    user_profile = UserProfile.objects.filter(user=user).first()
+
+    
+
+
+    return render(request, 'profile/referal.html', {'available_coupons': available_coupons,
+                                                    'user_profile': user_profile,
+
+                                                    })
+
+
+
+
+
+def return_order(request, order_id):
+    order = get_object_or_404(Order, id=order_id)
+
+    if order.status == 'DELIVERED':
+        order.status = 'RETURNED'
+        
+        shipping_charge = Decimal('50.00')  
+        refund_amount = order.total_amount - shipping_charge
+
+        user_wallet, created = Wallet.objects.get_or_create(user=request.user)
+        user_wallet.add_balance(refund_amount)
+
+        Transaction.objects.create(
+            wallet=user_wallet,
+            amount=refund_amount,
+            transaction_type='credit',
+            purpose='refund',
+            description=f"Refund for returned order {order.id}"
+        )
+
+        # Restock products
+        for item in OrderItem.objects.filter(order=order):
+            product_size = item.product_size
+            product_size.quantity += item.quantity
+            product_size.save()
+
+        # Save updated order
+        # order.total_amount = shipping_charge  
+        order.save()
+
+        # Redirect with a success message
+        messages.success(request, "Order returned successfully and refund issued.")
+        return redirect('profile-order-details', order_id=order_id)
+    else:
+        messages.error(request, "This order cannot be returned.")
+        return redirect('profile-order-details', order_id=order_id)
+
+
+
+
+    
+
+
+
+def return_product(request, order_id, order_item_id):
+
+    order = get_object_or_404(Order, id=order_id)
+
+    if order.status == 'DELIVERED':
+        try:
+            order_item = OrderItem.objects.get(order=order, id=order_item_id)
+        except OrderItem.DoesNotExist:
+            messages.error(request, "This product is not part of the order or the order item ID is incorrect.")
+            return redirect('profile-order-details', order_id=order_id)
+
+        refund_amount = order_item.final_price * order_item.quantity
+
+        user_wallet, created = Wallet.objects.get_or_create(user=request.user)
+
+        user_wallet.add_balance(refund_amount)
+
+        Transaction.objects.create(
+            wallet=user_wallet,
+            amount=refund_amount,
+            transaction_type='credit',
+            purpose='refund',
+            description=f"Refund for product in order {order.id}"
+        )
+
+        # Adjust the product size quantity
+        product_size = order_item.product_size
+        product_size.quantity += order_item.quantity
+        product_size.save()
+
+        # Remove the order item
+        order_item.delete()
+
+        
+
+        # Update order status if no items remain
+        remaining_items = OrderItem.objects.filter(order=order).exists()
+        if not remaining_items:
+            order.status = 'RETURNED'
+            order.save()
+
+        # Show a success message
+        messages.success(request, "Product returned successfully and refund issued.")
+        return redirect('profile-order-details', order_id=order_id)
+    else:
+        messages.error(request, "This order cannot be returned.")
+        return redirect('profile-order-details', order_id=order_id)
+    
+
+
+
+@never_cache
+@login_required(login_url='login-page')
+def invoice_view(request, order_id):
+    order = get_object_or_404(Order, id=order_id)
+    order_items = order.order_items.filter(status='PENDING')  
+    shipping_charge = Decimal('50.00')
+    
+    discount_amount = order.original_price - order.discounted_price
+    
+    return render(request, 'profile/invoice_bill.html', {
+        'order': order,
+        'order_items': order_items,
+        'shipping_charge': shipping_charge,
+        'discount_amount': discount_amount,
+        'page':'invoice'
+    })
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+def generate_pdf(order_id):
+    order = get_object_or_404(Order, id=order_id)
+    order_items = order.order_items.filter(status='PENDING')  # Include only non-canceled items
+    shipping_charge = Decimal('50.00')  # Fixed shipping charge
+    
+    # Use the values from the Order model directly
+    total_amount = order.total_amount
+    discount_amount = order.original_price - order.discounted_price
+    final_price = order.final_price
+    
+    # Create a PDF buffer
+    buffer = BytesIO()
+    doc = SimpleDocTemplate(buffer, pagesize=letter)
+    elements = []
+
+    # Styles for the PDF
+    styles = getSampleStyleSheet()
+
+    # Header
+    header_style = ParagraphStyle(
+        'Header',
+        fontSize=18,
+        alignment=1,  # Centered
+        spaceAfter=12,
+        fontName='Helvetica-Bold'
+    )
+    header_info_style = ParagraphStyle(
+        'HeaderInfo',
+        fontSize=12,
+        spaceAfter=10,
+        fontName='Helvetica'
+    )
+    
+    header = (
+        f"<strong>Invoice ID:</strong> {order.id}<br/>"
+        f"<strong>Date:</strong> {order.order_date.strftime('%d M Y')}<br/>"
+        f"<strong>Customer:</strong> {order.user.username}<br/>"
+        f"<strong>Address:</strong> {order.address}"
+    )
+    elements.append(Paragraph("Invoice", header_style))
+    elements.append(Paragraph(header, header_info_style))
+    
+    elements.append(Spacer(1, 12))
+
+    # Order Details Table
+    data = [['Product', 'Size', 'Quantity', 'Price', 'Total']]
+    for item in order_items:
+        product_price = item.product_size.variant.product.price
+        total_price = product_price * item.quantity
+        
+        data.append([
+            item.product_size.variant.product.name,
+            item.product_size.size,
+            item.quantity,
+            f"Rs {product_price:.2f}",
+            f"Rs {total_price:.2f}"
+        ])
+    
+    table = Table(data, colWidths=[2.5*inch, 1.5*inch, 1.5*inch, 1.5*inch, 2*inch], rowHeights=[24]*len(data))
+    table.setStyle(TableStyle([
+        ('BACKGROUND', (0, 0), (-1, 0), colors.lightblue),
+        ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
+        ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+        ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
+        ('FONTNAME', (0, 1), (-1, -1), 'Helvetica'),
+        ('FONTSIZE', (0, 0), (-1, 0), 12),
+        ('FONTSIZE', (0, 1), (-1, -1), 10),
+        ('BOTTOMPADDING', (0, 0), (-1, 0), 10),
+        ('BACKGROUND', (0, 1), (-1, -1), colors.beige),
+        ('GRID', (0, 0), (-1, -1), 0.5, colors.black),
+        ('LEFTPADDING', (0, 1), (-1, -1), 8),
+        ('RIGHTPADDING', (0, 1), (-1, -1), 8),
+        ('TOPPADDING', (0, 1), (-1, -1), 8),
+        ('BOTTOMPADDING', (0, 1), (-1, -1), 8),
+    ]))
+    
+    elements.append(table)
+    
+    elements.append(Spacer(1, 24))
+    
+    # Totals
+    total_style = ParagraphStyle(
+        'Total',
+        fontSize=12,
+        spaceBefore=12,
+        spaceAfter=6,
+        alignment=2,  # Align right
+        fontName='Helvetica'
+    )
+    
+    if order.original_price > 0:
+        elements.append(Paragraph(f"Original Price: Rs {order.original_price:.2f}", total_style))
+    
+    if discount_amount > 0:
+        elements.append(Paragraph(f"Discount: -Rs {discount_amount:.2f}", total_style))
+    
+    elements.append(Paragraph(f"Final Price: Rs {final_price:.2f}", total_style))
+    elements.append(Paragraph(f"Shipping Charge: Rs {shipping_charge:.2f}", total_style))
+    elements.append(Paragraph(f"<b>Total Amount: Rs {total_amount:.2f}</b>", total_style))
+    
+    elements.append(Spacer(1, 36))
+    
+    # Footer
+    footer_style = ParagraphStyle(
+        'Footer',
+        fontSize=10,
+        leading=12,
+        alignment=1,
+        textColor=colors.grey,
+        fontName='Helvetica'
+    )
+    footer_text = """
+    Thank you for your purchase!<br/>
+    For inquiries, contact us at: support@shoespectra.com<br/>
+    Address: 123 Fashion Street, Malappuram, Kerala - 676505
+    """
+    elements.append(Paragraph(footer_text, footer_style))
+    
+    # Build PDF
+    doc.build(elements)
+    
+    buffer.seek(0)
+    return buffer
+
+
+
+
+def download_invoice(request, order_id):
+    order = get_object_or_404(Order, id=order_id)
+    pdf_buffer = generate_pdf(order_id)
+
+    response = HttpResponse(pdf_buffer, content_type='application/pdf')
+    response['Content-Disposition'] = f'attachment; filename="invoice_{order_id}.pdf"'
+    return response
 # -------------------------------------- END PROFILE SECTION---------------------------
 
 
@@ -1116,7 +1557,7 @@ def shopPage(request):
 
     product_obj = Product.objects.filter(
         status=True,
-        category__status=True,   # Ensure category status is True
+        category__status=True,   
         brand__status=True,  
         variants__status=True,
         variants__sizes__quantity__gt=0
@@ -1142,9 +1583,11 @@ def shopPage(request):
         product_obj = product_obj.filter(name__icontains=serach_field)
     product_obj = product_obj.filter(status=True)
 
+
+   
+
      # =========================== FILTERING SECTION =========================
     brand_id = request.GET.get('brand')
-    print(brand_id, 'branddd')
     if brand_id:
         try:
             brand_id = int(brand_id)  
@@ -1161,7 +1604,6 @@ def shopPage(request):
         except ValueError:
             pass
     
-    # Apply category filter (if needed)
     category_id = request.GET.get('category')
     if category_id:
         try:
@@ -1183,6 +1625,16 @@ def shopPage(request):
             min_price = min_price_filter
         if max_price_filter is not None:
             max_price = max_price_filter
+
+
+    sort_order = request.GET.get('sort', 'default') 
+    if sort_order == 'name_asc':
+        product_obj = product_obj.order_by('name') 
+    elif sort_order == 'name_desc':
+        product_obj = product_obj.order_by('-name') 
+    else:
+        product_obj = product_obj.order_by('-updated_at') 
+        
 
     if min_price:
         try:
@@ -1213,7 +1665,6 @@ def shopPage(request):
         else:
             product.discounted_price = None
 
-    # Check if the filtered products queryset is empty
     if not product_obj.exists():
         no_items_message = "No items found for the selected filters."
     else:
@@ -1242,16 +1693,13 @@ def shopPage(request):
 
 def filtering_items(request):
 
-    print('filtering items is working')
     color = request.GET.get('color')
     category = request.GET.get('category')
     min_price = request.GET.get('min_price')
     max_price = request.GET.get('max_price')
 
-    # Start with all products
     products = Product.objects.all()
 
-    # Apply filters if provided
     if color:
         products = products.filter(color__name=color)
     if category:
@@ -1261,7 +1709,6 @@ def filtering_items(request):
     if max_price:
         products = products.filter(price__lte=max_price)
 
-    # Serialize product data
     product_list = list(products.values('id', 'name', 'price', 'image'))
 
     return JsonResponse({'products': product_list})

@@ -30,6 +30,7 @@ from openpyxl import Workbook
 # from openpyxl.writer.excel import save_virtual_workbook
 from django.shortcuts import render, get_object_or_404
 from django.core.exceptions import ObjectDoesNotExist
+import json
 # Create your views here.
 
 
@@ -38,210 +39,102 @@ from django.core.exceptions import ObjectDoesNotExist
 
 def get_sales_report(start_date, end_date):
     completed_orders = Order.objects.filter(order_date__range=[start_date, end_date])
-
    
     total_sales = completed_orders.aggregate(total_sales=Sum('final_price'))['total_sales'] or 0
-
    
     return total_sales, completed_orders
 
 
-
-# def export_sales_report_exelSheet(request):
-#     # Get parameters from the request (e.g., date range)
-#     start_date_str = request.GET.get('start_date', '')
-#     end_date_str = request.GET.get('end_date', '')
-#     status = request.GET.get('status', '')
-
-#     start_date = parse_date(start_date_str) if start_date_str else None
-#     end_date = parse_date(end_date_str) if end_date_str else None
-
-#     # Fetch order data from the database
-#     orders_query = Order.objects.all()
-    
-#     if start_date and end_date:
-#         orders_query = orders_query.filter(order_date__range=[start_date, end_date])
-    
-#     if status:
-#         orders_query = orders_query.filter(status=status)
-    
-#     orders_data = orders_query.values('order_date', 'user__username', 'address__address', 'total_amount', 'payment_method', 'payment_success', 'original_price', 'discounted_price', 'final_price')
-
-#     # Create a workbook and a worksheet
-#     workbook = Workbook()
-#     worksheet = workbook.active
-#     worksheet.title = 'Sales Report'
-
-#     # Define the column headers
-#     headers = ['Order Date', 'User', 'Address', 'Total Amount', 'Payment Method', 'Payment Success', 'Original Price', 'Discounted Price', 'Final Price']
-#     worksheet.append(headers)
-
-#     # Write data to the worksheet
-#     for order in orders_data:
-#         worksheet.append([
-#             order['order_date'],
-#             order['user__username'],
-#             order['address__address'] if order['address__address'] else 'N/A',
-#             order['total_amount'],
-#             order['payment_method'],
-#             'Yes' if order['payment_success'] else 'No',
-#             order['original_price'],
-#             order['discounted_price'],
-#             order['final_price']
-#         ])
-
-#     # Create an HTTP response with the Excel file
-#     response = HttpResponse(content=save_virtual_workbook(workbook), content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
-#     response['Content-Disposition'] = 'attachment; filename="sales_report.xlsx"'
-#     return response
-
-
-
-
-
 # ADMIN DASHBOARD
-# @never_cache
-# @login_required(login_url='adminLogin-page')
-# def adminPage(request):
-
-#     name=request.user.username
-#     print(name,'username issssss')
-#     if not request.user.is_superuser:
-#         return redirect('index-page')
-    
-
-
-#     today = datetime.now().date()
-#     default_start_date = today - timedelta(days=30)
-#     default_end_date = today
-
-#     filter_type = request.GET.get('filter_type', 'custom')
-
-#     if filter_type == '1_day':
-#         print('filter is workingg')
-#         start_date = today - timedelta(days=1)
-#         end_date = today
-#     elif filter_type == '1_week':
-#         start_date = today - timedelta(weeks=1)
-#         end_date = today
-#     elif filter_type == '1_month':
-#         start_date = today - timedelta(weeks=4)
-#         end_date = today
-#     elif filter_type == 'custom':
-#         start_date_str = request.GET.get('start_date', default_start_date.strftime('%Y-%m-%d'))
-#         end_date_str = request.GET.get('end_date', default_end_date.strftime('%Y-%m-%d'))
-#         try:
-#             start_date = datetime.strptime(start_date_str, '%Y-%m-%d').date()
-#             end_date = datetime.strptime(end_date_str, '%Y-%m-%d').date()
-#             if end_date < start_date:
-#                 raise ValueError("End date cannot be before start date.")
-#         except ValueError as e:
-#             return render(request, 'dashboard.html', {
-#                 'error_message': str(e),
-#                 'start_date': default_start_date,
-#                 'end_date': default_end_date,
-#                 'filter_type': filter_type
-#             })
-#     else:
-#         start_date = default_start_date
-#         end_date = default_end_date
-
-#     total_sales, completed_orders = get_sales_report(start_date, end_date)
-
-    
-
-#     no_orders_message = "No orders found for the selected date range." if not completed_orders else None
-
-#     if request.GET.get('pdf'):
-#         # Generate PDF
-#         response = HttpResponse(content_type='application/pdf')
-#         response['Content-Disposition'] = 'attachment; filename=sales_report.pdf'
-        
-#         buffer = io.BytesIO()
-#         doc = SimpleDocTemplate(buffer, pagesize=letter)
-#         elements = []
-
-#         # Define styles
-#         styles = getSampleStyleSheet()
-#         header_style = ParagraphStyle('Header', parent=styles['Title'], fontSize=18, alignment=1, spaceAfter=12)
-#         title_style = ParagraphStyle('Title', parent=styles['Title'], fontSize=16, alignment=1, spaceAfter=12)
-#         normal_style = styles['Normal']
-        
-#         # Header
-#         project_name = "ShoeSpectra Sales Report"
-#         header = Paragraph(f'<b>{project_name}</b>', header_style)
-#         elements.append(header)
-
-#         # Report Date
-#         if filter_type == 'custom':
-#             print('custom is workinggggggg')
-#             report_date_description = f'From {start_date} to {end_date}'
-#         else:
-#             filter_description = {
-#                 '1_day': 'Last 1 Day',
-#                 '1_week': 'Last 1 Week',
-#                 '1_month': 'Last 1 Month'
-#             }
-#             print('else case is workinggg')
-#             report_date_description = filter_description.get(filter_type, 'Custom Range')
-        
-#         report_date = Paragraph(f'Report Period: {report_date_description}', normal_style)
-#         elements.append(report_date)
-
-#         # Total Sales
-#         total_sales_paragraph = Paragraph(f'<b>Total Sales:</b> ${total_sales:.2f}', title_style)
-#         elements.append(total_sales_paragraph)
-
-#         if no_orders_message:
-#             no_orders_paragraph = Paragraph(no_orders_message, normal_style)
-#             elements.append(no_orders_paragraph)
-#         else:
-#             # Order Details Table
-#             data = [['Order ID', 'User', 'Final Price', 'Payment Method', 'Order Date', 'Status']]
-#             for order in completed_orders:
-#                 data.append([
-#                     order.id,
-#                     order.user.username,
-#                     f'${order.final_price:.2f}',
-#                     order.payment_method,
-#                     order.order_date.strftime('%Y-%m-%d %H:%M:%S'),
-#                     order.status
-#                 ])
-
-#             table = Table(data)
-#             table.setStyle(TableStyle([
-#                 ('BACKGROUND', (0, 0), (-1, 0), colors.grey),
-#                 ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
-#                 ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
-#                 ('BACKGROUND', (0, 1), (-1, -1), colors.beige),
-#                 ('GRID', (0,0), (-1,-1), 1, colors.black),
-#                 ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
-#             ]))
-#             elements.append(table)
-
-#         doc.build(elements)
-#         pdf = buffer.getvalue()
-#         buffer.close()
-#         response.write(pdf)
-#         return response
-    
-#     context = {
-#         'total_sales': total_sales,
-#         'completed_orders': completed_orders,
-#         'start_date': start_date,
-#         'end_date': end_date,
-#         'name':name,
-#         'no_orders_message': no_orders_message,
-#         'filter_type': filter_type,
-#     }
-#     return render(request,'dashboard.html',context)
-
-
 @never_cache
 @login_required(login_url='adminLogin-page')
 def adminPage(request):
     name = request.user.username
-    print(name, 'username issssss')
+    if not request.user.is_superuser:
+        return redirect('index-page')
+
+    today = timezone.now()
+
+    # Filter orders by day, week, and month
+    day_orders = Order.objects.filter(order_date__date=today.date())
+    week_orders = Order.objects.filter(order_date__gte=today - timedelta(days=7))
+    month_orders = Order.objects.filter(order_date__gte=today - timedelta(days=30))
+    year_orders = Order.objects.filter(order_date__gte=today - timedelta(days=365))
+
+    def get_chart_data(orders):
+        return {
+            'labels': [order.order_date.strftime('%Y-%m-%d') for order in orders],
+            'data': [float(order.final_price) for order in orders]  
+        }
+    
+    top_products = (
+        OrderItem.objects
+        .values('product_size__variant__product')
+        .annotate(total_sold=Count('product_size'))
+        .order_by('-total_sold')[:10]
+    )
+
+    top_products_list = [
+        {
+            'name': Product.objects.get(id=item['product_size__variant__product']).name,
+            'total_sold': item['total_sold'],
+            'image': Product.objects.get(id=item['product_size__variant__product']).image.url
+        }
+        for item in top_products
+    ]
+
+
+    top_categories = (
+        OrderItem.objects
+        .values('product_size__variant__product__category')
+        .annotate(total_sold=Count('product_size'))
+        .order_by('-total_sold')[:10]
+    )
+
+    top_categories_list = [
+        {
+            'name': Category.objects.get(id=item['product_size__variant__product__category']).name,
+            'total_sold': item['total_sold'],
+        }
+        for item in top_categories
+    ]
+
+
+    top_brands = (
+        OrderItem.objects
+        .values('product_size__variant__product__brand')
+        .annotate(total_sold=Count('product_size'))
+        .order_by('-total_sold')[:10]
+    )
+
+    top_brands_list = [
+        {
+            'name': Brand.objects.get(id=item['product_size__variant__product__brand']).name,
+            'total_sold': item['total_sold'],
+        }
+        for item in top_brands
+    ]
+ 
+    context = {
+        'name': request.user,
+        'day_data': json.dumps(get_chart_data(day_orders)), 
+        'week_data': json.dumps(get_chart_data(week_orders)), 
+        'month_data': json.dumps(get_chart_data(month_orders)),  
+        'year_data': json.dumps(get_chart_data(year_orders)),
+        'top_products_list': top_products_list,
+        'top_categories_list': top_categories_list ,
+        'top_brands_list': top_brands_list
+        
+    }
+  
+    return render(request, 'dashboard.html', context)
+
+
+
+
+def sales_report(request):
+
+    name = request.user.username
     if not request.user.is_superuser:
         return redirect('index-page')
 
@@ -252,7 +145,6 @@ def adminPage(request):
     filter_type = request.GET.get('filter_type', 'custom')
 
     if filter_type == '1_day':
-        print('filter is workingg')
         start_date = today - timedelta(days=1)
         end_date = today
     elif filter_type == '1_week':
@@ -309,7 +201,6 @@ def adminPage(request):
         elements.append(header)
 
         if filter_type == 'custom':
-            print('custom is workinggggggg')
             report_date_description = f'From {start_date} to {end_date}'
         else:
             filter_description = {
@@ -317,7 +208,6 @@ def adminPage(request):
                 '1_week': 'Last 1 Week',
                 '1_month': 'Last 1 Month'
             }
-            print('else case is workinggg')
             report_date_description = filter_description.get(filter_type, 'Custom Range')
         
         report_date = Paragraph(f'Report Period: {report_date_description}', normal_style)
@@ -380,14 +270,14 @@ def adminPage(request):
         'start_date': start_date_str, 
         'end_date': end_date_str, 
     }
-    return render(request, 'dashboard.html', context)
+
+    return render(request,'sales_report.html',context)
 
 
 
 # ADMIN LOGIN PAGE
 @never_cache
 def adminLogin(request):
-    print('working login')
     if request.session.session_key:
         if request.user.is_staff:
             return redirect('admin-page')
@@ -423,7 +313,6 @@ def logoutAdmin(request):
 @never_cache
 @login_required(login_url='adminLogin-page')
 def profilePage(request):
-    print('profile')
     if not request.user.is_superuser:
         return redirect('index-page')
     return render(request,'adminProfile.html')
@@ -437,10 +326,8 @@ def usersPage(request):
 
 
     users_count = UserProfile.objects.aggregate(total_users=Count('id'))            
-    print(users_count['total_users'])
 
     users_obj= UserProfile.objects.all()
-
 
     context= {
         'users':users_obj,
@@ -478,9 +365,7 @@ def productList(request):
         return redirect('index-page')
 
 
-
     categories_count = Category.objects.aggregate(count=Count('id'))
-    print(categories_count['count'], 'the count isss')
     brands_count= Brand.objects.aggregate(count=Count('id'))
     colors_count= Color.objects.aggregate(count=Count('id'))
     shoe_count= ShoeSize.objects.aggregate(count=Count('id'))
@@ -527,7 +412,6 @@ def productList(request):
 @never_cache
 @login_required(login_url='adminLogin-page')
 def productSingle_status(request,id):
-    print('statuss is wowrkinggg')
     product_obj=Product.objects.get(id=id)
     if product_obj:
        product_obj.status = not product_obj.status  
@@ -558,9 +442,7 @@ def productAdd(request):
         'gender': gender_obj
     }
 
-    print('is working')
     if request.method == 'POST':
-        print('Trigger')
         cropped_image = request.POST.get('cropped_image_1')
         if cropped_image:
             format, imgstr = cropped_image.split(';base64,')
@@ -571,7 +453,6 @@ def productAdd(request):
             price = request.POST.get('price').strip()
             description = request.POST.get('description').strip()
             brand_id = request.POST.get('brand1') 
-            print(brand_id)
             gender_id = request.POST.get('gender') 
             category_id = request.POST.get('category1') 
             
@@ -601,7 +482,6 @@ def productAdd(request):
                 image=data
             )
             product.save()
-            print("Image saved successfully")
             return redirect('product-edit', product.id )
         else:
             print("No cropped image received")
@@ -613,24 +493,14 @@ def productAdd(request):
 
 
 
-
-
 def edit_product_form(request, product_id):
-    print('this is working')
     product = get_object_or_404(Product, id=product_id)
 
     image= product.image
-    print(image,'image issssss')
 
 
     if request.method == 'POST':
-        # Update product with form data
-        # product.name = request.POST.get('productTitle')
-        # product.description = request.POST.get('description')
-        # product.price = request.POST.get('price')
-        # product.gender_id = request.POST.get('gender')
-        # product.category_id = request.POST.get('category1')
-        # product.brand_id = request.POST.get('brand1')
+       
 
         product_title = request.POST.get('productTitle', '').strip()
         description = request.POST.get('description', '').strip()
@@ -639,7 +509,6 @@ def edit_product_form(request, product_id):
         category_id = request.POST.get('category1', '').strip()
         brand_id = request.POST.get('brand1', '').strip()
 
-        print(price,'priceeee')
 
 
         errors = {}
@@ -649,7 +518,7 @@ def edit_product_form(request, product_id):
         if not description:
             errors['description'] = 'Description is required and cannot be empty or just spaces.'
         if price:
-            price = float(price)  # Try to convert the price to a float
+            price = float(price) 
             if price <= 0:
                 errors['price'] = 'Price must be a positive number.'
         else:
@@ -661,7 +530,6 @@ def edit_product_form(request, product_id):
         if not brand_id:
             errors['brand1'] = 'Brand is required and cannot be empty or just spaces.'
 
-        # Check if there are any errors
         if errors:
             return render(request, 'SingleEdit.html', {'errors': errors})
         
@@ -687,14 +555,14 @@ def edit_product_form(request, product_id):
         
         # Save changes
         product.save()
-        return redirect('product-edit',product.id)  # Redirect to a list of products or another view
+        return redirect('product-edit',product.id)  
 
     else:
         context = {
             'product': product,
-            'gender': Gender.objects.all(),  # Adjust to your actual model
-            'category': Category.objects.all(),  # Adjust to your actual model
-            'brand': Brand.objects.all()  # Adjust to your actual model
+            'gender': Gender.objects.all(),  
+            'category': Category.objects.all(),  
+            'brand': Brand.objects.all() 
         }
 
     return render(request, 'SingleEdit.html', context)
@@ -708,18 +576,15 @@ def variantsAdd(request,id):
     if not request.user.is_superuser:
         return redirect('index-page')
     
-    print(id)
     size_obj=ShoeSize.objects.all()
     color_obj=Color.objects.all()
 
     product_obj=Product.objects.get(id=id)
-    print(product_obj)
 
     if request.method == 'POST':
         color_id = request.POST.get('color') 
         size_id = request.POST.get('size') 
         quantity = request.POST.get('quantitiy') 
-        print('psot triger')
 
         color_obj= Color.objects.get(id=color_id)
         size_obj= ShoeSize.objects.get(id=size_id)
@@ -742,7 +607,7 @@ def variantsAdd(request,id):
             quantity = int(quantity)
             if quantity <= 0:
                 messages.error(request, "Quantity must be a positive number.")
-                return redirect('variants-add',product_obj.id)  # Redirect to an appropriate view
+                return redirect('variants-add',product_obj.id) 
         except ValueError:
             messages.error(request, "Invalid quantity.")
             return redirect('variants-add',product_obj.id)
@@ -768,7 +633,6 @@ def variantsAdd(request,id):
 
         for i in range(2, 5):
             cropped_image_data = request.POST.get(f'cropped_image_{i}')
-            print('Processing cropped_image_', i)  # Debugging log
             if cropped_image_data:
                 try:
                     # Decode the base64 image data for the additional images
@@ -803,9 +667,7 @@ def editVariants(request,id):
     
     productVariant_obj= ProductVariant.objects.get(id=id)
     mainProduct_id= productVariant_obj.product
-    print(mainProduct_id,'idddddd')
     productImages_obj= VariantImage.objects.filter(variant=productVariant_obj)
-    print(productImages_obj)
 
     new_size= ProductSize.objects.filter(variant= productVariant_obj)
 
@@ -813,7 +675,6 @@ def editVariants(request,id):
     color_obj= Color.objects.all()
     size_obj= ShoeSize.objects.all()
 
-    print(productVariant_obj,'this variants')
 
     if request.method == 'POST':
 
@@ -842,7 +703,6 @@ def editVariants(request,id):
         
         for i in range(2, 5):
             cropped_image_data = request.POST.get(f'cropped_image_{i}')
-            print('Processing cropped_image_', i)  # Debugging log
             if cropped_image_data:
                 try:
                     # Decode the base64 image data for the additional images
@@ -856,7 +716,6 @@ def editVariants(request,id):
                     print(f"Error processing cropped image {i}: {e}")
 
 
-        print("successsssss")
 
         return redirect('product-edit',mainProduct_id.id)
 
@@ -876,10 +735,8 @@ def editVariants(request,id):
 def editVariant_image(request,id):
 
     product_variant_obj= ProductVariant.objects.get(id=id)
-    print(product_variant_obj)
 
     if request.method == 'POST':
-        print('Trigger')
         cropped_image = request.POST.get('cropped_image_1')
         if cropped_image:
             format, imgstr = cropped_image.split(';base64,')
@@ -895,35 +752,6 @@ def editVariant_image(request,id):
 
 
 
-# def variant_size_edit(request,id):
-
-#     size_obj=ProductSize.objects.get(id=id)
-    
-   
-#     sizes=ShoeSize.objects.all()
-
-
-#     if request.method == 'POST':
-#         selected_size_id = request.POST.get('size')
-#         quantity = request.POST.get('quantity')
-
-#         size_instance= ShoeSize.objects.get(id=selected_size_id)
-
-#         size_obj.size=size_instance
-#         size_obj.quantity= quantity
-#         size_obj.save()
-
-         
-#         return redirect('variants-edit', id=size_obj.variant.id)
-
-#     context = {
-#         'size':size_obj,
-#         'sizes':sizes
-        
-#     }
-
-#     return render(request, 'variants/SizeEdit.html', context)
-
 @never_cache
 @login_required(login_url='adminLogin-page')
 def variant_size_edit(request, id):
@@ -931,17 +759,14 @@ def variant_size_edit(request, id):
     if not request.user.is_superuser:
         return redirect('index-page')
     
-    # Get all available sizes
     sizes = ShoeSize.objects.all()
 
     if request.method == 'POST':
         selected_size_id = request.POST.get('size', '').strip()
         quantity = request.POST.get('quantity', '').strip()
 
-        # Validation checks
         errors = []
         
-        # Check if a size is selected
         if not selected_size_id:
             errors.append("Size must be selected.")
         else:
@@ -950,14 +775,12 @@ def variant_size_edit(request, id):
             except ShoeSize.DoesNotExist:
                 errors.append("Selected size does not exist.")
         
-        # Check if quantity is valid
         if not quantity:
             errors.append("Quantity cannot be empty or spaces.")
         elif not quantity.isdigit() or int(quantity) <= 0:
             errors.append("Quantity must be a positive integer.")
         
         if errors:
-            # If there are errors, render the form with error messages
             context = {
                 'size_obj': size_obj,
                 'sizes': sizes,
@@ -966,14 +789,13 @@ def variant_size_edit(request, id):
             return render(request, 'variants/SizeEdit.html', context)
         
 
-        variant_obj = size_obj.variant  # Assuming size_obj has a related variant field
+        variant_obj = size_obj.variant  
         if ProductSize.objects.exclude(id=size_obj.id).filter(variant=variant_obj, size=size_instance).exists():
             messages.error(request, 'The selected size already exists for this variant.')
             return redirect('variants-size-edit',size_obj.id)
         
        
         
-        # Update the size_obj with the new size and quantity
         size_obj.size = size_instance
         size_obj.quantity = int(quantity)
         size_obj.save()
@@ -997,7 +819,6 @@ def edit_variant_images(request,id):
    
 
     if request.method == 'POST':
-        print('Trigger')
         cropped_image = request.POST.get('cropped_image_1')
         if cropped_image:
             format, imgstr = cropped_image.split(';base64,')
@@ -1024,13 +845,11 @@ def sizeAdd(request,id):
         return redirect('index-page')
 
     variant_obj= ProductVariant.objects.get(id=id)
-    print(variant_obj,'variant')
     size_obj= ShoeSize.objects.all()
 
 
     if request.method == 'POST':
-        # size_id = request.POST.get('size') 
-        # quantity = request.POST.get('quantity') 
+       
         size_id = request.POST.get('size', '').strip()
         quantity = request.POST.get('quantity', '').strip()
         errors = []
@@ -1050,7 +869,6 @@ def sizeAdd(request,id):
             errors.append("Quantity must be a positive integer.")
 
         if errors:
-            # If there are errors, render the form with error messages
             context = {
                 'size':size_obj,
                 'errors': errors
@@ -1089,16 +907,13 @@ def sizeStatus(request,id):
 @never_cache
 @login_required(login_url='adminLogin-page')
 def productSingleView(request,id):
-    print(id)
 
     if not request.user.is_superuser:
         return redirect('index-page')
     
     product_obj= Product.objects.get(id= id)
-    print(product_obj.gender)
 
     varient_obj= ProductVariant.objects.filter(product=product_obj)
-    print(varient_obj,'varrr')
 
     context={
         'product':product_obj,
@@ -1124,7 +939,6 @@ def singleVariant_status(request,id):
 @never_cache
 @login_required(login_url='adminLogin-page')
 def userDetailsPage(request,id):
-    print('this is user details page workinggg')
 
     if not request.user.is_superuser:
         return redirect('index-page')
@@ -1138,7 +952,6 @@ def userDetailsPage(request,id):
 @login_required(login_url='adminLogin-page')
 def userStatus(request, id):
 
-    print('working')
     user_obj = get_object_or_404(UserProfile, id=id)
     
     user_obj.is_active = not user_obj.is_active
@@ -1158,8 +971,6 @@ def productCategory(request):
     if not request.user.is_superuser:
         return redirect('index-page')
     
-    print('the category page is workijggg')
-    print('the current user',request.user)
     
 
 
@@ -1186,31 +997,23 @@ def productCategory(request):
 @never_cache
 @login_required(login_url='adminLogin-page')
 def brand_status(request):
-   print("status is working")
 
    if request.method == 'POST':
         item_id = request.POST.get('item_id')  
-        print(item_id)
         item = get_object_or_404(Brand, id=item_id)
-        print(item)
 
-        # Toggle status
         item.status = not item.status
         item.save()
-        # return redirect('product-category')
    return redirect('product-category') 
 
 # CATEGORY STATUS
 @never_cache
 @login_required(login_url='adminLogin-page')
 def category_status(request):
-   print("status is working")
 
    if request.method == 'POST':
         item_id = request.POST.get('item_id')  
-        print(item_id)
         item = get_object_or_404(Category, id=item_id)
-        print(item)
 
         # Toggle status
         item.status = not item.status
@@ -1230,11 +1033,8 @@ def orders_table(request):
     if not request.user.is_superuser:
         return redirect('index-page')
 
-    # Query all orders from the database
-    # orders = Order.objects.all()
     orders = Order.objects.all().order_by('-order_date')
 
-    # Pass the orders to the template
     context = {
         'orders': orders,
     }
@@ -1242,67 +1042,19 @@ def orders_table(request):
     return render(request,'orders/orders_table.html',context)
 
 
-# @never_cache
-# @login_required(login_url='adminLogin-page')
-# def order_details(request, order_id):
-
-#     print("order detailssssss")
-
-#     if not request.user.is_superuser:
-#         return redirect('index-page')
-    
-     
-#     order = get_object_or_404(Order, id=order_id)
-#     print(order,'order issss')
-
-#     print(order.id)
-#     print(order.payment_method)
-#     order_items = OrderItem.objects.filter(order=order)
-#     order_address = OrderAddress.objects.get(order=order)
-#     print(order_address,'order adressss')
-
-
-#     form_disabled = (order.status in ['DELIVERED', 'CANCELED']) or \
-#                     (order.payment_method == 'Razorpay' and not order.payment_success)
-
-#     if request.method == 'POST':
-#         new_status = request.POST.get('status')
-#         if new_status:
-#             if new_status == 'CANCELED' and order.status != 'CANCELED':
-#                 for item in order_items:
-#                     product_size = item.product_size
-#                     product_size.quantity += item.quantity  
-#                     product_size.save()
-
-#             order.status = new_status
-#             order.save()
-#             return redirect('admin-order-details', order_id=order.id)
-
-#     context = {
-#         'order': order,
-#         'order_items': order_items,
-#         'order_address': order_address,
-#         'form_disabled': form_disabled,
-#     }
-#     return render(request, 'orders/singleDetail.html', context)
 
 
 @never_cache
 @login_required(login_url='adminLogin-page')
 def order_details(request, order_id):
-    print("order detailssssss")
 
     if not request.user.is_superuser:
         return redirect('index-page')
 
     order = get_object_or_404(Order, id=order_id)
-    print(order, 'order issss')
 
-    print(order.id)
-    print(order.payment_method)
     order_items = OrderItem.objects.filter(order=order)
     order_address = OrderAddress.objects.get(order=order)
-    print(order_address, 'order adressss')
 
     form_disabled = (order.status in ['DELIVERED', 'CANCELED']) or \
                     (order.payment_method == 'Razorpay' and not order.payment_success)
@@ -1320,8 +1072,9 @@ def order_details(request, order_id):
                     
                     wallet.balance += refund_amount
                     wallet.save()  
+                    order.total_amount=0
+
                     
-                    # Create a transaction record for the refund
                     Transaction.objects.create(
                         wallet=wallet,
                         amount=refund_amount,
@@ -1329,15 +1082,13 @@ def order_details(request, order_id):
                         purpose='refund',
                         description=f"Refund for canceled order {order.id}"
                     )
-                    print(f"Refund of {refund_amount} credited to user {user.username}'s wallet.")
                 
-                # Restoring product quantities
                 for item in order_items:
                     product_size = item.product_size
                     product_size.quantity += item.quantity
                     product_size.save()
+                
 
-                # Update order status to 'CANCELED'
                 order.status = new_status
                 order.save()
                 return redirect('admin-order-details', order_id=order.id)
@@ -1345,6 +1096,7 @@ def order_details(request, order_id):
             elif new_status == 'DELIVERED' and order.status != 'DELIVERED':
                 
                 order.status = new_status
+                order.payment_success= True
                 order.save()
                 messages.success(request, 'Order has been marked as delivered.')
                 return redirect('admin-order-details', order_id=order.id)
@@ -1373,70 +1125,27 @@ def coupen_section(request):
 
 
 
-# def add_coupon(request):
-#     errors = []
-    
-#     if request.method == 'POST':
-#         coupon_code = request.POST.get('coupon_code')
-#         discount_percentage = request.POST.get('discount_percentage')
-#         expiry_date = request.POST.get('expiry_date')
-#         active = request.POST.get('active') == 'on'
-
-#         # Validation for coupon code
-#         if not coupon_code:
-#             errors.append("Coupon code is required.")
-#         else:
-#             coupon_code = coupon_code.strip()  # Remove leading/trailing spaces
-#             if ' ' in coupon_code:
-#                 errors.append("Coupon code should not contain spaces.")
-#             elif Coupon.objects.filter(code=coupon_code).exists():
-#                 errors.append("Coupon code already exists.")  
-        
-       
-#         try:
-#             discount_percentage = float(discount_percentage)
-#             if discount_percentage <= 0 or discount_percentage > 100:
-#                 errors.append("Discount percentage must be between 1 and 100.")
-#         except ValueError:
-#             errors.append("Discount percentage must be a valid number.")
-        
-        
-#         try:
-#             expiry_date = timezone.make_aware(timezone.datetime.fromisoformat(expiry_date))
-#             if expiry_date <= timezone.now():
-#                 errors.append("Expiry date must be in the future.")
-#         except ValueError:
-#             errors.append("Expiry date must be a valid date and time.")
-
-#         if not errors:
-#             Coupon.objects.create(
-#                 code=coupon_code,
-#                 discount_percentage=discount_percentage,
-#                 expiry_date=expiry_date,
-#                 active=active
-#             )
-#             return redirect('coupen-list')  
-#     return render(request, 'coupen/add.html',{'errors': errors})
-
 
 @never_cache
 @login_required(login_url='adminLogin-page')
 def add_coupon(request):
     if not request.user.is_superuser:
         return redirect('index-page')
+    
     errors = []
     
     if request.method == 'POST':
         coupon_code = request.POST.get('coupon_code')
         discount_percentage = request.POST.get('discount_percentage')
         expiry_date = request.POST.get('expiry_date')
+        min_amount = request.POST.get('min_amount')  # Get min_amount from POST data
         active = request.POST.get('active') == 'on'
 
-        # Validation for coupon code (no spaces and length check)
+        # Validate coupon_code
         if not coupon_code or len(coupon_code.strip()) == 0:
             errors.append("Coupon code is required and cannot be empty.")
         else:
-            coupon_code = coupon_code.strip()  # Remove leading/trailing spaces
+            coupon_code = coupon_code.strip()
             if ' ' in coupon_code:
                 errors.append("Coupon code should not contain spaces.")
             elif len(coupon_code) < 3:
@@ -1444,7 +1153,7 @@ def add_coupon(request):
             elif Coupon.objects.filter(code=coupon_code).exists():
                 errors.append("Coupon code already exists.")
         
-        # Validation for discount percentage
+        # Validate discount_percentage
         try:
             discount_percentage = float(discount_percentage)
             if discount_percentage <= 0 or discount_percentage > 100:
@@ -1452,7 +1161,7 @@ def add_coupon(request):
         except ValueError:
             errors.append("Discount percentage must be a valid number.")
         
-        # Validation for expiry date
+        # Validate expiry_date
         try:
             expiry_date = timezone.make_aware(timezone.datetime.fromisoformat(expiry_date))
             if expiry_date <= timezone.now():
@@ -1460,24 +1169,33 @@ def add_coupon(request):
         except ValueError:
             errors.append("Expiry date must be a valid date and time.")
         
+        # Validate min_amount
+        try:
+            min_amount = float(min_amount)
+            if min_amount < 0:
+                errors.append("Minimum amount must be a non-negative number.")
+        except ValueError:
+            errors.append("Minimum amount must be a valid number.")
+
         # If no errors, create the coupon
         if not errors:
             Coupon.objects.create(
                 code=coupon_code,
                 discount_percentage=discount_percentage,
                 expiry_date=expiry_date,
+                min_amount=min_amount,  # Include min_amount when creating the coupon
                 active=active
             )
-            return redirect('coupen-list')  # Redirect to the coupon list after successful creation
+            return redirect('coupen-list')
 
     return render(request, 'coupen/add.html', {'errors': errors})
-
 
 @never_cache
 @login_required(login_url='adminLogin-page')
 def edit_coupon(request, id):
     if not request.user.is_superuser:
         return redirect('index-page')
+    
     coupon = get_object_or_404(Coupon, id=id)
     errors = []
 
@@ -1485,17 +1203,18 @@ def edit_coupon(request, id):
         coupon_code = request.POST.get('code').strip()
         discount_percentage = request.POST.get('discount_percentage')
         expiry_date_str = request.POST.get('expiry_date')
+        min_amount_str = request.POST.get('min_amount')  # Get min_amount from POST data
         active = request.POST.get('active') == 'on'
 
-       
+        # Validate coupon code
         if not coupon_code:
             errors.append("Coupon code is required.")
         elif ' ' in coupon_code:
             errors.append("Coupon code should not contain spaces.")
         elif Coupon.objects.filter(code=coupon_code).exclude(id=coupon.id).exists():
-            errors.append("Coupon code already exists.")  
+            errors.append("Coupon code already exists.")
 
-        
+        # Validate discount percentage
         try:
             discount_percentage = float(discount_percentage)
             if discount_percentage <= 0 or discount_percentage > 100:
@@ -1503,7 +1222,7 @@ def edit_coupon(request, id):
         except ValueError:
             errors.append("Discount percentage must be a valid number.")
 
-        
+        # Validate expiry date
         try:
             expiry_date = timezone.make_aware(timezone.datetime.fromisoformat(expiry_date_str))
             if expiry_date <= timezone.now():
@@ -1511,17 +1230,31 @@ def edit_coupon(request, id):
         except ValueError:
             errors.append("Expiry date must be a valid date and time.")
 
+        # Validate min_amount
+        try:
+            min_amount = float(min_amount_str)
+            if min_amount < 0:
+                errors.append("Minimum amount must be a non-negative number.")
+        except ValueError:
+            errors.append("Minimum amount must be a valid number.")
+
+        # If there are errors, render the form with error messages
         if errors:
             return render(request, 'coupen/edit.html', {'coupon': coupon, 'errors': errors})
 
+        # Update the coupon
         coupon.code = coupon_code
         coupon.discount_percentage = discount_percentage
         coupon.expiry_date = expiry_date
-        coupon.active=active
+        coupon.min_amount = min_amount  # Include min_amount in the update
+        coupon.active = active
         coupon.save()
 
         return redirect('coupen-list')
+    
     return render(request, 'coupen/edit.html', {'coupon': coupon})
+
+
 
 
 
@@ -1532,6 +1265,11 @@ def delete_coupon(request, id):
         return redirect('coupen-list')
     return redirect('coupen-list')
 
+
+
+
+
+
 # ------------------------------------------------------------------ END COUPEN SECTION -----------------------------------
 @never_cache
 @login_required(login_url='adminLogin-page')
@@ -1541,8 +1279,11 @@ def offer_list(request):
     
     
     offers = Offer.objects.all()
-    total_offers = offers.count()
-    return render(request, 'offer/offer_list.html', {'offers': offers,'count':total_offers})
+    product_offer = ProductOffer.objects.all()
+
+    total_brand_offer = offers.count()
+    total_product_offer = offers.count()
+    return render(request, 'offer/offer_list.html', {'offers': offers,'count':total_brand_offer,'product_offer':product_offer,'total_product_offer':total_product_offer})
 
 
 @never_cache
@@ -1611,15 +1352,18 @@ def edit_offer(request, offer_id):
     return render(request, 'offer/Edit.html',{'offer':offer,'brands':brands})
 
 
+
+
+
+
 @never_cache
 @login_required(login_url='adminLogin-page')
 def add_offer(request):
     if not request.user.is_superuser:
         return redirect('index-page')
-    brands = Brand.objects.all()  # Fetch all brands
+    brands = Brand.objects.all() 
 
     if request.method == 'POST':
-        print('is offer form is working')
         brand_id = request.POST.get('brand')
         discount_percentage = request.POST.get('discount_percentage')
         start_date = request.POST.get('start_date')
@@ -1686,6 +1430,178 @@ def delete_offer(request, offer_id):
     
     return redirect('offer-list')
 
+
+
+
+
+
+
+
+
+
+# PRODUCT OFFER
+
+def add_product_offer(request):
+
+    errors = {}  
+
+    if request.method == 'POST':
+        product_id = request.POST.get('product', '').strip() 
+        offer_percentage = request.POST.get('offer_percentage', '').strip() 
+        start_date = request.POST.get('start_date', '').strip() 
+        end_date = request.POST.get('end_date', '').strip() 
+
+        if not product_id or len(product_id) < 1:
+            errors['product'] = 'Product selection is required.'
+        
+        if not offer_percentage:
+            errors['offer_percentage'] = 'Offer percentage is required.'
+        else:
+            try:
+                offer_percentage_value = int(offer_percentage)
+                if offer_percentage_value < 1 or offer_percentage_value > 100:
+                    errors['offer_percentage'] = 'Offer percentage must be between 1 and 100.'
+            except ValueError:
+                errors['offer_percentage'] = 'Offer percentage must be a valid number.'
+
+        if not start_date or len(start_date) < 1:
+            errors['start_date'] = 'Start date is required.'
+        else:
+            try:
+                start_date = datetime.strptime(start_date, '%Y-%m-%d').date()
+            except ValueError:
+                errors['start_date'] = 'Invalid start date format.'
+
+        if not end_date or len(end_date) < 1:
+            errors['end_date'] = 'Expiry date is required.'
+        else:
+            try:
+                end_date = datetime.strptime(end_date, '%Y-%m-%d').date()
+                if end_date <= datetime.today().date():
+                    errors['end_date'] = 'Expiry date must be in the future.'
+                elif start_date >= end_date:
+                    errors['end_date'] = 'Expiry date must be after the start date.'
+            except ValueError:
+                errors['end_date'] = 'Invalid expiry date format.'
+
+        if not errors:
+            try:
+                product = Product.objects.get(id=product_id)
+
+                existing_offer = ProductOffer.objects.filter(
+                    product=product,
+                    end_date__gte=timezone.now()  
+                ).first()
+
+                if existing_offer:
+                    errors['existing_offer'] = 'This product already has an active offer.'
+                else:
+                    ProductOffer.objects.create(
+                        product=product,
+                        discount_percentage=offer_percentage_value,
+                        start_date=start_date,
+                        end_date=end_date
+                    )
+                    return redirect('offer-list')  
+
+            except Product.DoesNotExist:
+                errors['product'] = 'Invalid product selected.'
+
+
+    product_obj = Product.objects.all()  
+
+    product_obj= Product.objects.all()
+    
+    return render(request,'offer/add_product_offer.html',{'products':product_obj,'errors': errors})
+
+
+def delete_product_offer(request, offer_id):
+
+
+    offer = get_object_or_404(ProductOffer, id=offer_id)
+    if request.method == 'POST':
+        offer.delete()
+        return redirect('offer-list')  
+    
+    return render(request, 'offer/confirm_delete.html', {'offer': offer})
+
+
+def edit_product_offer(request, offer_id):
+    offer = get_object_or_404(ProductOffer, id=offer_id)
+    products = Product.objects.all()  
+
+    if request.method == 'POST':
+        product_id = request.POST.get('product', '').strip()
+        discount_percentage = request.POST.get('discount_percentage', '').strip()
+        start_date = request.POST.get('start_date', '').strip()
+        end_date = request.POST.get('end_date', '').strip()
+        
+        errors = {}
+
+        if not product_id:
+            errors['product'] = 'Product is required.'
+        elif not Product.objects.filter(id=product_id).exists():
+            errors['product'] = 'Selected product does not exist.'
+
+        if not discount_percentage:
+            errors['discount_percentage'] = 'Discount percentage is required.'
+        else:
+            try:
+                discount_percentage = int(discount_percentage)
+                if discount_percentage < 1 or discount_percentage > 100:
+                    errors['discount_percentage'] = 'Discount percentage must be between 1 and 100.'
+            except ValueError:
+                errors['discount_percentage'] = 'Invalid discount percentage value.'
+
+        if not start_date:
+            errors['start_date'] = 'Start date is required.'
+        else:
+            try:
+                start_date = datetime.strptime(start_date, '%Y-%m-%d').date()
+            except ValueError:
+                errors['start_date'] = 'Invalid start date format.'
+
+        if not end_date:
+            errors['end_date'] = 'Expiry date is required.'
+        else:
+            try:
+                end_date = datetime.strptime(end_date, '%Y-%m-%d').date()
+                if end_date <= datetime.today().date():
+                    errors['end_date'] = 'Expiry date must be in the future.'
+            except ValueError:
+                errors['end_date'] = 'Invalid expiry date format.'
+
+        if errors:
+            return render(request, 'offer/edit_product_offer.html', {
+                'offer': offer,
+                'products': products,
+                'errors': errors,
+                'product_id': product_id,
+                'discount_percentage': discount_percentage,
+                'start_date': start_date,
+                'end_date': end_date
+            })
+        else:
+            offer.product_id = product_id
+            offer.discount_percentage = discount_percentage
+            offer.start_date = start_date
+            offer.end_date = end_date
+            offer.save()
+            
+            return redirect('offer-list')  
+
+    else:
+        return render(request, 'offer/edit_product_offer.html', {
+            'offer': offer,
+            'products': products,
+            'product_id': offer.product_id,
+            'discount_percentage': offer.discount_percentage,
+            'start_date': offer.start_date.strftime('%Y-%m-%d') if offer.start_date else '',
+            'end_date': offer.end_date.strftime('%Y-%m-%d') if offer.end_date else ''
+        })
+
+# ------------------------------------------------------ OFFER END------------------------
+
 # ADD CATEGORIES
 @never_cache
 @login_required(login_url='adminLogin-page')
@@ -1731,7 +1647,6 @@ def editCategories(request,id):
 @never_cache
 @login_required(login_url='adminLogin-page')
 def deleteCategory(request,id):
-    print('delete triger')
     Category.objects.get(id=id).delete()
     return redirect('product-category')
     
@@ -1787,7 +1702,6 @@ def brandEdit(request,id):
 @never_cache
 @login_required(login_url='adminLogin-page')
 def brandDelete(request,id):
-    print('delete triger')
     Brand.objects.get(id=id).delete()
     return redirect('product-category')
 
@@ -1824,7 +1738,6 @@ def colorEdit(request,id):
 @never_cache
 @login_required(login_url='adminLogin-page')
 def colorDelete(request,id):
-    print('delete triger')
     Color.objects.get(id=id).delete()
     return redirect('product-category')
 
@@ -1897,7 +1810,6 @@ def genderEdit(request,id):
 @login_required(login_url='adminLogin-page')
 def genderDelete(request,id):
 
-    print('delete triger')
     Gender.objects.get(id=id).delete()
     return redirect('product-category')
 

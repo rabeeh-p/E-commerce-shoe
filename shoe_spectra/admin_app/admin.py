@@ -48,3 +48,7 @@ admin.site.register(Transaction)
 # BRAND OFFER
 admin.site.register(Offer)
 
+
+# PRODUCT OFFER
+admin.site.register(ProductOffer)
+

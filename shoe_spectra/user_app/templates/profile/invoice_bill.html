@@ -1,0 +1,190 @@
+{% extends 'profile/detailsProfile.html' %}
+
+
+
+{% block css %}
+<style>
+   
+
+   
+       
+    .invoice-container {
+            max-width: 800px;
+            margin: 20px auto;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            background-color: #fff;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        .invoice-header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .invoice-header h1 {
+            margin: 0;
+            color: #007bff;
+        }
+        .invoice-header p {
+            margin: 5px 0;
+        }
+        .invoice-details {
+            margin-bottom: 20px;
+        }
+        .invoice-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        .invoice-table th, .invoice-table td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+        .invoice-table th {
+            background-color: #f2f2f2;
+        }
+        .invoice-footer {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 14px;
+            color: #555;
+        }
+        .invoice-total-row {
+            font-weight: bold;
+        }
+        @page {
+            margin: 20mm;
+        }
+
+
+        
+  
+</style>
+
+
+{% endblock %}
+
+
+
+{% block content %}
+
+<div class="col-lg-12">
+
+    
+
+   <div class="invoice-container">
+    <div class="invoice-header">
+        <h1>Invoice</h1>
+        <p><strong>Invoice ID:</strong> {{ order.id }}</p>
+        <p><strong>Date:</strong> {{ order.order_date|date:"d M Y" }}</p>
+        <p><strong>Customer:</strong> {{ order.user.username }}</p>
+        <p><strong>Address:</strong> {{ order.address }}</p>
+        {% if order.coupon_code %}
+        <p><strong>Coupon Code:</strong> {{ order.coupon_code }}</p>
+        {% endif %}
+    </div>
+    
+    <!-- <div class="invoice-details">
+        <h2>Order Details</h2>
+        <table class="invoice-table">
+            <thead>
+                <tr>
+                    <th>Product</th>
+                    <th>Size</th>
+                    <th>Quantity</th>
+                    <th>Price</th>
+                    <th>Total</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in order.order_items.all %}
+                <tr>
+                    <td>{{ item.product_size.variant.product.name }}</td>
+                    <td>{{ item.product_size.size }}</td>
+                    <td>{{ item.quantity }}</td>
+                    <td>₹{{ item.product_size.variant.product.price }}</td>
+                    <td>₹{{ item.final_price }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+            <tfoot>
+                <tr class="invoice-total-row">
+                    <td colspan="4">Shipping Charge</td>
+                    <td>₹{{ shipping_charge }}</td>
+                </tr>
+                {% if order.discounted_price > 0 %}
+                <tr class="invoice-total-row">
+                    <td colspan="4">Discount</td>
+                    <td>-₹{{ order.discounted_price }}</td>
+                </tr>
+                {% endif %}
+                <tr class="invoice-total-row">
+                    <td colspan="4">Totel</td>
+                    <td>₹{{ order.total_amount }}</td>
+                </tr>
+                
+            </tfoot>
+        </table>
+    </div> -->
+
+
+    <div class="invoice-details">
+        <h2>Order Details</h2>
+        <div class="table-responsive">
+            <table class="table table-bordered invoice-table">
+                <thead>
+                    <tr>
+                        <th>Product</th>
+                        <th>Size</th>
+                        <th>Quantity</th>
+                        <th>Price</th>
+                        <th>Total</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in order.order_items.all %}
+                    <tr>
+                        <td>{{ item.product_size.variant.product.name }}</td>
+                        <td>{{ item.product_size.size }}</td>
+                        <td>{{ item.quantity }}</td>
+                        <td>₹{{ item.product_size.variant.product.price }}</td>
+                        <td>₹{{ item.final_price }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+                <tfoot>
+                    <tr class="invoice-total-row">
+                        <td colspan="4">Shipping Charge</td>
+                        <td>₹{{ shipping_charge }}</td>
+                    </tr>
+                    {% if order.discounted_price > 0 %}
+                    <tr class="invoice-total-row">
+                        <td colspan="4">Discount</td>
+                        <td>-₹{{ order.discounted_price }}</td>
+                    </tr>
+                    {% endif %}
+                    <tr class="invoice-total-row">
+                        <td colspan="4">Total</td>
+                        <td>₹{{ order.total_amount }}</td>
+                    </tr>
+                </tfoot>
+            </table>
+        </div>
+    </div>
+    
+    
+    
+    <div class="invoice-footer">
+        <p>Thank you for your purchase!</p>
+        <a href="{% url 'download-invoice' order.id %}" class="btn btn-primary">Download Invoice</a>
+    </div>
+</div>
+
+
+
+
+</div>
+
+
+
+{% endblock %}

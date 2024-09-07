@@ -1,6 +1,13 @@
 {% extends 'profile/detailsProfile.html' %}
 
 
+{% block links %}
+
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
+
+{% endblock %}
+
 
 
 {% block profile %}
@@ -9,34 +16,76 @@
 <!-- <h1>order</h1> -->
 
 <div class="col-lg-8">
-    <div class="container mt-5">
-        {% if orders %}
-            <div class="table-responsive">
-                <table class="table table-hover">
-                    <thead class="table-dark">
-                        <tr>
-                            <th scope="col">Order ID</th>
-                            <th scope="col">Order Date</th>
-                            <th scope="col">Status</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for order in orders %}
-                        <tr class="clickable-row" data-href="{% url 'profile-order-details' order.id %}">
-                            <td>{{ order.id }}</td>
-                            <td>{{ order.order_date }}</td>
-                            <td>{{ order.status }}</td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-            </div>
-        {% else %}
-            <div class="alert alert-info" role="alert">
-                No orders found.
-            </div>
-        {% endif %}
+   
+
+
+<div class="container ">
+    <div class="text-center mb-4">
+        <h1 class="display-5 font-weight-semibold">My Orders</h1>
+        <p class="lead text-secondary">View and manage your recent orders</p>
     </div>
+    {% if orders %}
+        <div class="table-responsive">
+            <table class="table table-hover table-bordered align-middle">
+                <thead class="table-dark text-center">
+                    <tr>
+                        <th scope="col">Order ID</th>
+                        <th scope="col">Order Date</th>
+                        <th scope="col">Status</th>
+                        <th scope="col">Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for order in orders %}
+                    <tr class="text-center">
+                        <td>{{ order.id }}</td>
+                        <td>{{ order.order_date }}</td>
+                        <td>
+                            <span class="badge 
+                                {% if order.status == 'Pending' %}
+                                    bg-warning text-dark
+                                {% elif order.status == 'RETURNED' %}
+                                    bg-info
+                                {% elif order.status == 'DELIVERED' %}
+                                    bg-success
+                                {% elif order.status == 'CANCELED' %}
+                                    bg-danger
+                                {% else %}
+                                    bg-secondary
+                                {% endif %}">
+                                {{ order.status }}
+                            </span>
+                        </td>
+                        <td>
+                            <a href="{% url 'profile-order-details' order.id %}" class="btn btn-outline-primary btn-sm">
+                                View
+                            </a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    {% else %}
+        <div class="alert alert-info text-center" role="alert">
+            No orders found.
+        </div>
+    {% endif %}
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 </div>
 
 

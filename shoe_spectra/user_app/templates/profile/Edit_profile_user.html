@@ -6,6 +6,11 @@
 {% block profile %}
 
 <div class="col-lg-8">
+    {% if error %}
+    <div class="error-message" style="color: red;">
+        {{ error }}
+    </div>
+    {% endif %}
     <form action="" method="post">
         {% csrf_token %}
 

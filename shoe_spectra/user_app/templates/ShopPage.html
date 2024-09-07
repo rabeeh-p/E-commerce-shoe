@@ -31,170 +31,6 @@
 
 {% block content %}
 
-<!-- <div class="container">
-    <div class="row">
-        <div class="col-xl-3 col-lg-4 col-md-5">
-                <form action="" id="filtersForm">
-                <div class="sidebar-categories">
-                    <div class="head">Browse Categories</div>
-                    <ul class="main-categories">
-                        {% for c in category %}
-                        <li class="main-nav-list"><a data-toggle="collapse" href="#fruitsVegetable"
-                                aria-expanded="false" aria-controls="fruitsVegetable"><span
-                                    class="lnr lnr-arrow-right"></span>{{c.name}}<span class="number"></span></a>
-
-                        </li>
-                        {% endfor %}
-
-
-                    </ul>
-                </div>
-                <div class="sidebar-filter mt-50">
-                    <div class="top-filter-head">Product Filters</div>
-                    <div class="common-filter">
-                        <div class="head">Brands</div>
-                        <ul>
-                           
-                           
-                            <select id="brandFilter" name="brand_id">
-                                <option value="">Select Brand</option>
-                                {% for b in brand %}
-                                <option value="{{ b.id }}">{{ b.name }}</option>
-                                {% endfor %}
-                            </select>
-                            <h3 ><</h3>
-                        </ul>
-                    </div>
-                    <div class="common-filter">
-                        <div class="head">Color</div>
-                        
-                            <ul>
-                                {% for c in color %}
-                                <li class="filter-list"><input class="pixel-radio" type="radio" id="black"
-                                        name="color"><label for="black">{{c.name}}</label></li>
-                                {% endfor %}
-
-
-                            </ul>
-                        </form>
-                    </div>
-                    
-                </div>
-        </form>
-    </div>
-    <div class="col-xl-9 col-lg-8 col-md-7">
-        <div class="filter-bar d-flex flex-wrap align-items-center">
-            <div class="sorting">
-                <select style="display: none;">
-                    <option value="1">Default sorting</option>
-                    <option value="1">Default sorting</option>
-                    <option value="1">Default sorting</option>
-                </select>
-                <div class="nice-select" tabindex="0"><span class="current">Default sorting</span>
-                    <ul class="list">
-                        <li data-value="1" class="option selected">Default sorting</li>
-                        <li data-value="1" class="option">Default sorting</li>
-                        <li data-value="1" class="option">Default sorting</li>
-                    </ul>
-                </div>
-            </div>
-            <div class="sorting mr-auto">
-                <select style="display: none;">
-                    <option value="1">Show 12</option>
-                    <option value="1">Show 12</option>
-                    <option value="1">Show 12</option>
-                </select>
-                <div class="nice-select" tabindex="0"><span class="current">Show 12</span>
-                    <ul class="list">
-                        <li data-value="1" class="option selected">Show 12</li>
-                        <li data-value="1" class="option">Show 12</li>
-                        <li data-value="1" class="option">Show 12</li>
-                    </ul>
-                </div>
-            </div>
-            <div class="pagination">
-                <a href="#" class="prev-arrow"><i class="fa fa-long-arrow-left" aria-hidden="true"></i></a>
-                <a href="#" class="active">1</a>
-                <a href="#">2</a>
-                <a href="#">3</a>
-                <a href="#" class="dot-dot"><i class="fa fa-ellipsis-h" aria-hidden="true"></i></a>
-                <a href="#">6</a>
-                <a href="#" class="next-arrow"><i class="fa fa-long-arrow-right" aria-hidden="true"></i></a>
-            </div>
-        </div>
-        <section class="lattest-product-area pb-40 category-list">
-            <div class="row">
-                
-                {% for p in product %}
-                <div class="col-lg-4 col-md-6">
-                    <div class="single-product">
-                        <img class="img-fluid" src="{{p.image.url}}" alt="">
-                        <div class="product-details">
-                            <h6>{{p.name}}</h6>
-                            <div class="price">
-                                <h6>{{p.price}}</h6>
-                                <h6 class="l-through">$210.00</h6>
-                            </div>
-                            <div class="prd-bottom">
-
-                                <a href="" class="social-info">
-                                    <span class="ti-bag"></span>
-                                    <p class="hover-text">add to bag</p>
-                                </a>
-                                {% if p.id in user_wishlist %}
-                                <a href="{% url 'add-wishList' p.id %}" class="social-info">
-                                    <span class="fas fa-heart" style="color: rgb(245, 222, 11);"></span>
-                                    <p class="hover-text">In Wishlist</p>
-                                </a>
-                                {% else %}
-                                <a href="{% url 'add-wishList' p.id %}" class="social-info">
-                                    <span class="lnr lnr-heart" style="color: rgb(240, 240, 240);"></span>
-                                    <p class="hover-text">Wishlist</p>
-                                </a>
-                                {% endif %}
-
-                               
-                                <a href="{% url 'single-page' p.id %}" class="social-info">
-                                    <span class="lnr lnr-move"></span>
-                                    <p class="hover-text">view more</p>
-                                </a>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                {% endfor %}
-            </div>
-        </section>
-        <div class="filter-bar d-flex flex-wrap align-items-center">
-            <div class="sorting mr-auto">
-                <select style="display: none;">
-                    <option value="1">Show 12</option>
-                    <option value="1">Show 12</option>
-                    <option value="1">Show 12</option>
-                </select>
-                <div class="nice-select" tabindex="0"><span class="current">Show 12</span>
-                    <ul class="list">
-                        <li data-value="1" class="option selected">Show 12</li>
-                        <li data-value="1" class="option">Show 12</li>
-                        <li data-value="1" class="option">Show 12</li>
-                    </ul>
-                </div>
-            </div>
-            <div class="pagination">
-                <a href="#" class="prev-arrow"><i class="fa fa-long-arrow-left" aria-hidden="true"></i></a>
-                <a href="#" class="active">1</a>
-                <a href="#">2</a>
-                <a href="#">3</a>
-                <a href="#" class="dot-dot"><i class="fa fa-ellipsis-h" aria-hidden="true"></i></a>
-                <a href="#">6</a>
-                <a href="#" class="next-arrow"><i class="fa fa-long-arrow-right" aria-hidden="true"></i></a>
-            </div>
-        </div>
-
-        
-    </div>
-</div> -->
-
 <div class="container">
     <div class="row">
         <div class="col-xl-3 col-lg-4 col-md-5">
@@ -289,15 +125,17 @@
                         <button type="submit" class="btn btn-primary mb-2 ml-2">Search</button>
                     </form>
                 </div>
-                <div class="pagination">
-                    <a href="#" class="prev-arrow"><i class="fa fa-long-arrow-left" aria-hidden="true"></i></a>
-                    <a href="#" class="active">1</a>
-                    <a href="#">2</a>
-                    <a href="#">3</a>
-                    <a href="#" class="dot-dot"><i class="fa fa-ellipsis-h" aria-hidden="true"></i></a>
-                    <a href="#">6</a>
-                    <a href="#" class="next-arrow"><i class="fa fa-long-arrow-right" aria-hidden="true"></i></a>
+                
+                
+                <div class="sorting">
+                    <a href="?sort=name_asc" class="sort-btn">
+                        <i class="fa fa-sort-alpha-asc" aria-hidden="true"></i> Sort A-Z
+                    </a>
+                    <a href="?sort=name_desc" class="sort-btn">
+                        <i class="fa fa-sort-alpha-desc" aria-hidden="true"></i> Sort Z-A
+                    </a>
                 </div>
+                
             </div>
             <!-- End Filter Bar -->
             <!-- Start Best Seller -->
@@ -317,21 +155,18 @@
                             <div class="product-details">
                                 <h6>{{ p.name }}</h6>
                                 <div class="price">
-                                    <!-- <h6>{{ p.price }}</h6>
-                                    <h6 class="l-through">$210.00</h6> -->
+                                    
 
-                                    {% if p.discounted_price %}
-                                    <h6>${{ p.discounted_price }}</h6>
-                                    <h6 class="l-through">${{ p.price }}</h6> <!-- Original price strikethrough -->
-                                {% else %}
-                                    <h6>${{ p.price }}</h6>
-                                {% endif %}
+
+                                {% if p.get_discounted_price %}
+                        <h6>${{ p.get_discounted_price|floatformat:2 }}</h6>
+                        <h6 class="l-through">${{ p.price|floatformat:2 }}</h6>  <!-- Strikethrough original price -->
+                    {% else %}
+                        <h6>${{ p.price|floatformat:2 }}</h6> <!-- Only actual price if no offer -->
+                    {% endif %}
                                 </div>
                                 <div class="prd-bottom">
-                                    <a href="#" class="social-info">
-                                        <span class="ti-bag"></span>
-                                        <p class="hover-text">add to bag</p>
-                                    </a>
+                                    
                                     {% if p.id in user_wishlist %}
                                     <a href="{% url 'add-wishList' p.id %}" class="social-info">
                                         <span class="fas fa-heart" style="color: rgb(245, 222, 11);"></span>
@@ -366,75 +201,6 @@
 {% block js %}
 
 <script>
-    // $(document).ready(function () {
-    //     $('#filtersForm select').on('change', function () {
-    //         $.ajax({
-    //             url: "{% url 'shopping-page' %}",  // Adjust the URL to match your route name
-    //             method: "POST",
-    //             data: {
-    //                 category_id: $('#categoryFilter').val(),
-    //                 color_id: $('#colorFilter').val(),
-    //                 price_range: $('#priceFilter').val(),
-    //                 csrfmiddlewaretoken: '{{ csrf_token }}'
-    //             },
-    //             success: function(response) {
-    //         $('#product-list-container').html(response.products_html);
-    //     }
-    //         });
-    //     });
-    // });
-
-
-    // document.addEventListener('DOMContentLoaded', () => {
-    //     // Get form and select elements
-    //     const form = document.getElementById('filtersForm');
-    //     const brandFilter = document.getElementById('brandFilter');
-    //     const colorFilters = document.querySelectorAll('input[name="color"]');
-
-    //     // Function to load products via AJAX
-    //     function loadProducts() {
-    //         const formData = new FormData(form);
-
-    //         fetch("{% url 'shopping-page' %}", {
-    //             method: 'GET',
-    //             body: new URLSearchParams(formData).toString(),
-    //             headers: {
-    //                 'Accept': 'text/html'
-    //             }
-    //         })
-    //             .then(response => response.text())
-    //             .then(data => {
-    //                 document.getElementById('product-list').innerHTML = data;
-    //             })
-    //             .catch(error => console.error('Error:', error));
-    //     }
-
-    //     // Add event listener for brand filter change
-    //     brandFilter.addEventListener('change', () => {
-    //         loadProducts();
-    //     });
-
-    //     // Add event listeners for color filter changes
-    //     colorFilters.forEach(colorFilter => {
-    //         colorFilter.addEventListener('change', () => {
-    //             loadProducts();
-    //         });
-    //     });
-
-    //     // Add event listener for category filter clicks
-    //     document.querySelectorAll('.filter-link').forEach(link => {
-    //         link.addEventListener('click', (e) => {
-    //             e.preventDefault();
-    //             const categoryId = link.dataset.category;
-    //             document.querySelector('select[name="category"]').value = categoryId;
-    //             loadProducts();
-    //         });
-    //     });
-
-    //     // Initial load
-    //     loadProducts();
-    // });
-
     function clearFilters() {
         // Redirect to the base URL without any query parameters
         window.location.href = window.location.pathname;

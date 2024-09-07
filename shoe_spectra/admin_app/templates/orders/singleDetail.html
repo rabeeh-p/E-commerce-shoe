@@ -39,19 +39,47 @@
                 <button type="submit" class="btn btn-primary" {% if order.status != 'Pending' %}disabled{% endif %}>Update Status</button>
             </form> -->
 
-            <form action="" method="post">
+            <!-- <form action="" method="post">
                 {% csrf_token %}
                 <div class="form-group">
                     <label for="status">Update Order Status:</label>
-                    <select name="status" id="status" class="form-control" {% if form_disabled %}disabled{% endif %}>
+                    <select name="status" id="status" class="form-control" {% if order.status == 'RETURNED' %}disabled{% endif %}>
                         <option value="PENDING" {% if order.status == 'PENDING' %}selected{% endif %}>Pending</option>
                         <option value="DELIVERED" {% if order.status == 'DELIVERED' %}selected{% endif %}>Delivered</option>
                         <option value="CANCELED" {% if order.status == 'CANCELED' %}selected{% endif %}>Canceled</option>
                     </select>
                 </div>
-                <!-- <button type="submit" class="btn btn-primary" {% if form_disabled %}disabled{% endif %}>Update Status</button> -->
-                <button type="submit" class="btn btn-primary" {% if order.status != 'Pending' %}disabled{% endif %}>Update Status</button>
+                
+                
+                <button type="submit" class="btn btn-primary" {% if order.status == 'RETURNED' %}disabled{% endif %}>Update Status</button>
+                
+            </form> -->
+            {% if order.status == 'RETURNED' %}
+            <div class="alert alert-info mt-3">
+                This order has already been returned. No further actions can be performed.
+            </div>
+            {% else %}
+            <form action="" method="post">
+                {% csrf_token %}
+                <div class="form-group">
+                    <label for="status">Update Order Status:</label>
+                    <select name="status" id="status" class="form-control" {% if order.status == 'RETURNED' %}disabled{% endif %}>
+                        <option value="PENDING" {% if order.status == 'PENDING' %}selected{% endif %}>Pending</option>
+                        <option value="DELIVERED" {% if order.status == 'DELIVERED' %}selected{% endif %}>Delivered</option>
+                        <option value="CANCELED" {% if order.status == 'CANCELED' %}selected{% endif %}>Canceled</option>
+                    </select>
+                </div>
+                
+                
+                <!-- <button type="submit" class="btn btn-primary" {% if order.status == 'RETURNED' %}disabled{% endif %}>Update Status</button> -->
+                {% if order.status == 'Pending' %}
+                <button type="submit" class="btn btn-primary">Update Status</button>
+            {% endif %}
+                
+                
             </form>
+            {% endif %}
+
 
         </div>
     </div>
@@ -89,7 +117,9 @@
                         {% for item in order_items %}
                         <tr>
                             <td>
-                                <img src="{{ item.product_size.variant.product.image.url }}" alt="{{ item.product_size.variant.product.name }}" style="width: 50px; height: auto; margin-right: 10px;">
+                                <img src="{{ item.product_size.variant.product.image.url }}"
+                                    alt="{{ item.product_size.variant.product.name }}"
+                                    style="width: 50px; height: auto; margin-right: 10px;">
                                 {{ item.product_size.variant.product.name }}
                             </td>
                             <td>{{ item.product_size.size }}</td>
@@ -97,9 +127,9 @@
                             <!-- <td>${{ item.product_size.variant.product.price }}</td> -->
                             <td>
                                 {% if item.final_price %}
-                                    ₹{{ item.final_price }} <!-- Display discounted price -->
+                                ₹{{ item.final_price }} <!-- Display discounted price -->
                                 {% else %}
-                                    ₹{{ item.product_size.variant.product.price }} <!-- Display original price -->
+                                ₹{{ item.product_size.variant.product.price }} <!-- Display original price -->
                                 {% endif %}
                             </td>
                         </tr>

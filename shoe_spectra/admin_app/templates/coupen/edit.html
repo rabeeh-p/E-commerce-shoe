@@ -24,6 +24,16 @@
         <div class="card-body">
             <form class="browser-default-validation" method="post">
                 {% csrf_token %}
+
+                {% if errors %}
+                    <div class="alert alert-danger">
+                        <ul>
+                            {% for error in errors %}
+                                <li>{{ error }}</li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                {% endif %}
                 <div class="form-floating form-floating-outline mb-6">
                     <input type="text" name="code" class="form-control" id="basic-default-name"
                         placeholder="code" required="" value="{{ coupon.code }}">
@@ -33,6 +43,11 @@
                     <input type="number" class="form-control" id="basic-default-name"
                         placeholder="new category" required="" name="discount_percentage" value="{{ coupon.discount_percentage }}">
                     <label for="basic-default-name">Discount Percentage</label>
+                </div>
+                <div class="form-floating form-floating-outline mb-6">
+                    <input type="number" class="form-control" id="basic-default-name"
+                        placeholder="new category" required="" name="min_amount" value="{{ coupon.min_amount }}">
+                    <label for="basic-default-name">Minimum amount</label>
                 </div>
                 <div class="form-floating form-floating-outline mb-6">
                     <input type="date"  class="form-control" id="basic-default-name"

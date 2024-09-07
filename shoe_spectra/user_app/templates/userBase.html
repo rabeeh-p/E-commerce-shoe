@@ -79,8 +79,8 @@
 			<nav class="navbar navbar-expand-lg navbar-light main_box">
 				<div class="container">
 					<!-- Brand and toggle get grouped for better mobile display -->
-					<a class="navbar-brand logo_h" href="{% url 'index-page' %}"><img src="{% static 'img/avatar/spectra 3.png' %}"
-							alt="" class="navbar-logo"></a>
+					<a class="navbar-brand logo_h" href="{% url 'index-page' %}"><img
+							src="{% static 'img/avatar/spectra 3.png' %}" alt="" class="navbar-logo"></a>
 					<button class="navbar-toggler" type="button" data-toggle="collapse"
 						data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent"
 						aria-expanded="false" aria-label="Toggle navigation">
@@ -91,24 +91,17 @@
 					<!-- Collect the nav links, forms, and other content for toggling -->
 					<div class="collapse navbar-collapse offset" id="navbarSupportedContent">
 						<ul class="nav navbar-nav menu_nav ml-auto">
-							
+
 
 							{% if request.user.is_authenticated %}
 							{% if profile_exists %}
 							<li class="nav-item active"><a class="nav-link" href="{% url 'index-page' %}">Home</a></li>
 							<li class="nav-item "><a class="nav-link" href="{% url 'shopping-page' %}">Shop</a></li>
-							<!-- <li class="nav-item submenu dropdown">
-								<a href="#" class="nav-link dropdown-toggle" data-toggle="dropdown" role="button"
-									aria-haspopup="true" aria-expanded="false">Shop</a>
-								<ul class="dropdown-menu">
-									<li class="nav-item"><a class="nav-link" href="{% url 'shopping-page' %}">Shop
-											Category</a></li>
-								</ul>
-							</li> -->
+
 							{% endif %}
 							{% endif %}
 
-		
+
 
 							{% if request.user.is_authenticated %}
 							<li class="nav-item submenu dropdown">
@@ -119,10 +112,11 @@
 								</a>
 								<ul class="dropdown-menu">
 									{% if profile_exists %}
-									
-									<li class="nav-item"><a class="nav-link" href="{% url 'profile' %}">{{request.user}}</a></li>
+
 									<li class="nav-item"><a class="nav-link"
-										href="{% url 'logoutUser-page' %}">Logout</a></li>
+											href="{% url 'profile' %}">{{request.user}}</a></li>
+									<li class="nav-item"><a class="nav-link"
+											href="{% url 'logoutUser-page' %}">Logout</a></li>
 									{% else %}
 									<li class="nav-item"><a class="nav-link"
 											href="{% url 'logoutUser-page' %}">Logout</a></li>
@@ -135,28 +129,13 @@
 							<li class="nav-item"><a class="nav-link" href="{% url 'login-page' %}">Login</a></li>
 							{% endif %}
 
-
-
 						</ul>
-						<!-- <ul class="nav navbar-nav navbar-right">
-							<li class="nav-item"><a href="#" class="cart"><span class="ti-bag"></span></a></li>
-							<li class="nav-item">
-								<button class="search"><span class="lnr lnr-magnifier" id="search"></span></button>
-							</li>
-						</ul> -->
+
 					</div>
 				</div>
 			</nav>
 		</div>
-		<!-- <div class="search_input" id="search_input_box">
-			<div class="container">
-				<form class="d-flex justify-content-between">
-					<input type="text" class="form-control" id="search_input" placeholder="Search Here">
-					<button type="submit" class="btn"></button>
-					<span class="lnr lnr-cross" id="close_search" title="Close Search"></span>
-				</form>
-			</div>
-		</div> -->
+
 	</header>
 	<!-- End Header Area -->
 
@@ -179,6 +158,13 @@
 
 
 	{% block content %}
+
+
+
+
+
+
+
 
 	{% endblock %}
 
@@ -225,9 +211,7 @@
 											type="text">
 									</div>
 
-									<!-- <div class="col-lg-4 col-md-4">
-													<button class="bb-btn btn"><span class="lnr lnr-arrow-right"></span></button>
-												</div>  -->
+									
 								</div>
 								<div class="info"></div>
 							</form>
@@ -236,7 +220,7 @@
 				</div>
 				<div class="col-lg-3  col-md-6 col-sm-6">
 					<div class="single-footer-widget mail-chimp">
-						<h6 class="mb-20">Instragram Feed</h6>
+						<h6 class="mb-20">Instragram Feed1</h6>
 						<ul class="instafeed d-flex flex-wrap">
 							<li><img src="{% static 'img/i1.jpg' %}" alt=""></li>
 							<li><img src="{% static 'img/i2.jpg' %}" alt=""></li>
@@ -262,14 +246,7 @@
 					</div>
 				</div>
 			</div>
-			<div class="footer-bottom d-flex justify-content-center align-items-center flex-wrap">
-				<!-- <p class="footer-text m-0">
-					Copyright &copy;
-					<script>document.write(new Date().getFullYear());</script> All rights reserved | This template is
-					made with <i class="fa fa-heart-o" aria-hidden="true"></i> by <a href="https://colorlib.com"
-						target="_blank">Colorlib</a>
-				</p> -->
-			</div>
+			
 		</div>
 	</footer>
 	<!-- End footer Area -->

@@ -58,17 +58,7 @@
 
 {% block content %}
 
-<!-- <h1>success conform </h1> -->
 
-
-    <!-- <h1>Complete Payment</h1>
-    <button id="pay-button" class="btn">Pay Now</button> -->
-
-    <!-- <div class="payment-container">
-        <h1>Success Confirm</h1>
-        <h2>Complete Payment</h2>
-        <button id="pay-button" class="btn">Pay Now</button>
-    </div> -->
     
         <div class="container d-flex justify-content-center align-items-center min-vh-100 my-5">
             <!-- Responsive Payment Box -->
@@ -95,31 +85,7 @@
 <script src="{% static 'newStyle/assets/js/main.js' %}"></script>
 
 <script>
-    // document.getElementById('pay-button').onclick = function(e) { 
-    //     e.preventDefault();
-
-    //     var options = {
-    //         "key": "{{ razorpay_key_id }}", 
-    //         "amount": "{{ razorpay_amount }}", 
-    //         "currency": "INR",
-    //         "name": "Your Company",
-    //         "description": "Order Payment",
-    //         "order_id": "{{ razorpay_order_id }}", 
-    //         "handler": function (response) {
-    //             console.log('Payment successful', response);
-
-    //             // Redirect to success page
-    //             window.location.href = "{% url 'order_success' order_id %}";
-    //         },
-    //         "theme": {
-    //             "color": "#3399cc"
-    //         }
-    //     };
-
-    //     var rzp1 = new Razorpay(options);
-    //     rzp1.open();
-    // }
-
+   
 
     document.getElementById('pay-button').onclick = function(e) {
     e.preventDefault();

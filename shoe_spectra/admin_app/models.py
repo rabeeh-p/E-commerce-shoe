@@ -2,6 +2,7 @@ from django.db import models
 from django.contrib.auth.models import User
 from django.utils import timezone
 from datetime import date
+from decimal import Decimal
 
 # Create your models here.
 
@@ -86,14 +87,43 @@ class Product(models.Model):
         return self.name
     
 
+  
+
+
     def get_active_offer(self):
-        # Get all active offers for the product's brand
-        active_offers = self.brand.offers.filter(
-            start_date__lte=date.today(),
-            end_date__gte=date.today()
+        product_offer = getattr(self, 'product_offer', None)
+        if product_offer and product_offer.is_active():
+            return product_offer
+        
+        brand_offers = self.brand.offers.filter(
+            start_date__lte=timezone.now(),
+            end_date__gte=timezone.now()
         )
-        # Return the first active offer, or None if no offer is active
-        return active_offers.first()
+        return brand_offers.first()
+
+    def get_discounted_price(self):
+        offer = self.get_active_offer()
+        if offer:
+            discount = offer.discount_percentage / 100
+            discounted_price = self.price * (1 - discount)
+            return discounted_price
+        return None
+
+
+class ProductOffer(models.Model):
+    product = models.OneToOneField(Product, on_delete=models.CASCADE, related_name='product_offer')
+    discount_percentage = models.DecimalField(max_digits=5, decimal_places=2)  
+    start_date = models.DateTimeField(default=timezone.now)
+    end_date = models.DateTimeField()
+    offer_description = models.TextField(blank=True, null=True)
+
+    def is_active(self):
+        now = timezone.now()
+        return self.start_date <= now <= self.end_date
+    
+    def __str__(self):
+        return f"{self.product.name} - {self.discount_percentage}% off"
+    
 
 
 
@@ -147,6 +177,7 @@ class UserProfile(models.Model):
     full_name = models.CharField(max_length=20, null=True, blank=True)
     is_active = models.BooleanField(default=True)
 
+    referral_code = models.CharField(max_length=20, null=True, blank=True)
 
     def __str__(self):
         return f'{self.user.username} Profile'
@@ -242,16 +273,17 @@ class Order(models.Model):
         ('Bank Transfer', 'Bank Transfer'),
     ]
 
-    user = models.ForeignKey(User, on_delete=models.CASCADE)  # Link directly to the User model
+    user = models.ForeignKey(User, on_delete=models.CASCADE)  
     address = models.ForeignKey(Address, on_delete=models.SET_NULL, null=True, blank=True)
     order_date = models.DateTimeField(auto_now_add=True)
     status = models.CharField(max_length=20, default='Pending')
     total_amount = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
     payment_method = models.CharField(max_length=50, choices=PAYMENT_METHOD_CHOICES, default='Credit Card')
     payment_success = models.BooleanField(default=False)
-    original_price = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)  # Price before discount
-    discounted_price = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)  # Price after discount
-    final_price = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)  # Actual amount to be paid
+    original_price = models.DecimalField(max_digits=10, decimal_places=2, default=0.00) 
+    discounted_price = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)  
+    final_price = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)  
+    coupon_code = models.CharField(max_length=50, blank=True, null=True)
 
     def __str__(self):
         return f'Order {self.id} by {self.user.username}'
@@ -275,16 +307,21 @@ class OrderItem(models.Model):
     def __str__(self):
         return f'{self.quantity} x {self.product_size.variant.product.name} (Size: {self.product_size.size}) in Order {self.order.id}'
     
+   
+
+
     def calculate_final_price(self):
         product = self.product_size.variant.product
-        brand = product.brand
-        # Check for an active offer on the brand
-        active_offer = brand.offers.filter(start_date__lte=date.today(), end_date__gte=date.today()).first()
         
+        active_offer = product.get_active_offer()
+
         if active_offer:
             discount = (product.price * active_offer.discount_percentage) / 100
-            return product.price - discount
-        return product.price
+            final_price = product.price - Decimal(discount)
+        else:
+            final_price = product.price
+        
+        return final_price * self.quantity
 
 
 
@@ -320,6 +357,7 @@ class Coupon(models.Model):
     active = models.BooleanField(default=True)
     expiry_date = models.DateTimeField()
     created_at = models.DateTimeField(auto_now_add=True)  # Add this line
+    min_amount = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
 
     def __str__(self):
         return self.code
@@ -353,6 +391,11 @@ class Wallet(models.Model):
 
     def __str__(self):
         return f"{self.user.username}'s Wallet"
+    
+    def add_balance(self, amount):
+        """Add credit to the wallet balance."""
+        self.balance += amount
+        self.save()
     
 
 

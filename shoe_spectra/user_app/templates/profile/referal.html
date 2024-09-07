@@ -1,0 +1,93 @@
+{% extends 'profile/detailsProfile.html' %}
+
+
+
+
+{% block profile %}
+
+
+<!-- <h1>order</h1> -->
+
+<div class="col-lg-8">
+    <div class="container mt-5">
+        <div class="row">
+            <div class="col-lg-8 mx-auto">
+                <h2 class="text-center mb-4">Your Referral Code</h2>
+                
+                <!-- Display Referral Code -->
+                {% if user_profile and user_profile.referral_code %}
+                    <div class="card mb-4">
+                        <div class="card-body text-center">
+                            <h5 class="card-title">Your Referral Code</h5>
+                            <p class="card-text">
+                                <strong>{{ user_profile.referral_code }}</strong>
+                            </p>
+                            <div class="d-flex justify-content-center mb-3">
+                                <a href="https://wa.me/?text=Hey!%20I%20just%20used%20this%20awesome%20referral%20code%20{{ user_profile.referral_code }}%20on%20Shoe%20Spectra%20and%20got%20500%20credits%20in%20my%20wallet!%20You%20can%20use%20it%20too%20to%20enjoy%20discounts.%20Check%20it%20out!" class="btn btn-success mr-2" target="_blank">
+                                    Share on WhatsApp
+                                </a>
+                                <a href="mailto:?subject=Check%20Out%20My%20Referral%20Code&body=Hi,%0A%0AI%20wanted%20to%20share%20my%20referral%20code%20with%20you:%20{{ user_profile.referral_code }}.%20You%20can%20use%20it%20to%20get%20discounts%20on%20[Your%20Website%20URL].%0A%0ACheck%20it%20out!" class="btn btn-info" target="_blank">
+                                    Share via Email
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                {% else %}
+                    <p class="text-center">You do not have a referral code at the moment.</p>
+                {% endif %}
+                
+                <!-- Display Available Coupons -->
+                {% if available_coupons %}
+                    <h3 class="text-center mb-4">Available Coupons</h3>
+                    <div class="row">
+                        {% for coupon in available_coupons %}
+                            <div class="col-md-6 mb-4">
+                                <div class="card h-100">
+                                    <div class="card-body text-center">
+                                        <h5 class="card-title">{{ coupon.code }}</h5>
+                                        <p class="card-text">
+                                            <strong>{{ coupon.discount_percentage }}% off</strong>
+                                        </p>
+                                        <p class="card-text">
+                                            Expires on: {{ coupon.expiry_date|date:"d M Y" }}
+                                        </p>
+                                        
+                                    </div>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <p class="text-center">No coupons available at the moment.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    </div>
+    
+    
+   
+</div>
+
+
+
+
+
+{% endblock %}
+
+
+{% block js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        var rows = document.querySelectorAll('.clickable-row');
+        rows.forEach(function(row) {
+            row.addEventListener('click', function() {
+                window.location.href = row.getAttribute('data-href');
+            });
+        });
+    });
+    </script>
+    
+
+
+{% endblock %}

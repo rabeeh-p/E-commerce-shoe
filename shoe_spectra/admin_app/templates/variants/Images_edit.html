@@ -49,29 +49,7 @@
                     <input type="hidden" id="cropped-image-1" name="cropped_image_1">
                 </div>
             
-                <!-- <div class="form-floating form-floating-outline mb-6">
-                    <input type="file" class="form-control" id="upload-file-2" required>
-                    <label for="upload-file-2">Product Additional Pic 1</label>
-                    <img id="image-preview-2" style="display:none; max-width: 100%;">
-                    <button type="button" id="crop-button-2" style="display:none;">Crop</button>
-                    <input type="hidden" id="cropped-image-2" name="cropped_image_2">
-                </div> -->
-            
-                <!-- <div class="form-floating form-floating-outline mb-6">
-                    <input type="file" class="form-control" id="upload-file-3" required>
-                    <label for="upload-file-3">Product Additional Pic 2</label>
-                    <img id="image-preview-3" style="display:none; max-width: 100%;">
-                    <button type="button" id="crop-button-3" style="display:none;">Crop</button>
-                    <input type="hidden" id="cropped-image-3" name="cropped_image_3">
-                </div> -->
-            
-                 <!-- <div class="form-floating form-floating-outline mb-6">
-                    <input type="file" class="form-control" id="upload-file-4" required>
-                    <label for="upload-file-4">Product Additional Pic 3</label>
-                    <img id="image-preview-4" style="display:none; max-width: 100%;">
-                    <button type="button" id="crop-button-4" style="display:none;">Crop</button>
-                    <input type="hidden" id="cropped-image-4" name="cropped_image_4">
-                </div>  -->
+               
             
                 <button type="submit" class="btn btn-primary waves-effect waves-light">Submit</button>
             </form>
@@ -139,22 +117,9 @@
         handleFileSelect(event, 'image-preview-1', 'crop-button-1', 'cropped-image-1');
     });
 
-    // document.getElementById('upload-file-2').addEventListener('change', function (event) {
-    //     handleFileSelect(event, 'image-preview-2', 'crop-button-2', 'cropped-image-2');
-    // });
-
-    // document.getElementById('upload-file-3').addEventListener('change', function (event) {
-    //     handleFileSelect(event, 'image-preview-3', 'crop-button-3', 'cropped-image-3');
-    // });
-
-    // document.getElementById('upload-file-4').addEventListener('change', function (event) {
-    //     handleFileSelect(event, 'image-preview-4', 'crop-button-4', 'cropped-image-4');
-    // });
-
+    
     initializeCropper('image-preview-1', 'crop-button-1', 'cropped-image-1');
-    // initializeCropper('image-preview-2', 'crop-button-2', 'cropped-image-2');
-    // initializeCropper('image-preview-3', 'crop-button-3', 'cropped-image-3');
-    // initializeCropper('image-preview-4', 'crop-button-4', 'cropped-image-4');
+    
 </script>
 
 

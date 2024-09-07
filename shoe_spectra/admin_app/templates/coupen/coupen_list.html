@@ -83,6 +83,7 @@
                   <th class="sorting_disabled dt-checkboxes-cell dt-checkboxes-select-all" rowspan="1" colspan="1" style="width: 17.625px;" data-col="1" aria-label="">No</th>
                   <th class="sorting sorting_asc" tabindex="0" aria-controls="DataTables_Table_0" rowspan="1" colspan="1" style="width: 114.025px;" aria-label="product: activate to sort column descending" aria-sort="ascending">Coupon Code</th>
                   <th class="sorting" tabindex="0" aria-controls="DataTables_Table_0" rowspan="1" colspan="1" style="width: 124.062px;" aria-label="category: activate to sort column ascending">Discount (%)</th>
+                  <th class="sorting" tabindex="0" aria-controls="DataTables_Table_0" rowspan="1" colspan="1" style="width: 124.062px;" aria-label="category: activate to sort column ascending">Min Amount</th>
                   <th class="sorting" tabindex="0" aria-controls="DataTables_Table_0" rowspan="1" colspan="1" style="width: 59.975px;" aria-label="qty: activate to sort column ascending">Expiry Date</th>
                   <th class="sorting" tabindex="0" aria-controls="DataTables_Table_0" rowspan="1" colspan="1" style="width: 94.175px;" aria-label="status: activate to sort column ascending">Action</th>
               </tr>
@@ -94,6 +95,7 @@
                   <td valign="top" class="dt-checkboxes-cell">{{ forloop.counter }}</td>
                   <td valign="top">{{ coupon.code  }}</td> <!-- Full Name -->
                   <td valign="top">{{  coupon.discount_percentage }}</td> <!-- Address -->
+                  <td valign="top">{{  coupon.min_amount }}</td> <!-- Address -->
                   <td valign="top">{{  coupon.expiry_date|date:"Y-m-d" }}</td> <!-- Address -->
                   <td>
                     <!-- Edit Button -->

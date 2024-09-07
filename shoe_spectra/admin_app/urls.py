@@ -107,8 +107,18 @@ urlpatterns = [
     path('offer-table/<int:offer_id>/edit/',views.edit_offer, name='offer-edit' ),
     path('offer-table/<int:offer_id>/delete/',views.delete_offer, name='offer-delete' ),
 
-    # EXCEL SHEET
-    # path('admin-export_sales_report_exelSheet/',views.export_sales_report_exelSheet, name='admin-exelSheet' ),
+
+
+
+    # PRODUCT OFFER
+    path('product-offer-add/',views.add_product_offer, name='product-offer-add' ),
+    path('product-offer-delete/<int:offer_id>/',views.delete_product_offer, name='product-offer-delete' ),
+    path('product-offer-edit/<int:offer_id>/',views.edit_product_offer, name='product-offer-edit' ),
+
+
+
+    path('sales-report/',views.sales_report, name='sales-report' ),
+
 
 ]
 
