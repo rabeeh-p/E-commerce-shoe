@@ -1714,18 +1714,3 @@ def filtering_items(request):
     return JsonResponse({'products': product_list})
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
