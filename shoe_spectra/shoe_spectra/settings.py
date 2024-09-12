@@ -103,27 +103,16 @@ WSGI_APPLICATION = 'shoe_spectra.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.0/ref/settings/#databases
 
-
-
-
-
-
-
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'backendcourse',
-        'USER': 'mysuperuser',
-        'PASSWORD': 'mysuperuser',
-        'HOST': 'backendcourser.cz0qiowkmoqi.ap-southeast-2.rds.amazonaws.com',
-        'PORT': '5432',
+        'NAME': 'shoe_spectra_pjt',
+        'USER': 'postgres',
+        'PASSWORD': 'admin123',
+        'HOST': 'localhost',  # or the IP address of your database server
+        'PORT': '5432',       # default PostgreSQL port
     }
 }
-
-
-
-
-
 
 
 # Password validation
@@ -203,17 +192,3 @@ MESSAGE_TAGS = {
 
 RAZORPAY_API_KEY = "rzp_test_Y1IK2jrJDfFSb5"
 RAZORPAY_API_SECRET = "rmosXgafQcUObgAVKu5Rpvs0"
-
-
-
-
-
-AWS_ACCESS_KEY_ID = 'AKIA6JKEXWZBFMLZYRO6 '
-AWS_SECRET_ACCESS_KEY = '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'
-AWS_STORAGE_BUCKET_NAME = 'backendcoursone'
-AWS_S3_SIGNATURE_NAME = 's3v4',
-AWS_S3_REGION_NAME = 'ap-southeast-2'
-AWS_S3_FILE_OVERWRITE = False
-AWS_DEFAULT_ACL =  None
-AWS_S3_VERITY = True
-DEFAULT_FILE_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
