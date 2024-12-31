@@ -713,7 +713,8 @@ def editVariants(request,id):
                     # Save the additional image to the ProductImage model
                     VariantImage.objects.create(variant=productVariant_obj, image=data)
                 except Exception as e:
-                    print(f"Error processing cropped image {i}: {e}")
+                    # print(f"Error processing cropped image {i}: {e}")
+                    pass
 
 
 
