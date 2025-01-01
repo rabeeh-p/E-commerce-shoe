@@ -24,12 +24,7 @@ Built with **Django**, **Python**, **Bootstrap**, and **JavaScript**, ShoeSpectr
 - **SweetAlert**: For pop-up alerts.
 - **Deployment**: Heroku or DigitalOcean (optional)
 
-## 📸 **Screenshots**
-![Home Page](https://via.placeholder.com/800x400.png?text=Home+Page+Screenshot)  
-*Home page with featured products.*
 
-![Product Page](https://via.placeholder.com/800x400.png?text=Product+Page+Screenshot)  
-*Product page showcasing details and variants.*
 
 ## 📣 **Contact**
 For any questions, feel free to reach out to me:
