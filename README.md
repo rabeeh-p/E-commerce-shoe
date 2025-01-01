@@ -33,9 +33,9 @@ Built with **Django**, **Python**, **Bootstrap**, and **JavaScript**, ShoeSpectr
 
 ## 📣 **Contact**
 For any questions, feel free to reach out to me:
-- **Email**: your-email@example.com
-- **LinkedIn**: [Your LinkedIn]([https://www.linkedin.com/in/yourprofile](https://www.linkedin.com/in/rabeeh-p-3a4299260/))
-- **GitHub**: [Your GitHub]([https://github.com/yourusername](https://github.com/rabeeh-p))
+- **Email**: rabeehp008@gmail.com
+- **LinkedIn**: [LinkedIn]([https://www.linkedin.com/in/yourprofile](https://www.linkedin.com/in/rabeeh-p-3a4299260/))
+- **GitHub**: [GitHub]([https://github.com/yourusername](https://github.com/rabeeh-p))
 
 ---
 
