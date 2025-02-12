@@ -194,3 +194,6 @@ MESSAGE_TAGS = {
 
 RAZORPAY_API_KEY = "rzp_test_Y1IK2jrJDfFSb5"
 RAZORPAY_API_SECRET = "rmosXgafQcUObgAVKu5Rpvs0"
+
+
+
