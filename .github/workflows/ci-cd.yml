@@ -30,7 +30,7 @@ jobs:
 
       - name: Build and Push Docker Image
         run: |
-          docker build -t ${{ secrets.DOCKER_USERNAME }}/shoespectra:latest -f shoespectra/Dockerfile shoespectra/
+          docker build -t ${{ secrets.DOCKER_USERNAME }}/shoespectra:latest -f shoe_spectra/Dockerfile shoe_spectra/
           docker push ${{ secrets.DOCKER_USERNAME }}/shoespectra:latest
 
       - name: Deploy to AWS EC2
