@@ -16,8 +16,8 @@ COPY requirements.txt /app/
 RUN pip install --no-cache-dir --upgrade pip && pip install --no-cache-dir -r requirements.txt
 
 # Copy the application files
-# COPY . /app/
-COPY shoe_spectra/ /app/
+COPY . /app/
+# COPY shoe_spectra/ /app/
 ENV SECRET_KEY="django-insecure-v9zfx2ugz#h+y^m1i!p-=a3efyi55ra&&_1$i-83_so*t0@rpd"
 
 # Expose the Django port
