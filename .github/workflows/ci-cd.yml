@@ -30,7 +30,12 @@ jobs:
 
       - name: Build and Push Docker Image
         run: |
-          docker build -t ${{ secrets.DOCKER_USERNAME }}/shoespectra:latest -f shoe_spectra/Dockerfile shoe_spectra/
+          docker build --build-arg SECRET_KEY=${{ secrets.SECRET_KEY }} \
+                      --build-arg DB_HOST=${{ secrets.DB_HOST }} \
+                      --build-arg DB_NAME=${{ secrets.DB_NAME }} \
+                      --build-arg DB_USER=${{ secrets.DB_USER }} \
+                      --build-arg DB_PASSWORD=${{ secrets.DB_PASSWORD }} \
+                      -t ${{ secrets.DOCKER_USERNAME }}/shoespectra:latest -f shoe_spectra/Dockerfile shoe_spectra/
           docker push ${{ secrets.DOCKER_USERNAME }}/shoespectra:latest
 
       - name: Deploy to AWS EC2
