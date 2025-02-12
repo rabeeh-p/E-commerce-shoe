@@ -16,7 +16,8 @@ COPY requirements.txt /app/
 RUN pip install --no-cache-dir --upgrade pip && pip install --no-cache-dir -r requirements.txt
 
 # Copy the application files
-COPY . /app/
+# COPY . /app/
+COPY shoe_spectra/ /app/
 
 # Expose the Django port
 EXPOSE 8000
@@ -25,4 +26,5 @@ EXPOSE 8000
 RUN python manage.py collectstatic --noinput 
 
 # Start the Django application
-CMD ["python", "manage.py", "runserver", "0.0.0.0:8000"]
+# CMD ["python", "manage.py", "runserver", "0.0.0.0:8000"]
+CMD ["gunicorn", "--bind", "0.0.0.0:8000", "shoe_spectra.wsgi:application"]
