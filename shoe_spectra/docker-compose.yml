@@ -11,16 +11,18 @@ services:
       - "8000:8000"
     depends_on:
       - db
-    environment:
-      - DEBUG=True
-      - DB_NAME=shoe_spectra_pjt
-      - DB_USER=postgres
-      - DB_PASSWORD=admin123
-      - DB_HOST=db
-      - DB_PORT=5432
-      - SECRET_KEY=django-insecure-v9zfx2ugz#h+y^m1i!p-=a3efyi55ra&&_1$i-83_so*t0@rpd
-      - GOOGLE_CLIENT_ID="1026950511350-h4a1dik27uugqja7oe1qhstml3kc0hjh.apps.googleusercontent.com" 
-      - GOOGLE_SECRET_KEY="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"
+    env_file:
+      - .env
+    # environment:
+    #   - DEBUG=True
+    #   - DB_NAME=shoe_spectra_pjt
+    #   - DB_USER=postgres
+    #   - DB_PASSWORD=admin123
+    #   - DB_HOST=db
+    #   - DB_PORT=5432
+    #   - SECRET_KEY=django-insecure-v9zfx2ugz#h+y^m1i!p-=a3efyi55ra&&_1$i-83_so*t0@rpd
+    #   - GOOGLE_CLIENT_ID="1026950511350-h4a1dik27uugqja7oe1qhstml3kc0hjh.apps.googleusercontent.com" 
+    #   - GOOGLE_SECRET_KEY="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"
 
   db:
     image: postgres:latest
