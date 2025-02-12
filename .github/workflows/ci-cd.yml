@@ -39,6 +39,7 @@ jobs:
           AWS_USERNAME: ${{ secrets.AWS_USERNAME }}
           AWS_KEY: ${{ secrets.AWS_KEY }}
 
+
         run: |
           echo "$AWS_KEY" > aws_key.pem
           chmod 600 aws_key.pem
