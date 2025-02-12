@@ -19,6 +19,7 @@ RUN pip install --no-cache-dir --upgrade pip && pip install --no-cache-dir -r re
 COPY . /app/
 # COPY shoe_spectra/ /app/
 ENV SECRET_KEY="django-insecure-v9zfx2ugz#h+y^m1i!p-=a3efyi55ra&&_1$i-83_so*t0@rpd"
+ENV GOOGLE_CLIENT_ID="1026950511350-h4a1dik27uugqja7oe1qhstml3kc0hjh.apps.googleusercontent.com"
 
 # Expose the Django port
 EXPOSE 8000
