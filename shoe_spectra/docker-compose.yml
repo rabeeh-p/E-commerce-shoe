@@ -1,0 +1,39 @@
+version: '3.8'
+
+services:
+  web:
+    build: .
+    container_name: web
+    volumes: 
+      - .:/app
+      - ./staticfiles:/app/staticfiles
+    ports:
+      - "8000:8000"
+    depends_on:
+      - db
+    environment:
+      - DEBUG=True
+      - DB_NAME=shoe_spectra_pjt
+      - DB_USER=postgres
+      - DB_PASSWORD=admin123
+      - DB_HOST=db
+      - DB_PORT=5432
+
+  db:
+    image: postgres:latest
+    container_name: db
+    restart: always
+    environment:
+      - POSTGRES_DB=shoe_spectra_pjt
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=admin123
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    # ports:
+    #   - "5434:5432"
+    ports:
+      - "5432:5432"
+
+volumes:
+  postgres_data:
+  staticfiles:
