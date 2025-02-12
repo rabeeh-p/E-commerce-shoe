@@ -18,6 +18,7 @@ services:
       - DB_PASSWORD=admin123
       - DB_HOST=db
       - DB_PORT=5432
+      - SECRET_KEY=django-insecure-v9zfx2ugz#h+y^m1i!p-=a3efyi55ra&&_1$i-83_so*t0@rpd
 
   db:
     image: postgres:latest
