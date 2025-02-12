@@ -21,6 +21,15 @@ COPY . /app/
 ENV SECRET_KEY="django-insecure-v9zfx2ugz#h+y^m1i!p-=a3efyi55ra&&_1$i-83_so*t0@rpd"
 ENV GOOGLE_CLIENT_ID="1026950511350-h4a1dik27uugqja7oe1qhstml3kc0hjh.apps.googleusercontent.com"
 ENV GOOGLE_SECRET_KEY="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"
+ENV EMAIL_HOST="smtp.gmail.com"  
+ENV EMAIL_PORT="587"  
+ENV EMAIL_USE_TLS="True"  
+ENV EMAIL_HOST_USER="rabeehpuzhakkalakath8547@gmail.com"  
+ENV EMAIL_HOST_PASSWORD="uzvs fzaj uotu kdvi"   
+
+
+
+
 
 # Expose the Django port
 EXPOSE 8000
