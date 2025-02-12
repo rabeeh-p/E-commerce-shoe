@@ -49,6 +49,7 @@ jobs:
           ssh -o StrictHostKeyChecking=no -i aws_key.pem "$AWS_USERNAME@$AWS_IP" << EOF
           set -e
 
+
           echo "Logging into Docker..."
           echo "${{ secrets.DOCKER_PASSWORD }}" | sudo docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
 
