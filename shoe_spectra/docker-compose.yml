@@ -6,10 +6,9 @@ services:
     container_name: web
     volumes: 
       - .:/app
-      # - ./staticfiles:/app/staticfiles
-      # - ./static:/app/static 
-      - /home/ubuntu/static:/app/static   
-      - /home/ubuntu/media:/app/media
+      - ./staticfiles:/app/staticfiles
+      - ./static:/app/static 
+      
     ports:
       - "8000:8000"
     depends_on:
