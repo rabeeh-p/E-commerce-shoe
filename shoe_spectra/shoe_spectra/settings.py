@@ -27,8 +27,8 @@ SECRET_KEY = config('SECRET_KEY')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['13.201.23.100']
-# ALLOWED_HOSTS = []
+# ALLOWED_HOSTS = ['13.201.23.100']
+ALLOWED_HOSTS = []
 
 
 # Application definition
@@ -202,13 +202,9 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'static') 
 
-# STATIC_ROOT = os.path.join(BASE_DIR, 'static')
-# STATIC_ROOT = os.path.join(BASE_DIR, "staticfiles")
-# STATICFILES_DIRS = [
-#     os.path.join(BASE_DIR, 'shoe_spectra', 'static'),   
-# ]
 
-STATICFILES_DIRS = []
+
+
 from django.contrib.messages import constants as messages
 
 
