@@ -6,7 +6,8 @@ services:
     container_name: web
     volumes: 
       - .:/app
-      - ./staticfiles:/app/staticfiles
+      # - ./staticfiles:/app/staticfiles
+      - ./static:/app/static 
     ports:
       - "8000:8000"
     depends_on:
