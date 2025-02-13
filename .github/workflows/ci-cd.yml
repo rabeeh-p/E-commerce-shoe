@@ -80,6 +80,7 @@ jobs:
           postgres:latest
 
 
+
           echo "Starting ShoeSpectra container..."
           docker run -d \
             --name shoespectra \
