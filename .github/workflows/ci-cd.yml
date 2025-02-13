@@ -39,7 +39,7 @@ jobs:
           docker build -t ${{ secrets.DOCKER_USERNAME }}/shoespectra:latest -f ./shoe_spectra/Dockerfile ./shoe_spectra/
           docker push ${{ secrets.DOCKER_USERNAME }}/shoespectra:latest
 
-            - name: Deploy to AWS EC2
+      - name: Deploy to AWS EC2
         env:
           AWS_IP: ${{ secrets.AWS_IP }}
           AWS_USERNAME: ${{ secrets.AWS_USERNAME }}
@@ -61,16 +61,12 @@ jobs:
           docker rm -f shoespectra || true
           docker rm -f db || true
 
-          echo "Creating Docker network if not exists..."
-          docker network create shoespectra-network || true
-
           echo "Pulling latest Docker image..."
           docker pull ${{ secrets.DOCKER_USERNAME }}/shoespectra:latest
 
           echo "Starting database container..."
           docker run -d \
             --name db \
-            --network shoespectra-network \
             -e POSTGRES_DB=${{ secrets.DB_NAME }} \
             -e POSTGRES_USER=${{ secrets.DB_USER }} \
             -e POSTGRES_PASSWORD=${{ secrets.DB_PASSWORD }} \
@@ -81,7 +77,6 @@ jobs:
           echo "Starting ShoeSpectra container..."
           docker run -d \
             --name shoespectra \
-            --network shoespectra-network \
             -p 8000:8000 \
             --env-file /home/$AWS_USERNAME/.env \
             --restart unless-stopped \
