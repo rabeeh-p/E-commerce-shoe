@@ -69,14 +69,16 @@ jobs:
 
           echo "Starting database container..."
           docker run -d \
-            --name db \
-            --network shoespectra-network \
-            -e POSTGRES_DB=${{ secrets.DB_NAME }} \
-            -e POSTGRES_USER=${{ secrets.DB_USER }} \
-            -e POSTGRES_PASSWORD=${{ secrets.DB_PASSWORD }} \
-            -p 5432:5432 \
-            --restart unless-stopped \
-            postgres:latest
+          --name db \
+          --network shoespectra-network \
+          -e POSTGRES_DB=${{ secrets.DB_NAME }} \
+          -e POSTGRES_USER=${{ secrets.DB_USER }} \
+          -e POSTGRES_PASSWORD=${{ secrets.DB_PASSWORD }} \
+          -p 5432:5432 \
+          -v postgres_data:/var/lib/postgresql/data \   
+          --restart unless-stopped \
+          postgres:latest
+
 
           echo "Starting ShoeSpectra container..."
           docker run -d \
