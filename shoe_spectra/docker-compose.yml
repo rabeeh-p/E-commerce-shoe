@@ -7,7 +7,9 @@ services:
     volumes: 
       - .:/app
       # - ./staticfiles:/app/staticfiles
-      - ./static:/app/static 
+      # - ./static:/app/static 
+      - /home/ubuntu/static:/app/static   
+      - /home/ubuntu/media:/app/media
     ports:
       - "8000:8000"
     depends_on:
