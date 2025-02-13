@@ -30,6 +30,8 @@ urlpatterns = [
 
 
 
+
+
     # GOOGLE
     path('accounts/', include('allauth.urls'),name='google'),
 ]
