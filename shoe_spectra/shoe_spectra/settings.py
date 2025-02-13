@@ -200,13 +200,13 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 
 STATIC_URL = '/static/'
-STATIC_ROOT = "/app/static"
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles') 
 
 # STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 # STATIC_ROOT = os.path.join(BASE_DIR, "staticfiles")
-# STATICFILES_DIRS = [
-#     os.path.join(BASE_DIR, 'shoe_spectra', 'static'),   
-# ]
+STATICFILES_DIRS = [
+    os.path.join(BASE_DIR, 'shoe_spectra', 'static'),   
+]
 
 from django.contrib.messages import constants as messages
 
