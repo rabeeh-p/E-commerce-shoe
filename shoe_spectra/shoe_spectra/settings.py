@@ -208,6 +208,8 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 from django.contrib.messages import constants as messages
 
 
+
+
 MESSAGE_TAGS = {
   
     messages.ERROR: 'alert alert-danger',     # Error messages
