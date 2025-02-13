@@ -6,7 +6,6 @@ services:
     container_name: web
     volumes: 
       - .:/app
-      - ./staticfiles:/app/staticfiles
       - ./static:/app/static 
       
     ports:
